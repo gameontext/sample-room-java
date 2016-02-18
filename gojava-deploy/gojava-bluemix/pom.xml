@@ -4,16 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>myGroupId</groupId>
+        <groupId>org.gameon.walkthrough</groupId>
         <artifactId>gojava-deploy</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>myGroupId</groupId>
+    <groupId>org.gameon.walkthrough</groupId>
     <artifactId>gojava-bluemix</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
-    
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -21,7 +21,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <scm>
         <connection>scm:git:git@github.com:WASdev/tool.artisan.core.git</connection>
         <developerConnection>scm:git@github.com:WASdev/tool.artisan.core.git</developerConnection>
@@ -30,7 +30,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>myGroupId</groupId>
+            <groupId>org.gameon.walkthrough</groupId>
             <artifactId>gojava-wlpcfg</artifactId>
             <version>1.0-SNAPSHOT</version>
             <type>liberty-assembly</type>
@@ -43,12 +43,12 @@
         <cf.context>eu-gb.mybluemix.net</cf.context>
         <cf.target>https://api.eu-gb.bluemix.net</cf.target>
         <cf.space>dev</cf.space>
-        <!-- The cloud foundry organization, username and password can be 
+        <!-- The cloud foundry organization, username and password can be
             entered here. -->
         <!-- <cf.org></cf.org> -->
         <!-- <cf.username></cf.username> -->
         <!-- <cf.password></cf.password> -->
-        <app.name>liberty-app-builder</app.name>
+        <app.name>gojava-application</app.name>
         <war.name>gojava-application-1.0-SNAPSHOT</war.name>
         <cf.context.root>${app.name}.${cf.context}/${war.name}</cf.context.root>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -103,6 +103,15 @@
                                         must be provided with the
                                         bluemix profile.</message>
                                 </requireProperty>
+                                <requireProperty>
+                                    <property>gameon.id</property>
+                                    <message>This is your Game On! user id.</message>
+                                </requireProperty>
+                                <requireProperty>
+                                    <property>gameon.secret</property>
+                                    <message>This is the Shared Secret
+                                        associated with your user id.</message>
+                                </requireProperty>
                             </rules>
                         </configuration>
                     </execution>
@@ -142,6 +151,10 @@
                     <password>${cf.password}</password>
                     <appname>${app.name}</appname>
                     <memory>512</memory>
+                    <env>
+                        <GAMEON_ID>${gameon.id}</GAMEON_ID>
+                        <GAMEON_SECRET>${gameon.secret}</GAMEON_SECRET>
+                    </env>
                 </configuration>
                 <executions>
                     <execution>

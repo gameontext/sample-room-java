@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>myParentGroupId</groupId>
+        <groupId>org.gameon.walkthrough</groupId>
         <artifactId>gojava</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>myGroupId</groupId>
+    <groupId>org.gameon.walkthrough</groupId>
     <artifactId>gojava-wlpcfg</artifactId>
     <packaging>liberty-assembly</packaging>
     <version>1.0-SNAPSHOT</version>
@@ -40,7 +40,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>myGroupId</groupId>
+            <groupId>org.gameon.walkthrough</groupId>
             <artifactId>${warName}</artifactId>
             <version>${warVersion}</version>
             <type>war</type>
