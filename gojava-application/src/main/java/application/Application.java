@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *******************************************************************************/ 
+ *******************************************************************************/
 package application;
 
 import java.io.BufferedReader;
@@ -69,13 +69,13 @@ import javax.websocket.server.ServerEndpoint;
 
 /**
  * A very simple room.
- * 
- * The intent of this file is to keep an entire room implementation within one Java file, 
- * and to try to minimise its reliance on outside technologies, beyond those required by 
+ *
+ * The intent of this file is to keep an entire room implementation within one Java file,
+ * and to try to minimise its reliance on outside technologies, beyond those required by
  * gameon (WebSockets, Json)
- * 
+ *
  * Although it would be trivial to refactor out into multiple classes, doing so can make it
- * harder to see 'everything' needed for a room in one go. 
+ * harder to see 'everything' needed for a room in one go.
  */
 @ServerEndpoint("/room")
 @WebListener
@@ -117,15 +117,15 @@ public class Application implements ServletContextListener {
     private String buildHmac(List<String> stuffToHash, String key) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException{
         Mac mac = Mac.getInstance("HmacSHA256");
         mac.init(new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256"));
-        
+
         StringBuffer hashData = new StringBuffer();
         for(String s: stuffToHash){
-            hashData.append(s);            
+            hashData.append(s);
         }
-        
+
         return Base64.getEncoder().encodeToString( mac.doFinal(hashData.toString().getBytes("UTF-8")) );
     }
-    
+
     /**
      * The gameon-sig-body header requires the sha256 hash of the body content. This method calculates it.
      * @param data The string to hash
@@ -135,11 +135,11 @@ public class Application implements ServletContextListener {
      */
     private String buildHash(String data) throws NoSuchAlgorithmException, UnsupportedEncodingException{
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(data.getBytes("UTF-8")); 
+        md.update(data.getBytes("UTF-8"));
         byte[] digest = md.digest();
         return Base64.getEncoder().encodeToString( digest );
     }
-    
+
     /**
      * A Trust Manager that trusts everyone.
      */
@@ -151,20 +151,20 @@ public class Application implements ServletContextListener {
         public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {   }
     }
     /**
-     * A Hostname verifier that agrees everything is verified. 
+     * A Hostname verifier that agrees everything is verified.
      */
     public class TheNotVerySensibleHostnameVerifier implements HostnameVerifier {
         public boolean verify(String string, SSLSession sslSession) {
             return true;
         }
     }
-    
+
     /**
      * Entry point at application start, we use this to test for & perform room registration.
      */
     @Override
     public final void contextInitialized(final ServletContextEvent e) {
-              
+
         // for running against the real remote gameon.
         String registrationUrl = "https://game-on.org/map/v1/sites";
         String endPointUrl;
@@ -203,13 +203,13 @@ public class Application implements ServletContextListener {
         try {
             // build the query request.
             String queryParams = "name=" + name + "&owner=" + userId;
-            
+
             TrustManager[] trustManager = new TrustManager[] {new TheVeryTrustingTrustManager()};
 
-            // We don't want to worry about importing the game-on cert into 
+            // We don't want to worry about importing the game-on cert into
             // the jvm trust store.. so instead, we'll create an ssl config
-            // that no longer cares. 
-            // This is handy for testing, but for production you'd probably 
+            // that no longer cares.
+            // This is handy for testing, but for production you'd probably
             // want to goto the effort of setting up a truststore correctly.
             SSLContext sslContext = null;
             try {
@@ -220,7 +220,7 @@ public class Application implements ServletContextListener {
             }catch (KeyManagementException ex) {
                 System.out.println("Key management exception!! ");
             }
-            
+
             HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 
             // build the complete query url..
@@ -238,10 +238,10 @@ public class Application implements ServletContextListener {
             int httpResult = con.getResponseCode();
             if (httpResult == HttpURLConnection.HTTP_OK ) {
                 //if the result was 200, then we found a room with this id & owner..
-                //which is either a previous registration by us, or another room with 
+                //which is either a previous registration by us, or another room with
                 //the same owner & roomname
                 //We won't register our room in this case, although we _could_ choose
-                //do do an update instead.. (we'd need to parse the json response, and 
+                //do do an update instead.. (we'd need to parse the json response, and
                 //collect the room id, then do a PUT request with our new data.. )
                 System.out.println("We are already registered, there is no need to register this room");
             } else {
@@ -269,21 +269,21 @@ public class Application implements ServletContextListener {
                                                    // type.
                 connInfo.add("target", endPointUrl);
                 registrationPayload.add("connectionDetails", connInfo.build());
-                                               
+
                 String registrationPayloadString = registrationPayload.build().toString();
-                
+
                 Instant now = Instant.now();
                 String dateValue = now.toString();
 
                 String bodyHash = buildHash(registrationPayloadString);
-                
+
                 System.out.println("Building hmac with "+userId+dateValue+bodyHash);
                 String hmac = buildHmac(Arrays.asList(new String[] {
                                            userId,
                                            dateValue,
                                            bodyHash
                                        }),key);
-                
+
 
                 // build the complete registration url..
                 System.out.println("Beginning registration using url " + registrationUrl);
@@ -300,7 +300,7 @@ public class Application implements ServletContextListener {
                 con.setRequestProperty("gameon-sig-body", bodyHash);
                 con.setRequestProperty("gameon-signature", hmac);
                 OutputStream os = con.getOutputStream();
-                
+
                 os.write(registrationPayloadString.getBytes("UTF-8"));
                 os.close();
 
@@ -353,7 +353,7 @@ public class Application implements ServletContextListener {
     @OnOpen
     public void onOpen(Session session, EndpointConfig ec) {
         System.out.println("A new connection has been made to the room.");
-        //send ack 
+        //send ack
         try{
             JsonObjectBuilder ack = Json.createObjectBuilder();
             JsonArrayBuilder versions = Json.createArrayBuilder();

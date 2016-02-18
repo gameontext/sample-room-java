@@ -1,12 +1,12 @@
-<!-- 
+<!--
   Copyright (c) 2015 IBM Corp.
- 
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,53 +16,31 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <h1>Welcome to your Liberty Application</h1>
-    <p>Thanks for generating this project using the Liberty Starter.  Please see below for some extra information on each of the technologies you chose</p>
-    <div id="technologies">
-<div>
-	<h2>WebSockets</h2>
-	<p>
-		For the complete feature documentation, see the <a
-			href="http://www.ibm.com/support/knowledgecenter/SSAW57_8.5.5/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_feat.html%23rwlp_feat__websocket-1.0">websocket-1.1</a>
-		feature description in IBM Knowledge Center.
-	</p>
-</div><div>
-	<h2>REST</h2>
-	<p>
-		Inside the application project there is a application.rest package
-		containing the
-		<code>LibertyRestEndpoint</code>
-		class. This adds a REST endpoint which you can access at <a
-			href="rest">/rest</a>
-	<p>
-		Inside the wlpcfg project there is the
-		<code>it.rest.LibertyRestEndpointTest</code>
-		that will test the REST endpoint to ensure it is working.
-	</p>
-	<p>
-		For the complete feature documentation, see the <a
-			href="http://www.ibm.com/support/knowledgecenter/SSAW57_8.5.5/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_feat.html%23rwlp_feat__jaxrs-2.0">jaxrs-2.0</a>
-		feature description in IBM Knowledge Center.
-	</p>
-</div><div>
-	<h2>Servlet</h2>
-	<p>
-		Inside the application project there is a application.servlet package
-		containing the
-		<code>LibertyServlet</code>
-		class. This adds a servlet with an endpoint which you can access at <a
-			href="servlet">/servlet</a>
-	<p>
-		Inside the wlpcfg project there is the
-		<code>it.servlet.LibertyServletTest</code>
-		that will test the servlet's endpoint to ensure it is working.
-	</p>
-	<p>
-		For the complete feature documentation, see the <a
-			href="http://www.ibm.com/support/knowledgecenter/SSAW57_8.5.5/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/rwlp_feat.html%23rwlp_feat__servlet-3.1">servlet-3.1</a>
-		feature description in IBM Knowledge Center.
-	</p>
-</div>    
-    </div>
+    <h1>Your room is running!</h1>
+
+    <p>Consider this your primitive health check, well done!</p>
+
+    <p>Your websocket endpoint is ws://localhost:9080/room. Use browser
+        extensions to play with the WebSocket running locally.</p>
+
+    <p>The <a href="https://gameontext.gitbooks.io/gameon-gitbook/content/microservices/WebsocketProtocol.html">WebSocket protocol</a>
+        used by Game On! is documented in the <a href="https://gameontext.gitbooks.io/gameon-gitbook/content/">book</a>.</p>
+
+    <p>Standing up this initial room was pretty easy, right?</p>
+
+    <p>
+        So, what happens if you want to make this scale? How will the
+        Map service find and connect to the instances of your service?
+    </p><p>
+        Each room instance uses WebSockets to broadcast events and
+        chat to connected players. What happens when you have multiple
+        instances of your room? Do you want all of them to behave as
+        a single room (such that all events are visible in all rooms),
+        or is each an independent/transient sharded instance?
+    </p><p>
+        Want to try adding items? How do you track the state of those
+        items. In memory? In a shared cache? ...
+    </p>
+
 </body>
 </html>

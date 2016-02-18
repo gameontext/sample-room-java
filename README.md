@@ -53,13 +53,19 @@ The source code is located in GitHub, navigate to our [source code](https://gith
 
 1. `cd gameon-room-java`
 2. `mvn install`
-3. Use a maven target to push the application to bluemix
+  After running this, you will have the server running locally at [http://localhost:9080/](http://localhost:9080/).
+  You can use a browser extension to play with the websocket according to the
+  [Game On! WebSocket protocol](https://gameontext.gitbooks.io/gameon-gitbook/content/microservices/WebsocketProtocol.html").
+
+  Use `mvn clean -P stopServer` to stop the server.
+
+3. Use a maven target profile to push the application to bluemix:
 ```
 mvn install -P bluemix \
     -Dcf.org= <your organization> \
     -Dcf.username=<your username> \
     -Dcf.password=<your password> \
-    -Dcf.target=https://api.ng.bluemix.net` \
+    -Dcf.target=https://api.ng.bluemix.net \
     -Dgameon.id=<Your Game On! ID> \
     -Dgameon.secret=<Your Game On! Shared Secret>
 ```
@@ -71,6 +77,7 @@ mvn install -P bluemix \
   * `cf.context=eu-gb.mybluemix.net`
   * `cf.target=https://api.eu-gb.bluemix.net`
   * `cf.space=dev`
+  * `app.name=gameon-room-java`
 
 ## Access room on Game On!
 

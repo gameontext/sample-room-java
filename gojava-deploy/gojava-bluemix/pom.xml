@@ -48,7 +48,7 @@
         <!-- <cf.org></cf.org> -->
         <!-- <cf.username></cf.username> -->
         <!-- <cf.password></cf.password> -->
-        <app.name>gojava-application</app.name>
+        <app.name>gameon-room-java</app.name>
         <war.name>gojava-application-1.0-SNAPSHOT</war.name>
         <cf.context.root>${app.name}.${cf.context}/${war.name}</cf.context.root>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
