@@ -24,9 +24,11 @@ Gameon-room-nodejs when deployed using an instant runtime requires:
     that contains the IBM JDK (Windows, Linux)
 
 ## Create Bluemix accounts and log in
+
 To build a Game On! room in Bluemix, you will first need a Bluemix account.
 
 ### Sign up and log in to Bluemix and DevOps
+
 Sign up for Bluemix at https://console.ng.bluemix.net and DevOps Services at https://hub.jazz.net. When you sign up, you'll create an IBM ID, create an alias, and register with Bluemix.
 
 * Make a note of your username and org, as you will need both later.
@@ -36,10 +38,10 @@ Sign up for Bluemix at https://console.ng.bluemix.net and DevOps Services at htt
 
 For a new room to register with the Game-On server, you must first log into game-on.org and sign in using one of several methods to get your **Game On! ID** and **Shared Secret**.
 
-1.  Go to [https://game-on.org/](https://game-on.org/) and click **Play**.
-2.  Select any authentication method to log in with your username and password for that type.
-3.  Click the **Edit Profile** button (the person icon) at the top right.
-4.  You should now see **Game On! ID** and **Shared Secret** near the bottom of the page.  (If necessary, refresh the page, or even log out and log back in, to generate your **Shared Secret**).  Please make note of your **Game On! ID** and **Shared Secret** for later in the walkthrough.
+1.  Go to [https://game-on.org/](https://game-on.org/) and click **Enter**.
+2.  Select an authentication method to log in with your username and password for that type.
+3.  View your user profile using the link in the top right. It is either your username or a person icon.
+4.  You should now see your **Game On! ID** and **Shared Secret** near the bottom of the page.
 
 ## Getting the source code
 
