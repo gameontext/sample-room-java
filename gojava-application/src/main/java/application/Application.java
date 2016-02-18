@@ -77,7 +77,7 @@ import javax.websocket.server.ServerEndpoint;
  * Although it would be trivial to refactor out into multiple classes, doing so can make it
  * harder to see 'everything' needed for a room in one go. 
  */
-@ServerEndpoint("/simpleRoom")
+@ServerEndpoint("/room")
 @WebListener
 public class Application implements ServletContextListener {
 
@@ -169,9 +169,17 @@ public class Application implements ServletContextListener {
         String registrationUrl = "https://game-on.org/map/v1/sites";
         String endPointUrl;
 
-        // credentials, obtained from the gameon instance to connect to.
-        String userId = "twitter:281946000";
-        String key = "C4BiYeU9R8CgD48JI7M1Un5+dhGUo0VTlRevA557W0g=";
+        // credentials, read from the cf environment, and 
+		// originally obtained from the gameon instance to connect to.		
+        String userId = System.getenv("GAMEON_ID");
+        String key = System.getenv("GAMEON_SECRET");
+		if(userId == null || key == null){
+		    System.out.println("This room is intended to obtain it's configuration from the CF environment");
+			System.out.println("GameOn! userid or secret is missing from the environment.");
+			System.out.println("You should have supplied these via `-Dgameon.id=myid -Dgameon.secret=mysecret` when running mvn install");
+			System.out.println("Or you could configure them directly in the environment variables panel from your bluemix console for the app");
+			return;
+		}
         
         //if we're running in a cf, we should use the details from those environment vars.
         String vcap_application = System.getenv("VCAP_APPLICATION");
@@ -182,7 +190,7 @@ public class Application implements ServletContextListener {
             JsonObject vcapApplication = Json.createReader(new StringReader(vcap_application)).readObject();
             JsonArray uris = vcapApplication.getJsonArray("application_uris");
             JsonString firstUriAsString = uris.getJsonString(0);
-            endPointUrl = "ws://"+firstUriAsString.getString()+contextPath+"/simpleRoom";           
+            endPointUrl = "ws://"+firstUriAsString.getString()+contextPath+"/room";           
             System.out.println("Using CF details of "+endPointUrl);
         }else{
             System.out.println("This room is intended to obtain it's configuration from the CF environment");
