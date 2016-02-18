@@ -1,0 +1,162 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>myGroupId</groupId>
+        <artifactId>gojava-deploy</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>myGroupId</groupId>
+    <artifactId>gojava-bluemix</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://raw.github.com/WASdev/tool.artisan.core/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <scm>
+        <connection>scm:git:git@github.com:WASdev/tool.artisan.core.git</connection>
+        <developerConnection>scm:git@github.com:WASdev/tool.artisan.core.git</developerConnection>
+        <url>git@github.com:WASdev/tool.artisan.core.git</url>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>myGroupId</groupId>
+            <artifactId>gojava-wlpcfg</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>liberty-assembly</type>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <cf.context>eu-gb.mybluemix.net</cf.context>
+        <cf.target>https://api.eu-gb.bluemix.net</cf.target>
+        <cf.space>dev</cf.space>
+        <!-- The cloud foundry organization, username and password can be 
+            entered here. -->
+        <!-- <cf.org></cf.org> -->
+        <!-- <cf.username></cf.username> -->
+        <!-- <cf.password></cf.password> -->
+        <app.name>liberty-app-builder</app.name>
+        <war.name>gojava-application-1.0-SNAPSHOT</war.name>
+        <cf.context.root>${app.name}.${cf.context}/${war.name}</cf.context.root>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+                <executions>
+                    <execution>
+                        <id>copy-server-package</id>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeTypes>liberty-assembly</includeTypes>
+                            <outputDirectory>${project.build.directory}/app</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-bluemix-credentials</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireProperty>
+                                    <property>cf.org</property>
+                                    <message>The cf.org property must be
+                                        provided with the bluemix
+                                        profile.</message>
+                                </requireProperty>
+                                <requireProperty>
+                                    <property>cf.username</property>
+                                    <message>The cf.username property
+                                        must be provided with the
+                                        bluemix profile.</message>
+                                </requireProperty>
+                                <requireProperty>
+                                    <property>cf.password</property>
+                                    <message>The cf.password property
+                                        must be provided with the
+                                        bluemix profile.</message>
+                                </requireProperty>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <echo>Running bluemix profile with the following properties:
+                                        cf.target=${cf.target}
+                                        cf.space=${cf.space}
+                                        cf.org=${cf.org}
+                                        cf.username=${cf.username}
+                                      The application will be accessed at context root ${cf.context.root}</echo>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.cloudfoundry</groupId>
+                <artifactId>cf-maven-plugin</artifactId>
+                <version>1.1.3</version>
+                <configuration>
+                    <target>${cf.target}</target>
+                    <org>${cf.org}</org>
+                    <space>${cf.space}</space>
+                    <username>${cf.username}</username>
+                    <password>${cf.password}</password>
+                    <appname>${app.name}</appname>
+                    <memory>512</memory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>push</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <path>${project.build.directory}/app/gojava-wlpcfg-1.0-SNAPSHOT.zip</path>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

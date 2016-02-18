@@ -1,0 +1,171 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>myGroupId</groupId>
+        <artifactId>gojava-deploy</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>myGroupId</groupId>
+    <artifactId>gojava-localServer</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://raw.github.com/WASdev/tool.artisan.core/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <scm>
+        <connection>scm:git:git@github.com:WASdev/tool.artisan.core.git</connection>
+        <developerConnection>scm:git@github.com:WASdev/tool.artisan.core.git</developerConnection>
+        <url>git@github.com:WASdev/tool.artisan.core.git</url>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>myGroupId</groupId>
+            <artifactId>gojava-wlpcfg</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>liberty-assembly</type>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <wlpServerName>gojava-room</wlpServerName>
+        <testServerHttpPort>9080</testServerHttpPort>
+        <testServerHttpsPort>9443</testServerHttpsPort>
+        <warName>gojava-application-1.0-SNAPSHOT</warName>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- Enable liberty-maven plugin -->
+            <plugin>
+                <groupId>net.wasdev.wlp.maven.plugins</groupId>
+                <artifactId>liberty-maven-plugin</artifactId>
+                <version>1.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverName>${wlpServerName}</serverName>
+                    <installDirectory>${libertyInstallDirectory}/wlp</installDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>start-server</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>start-server</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <executions>
+                    <execution>
+                        <id>compile-test</id>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>echo_server_started</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <echo>************************************************************</echo>
+                                <echo>************************************************************</echo>
+                                <echo>Your application is running at http://localhost:${testServerHttpPort}/${warName}/</echo>
+                                <echo>************************************************************</echo>
+                                <echo>You will need to stop your server before running mvn install again:</echo>
+                                <echo>mvn clean -P stopServer</echo>
+                                <echo>************************************************************</echo>
+                                <echo>************************************************************</echo>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <profiles>
+        <profile>
+            <id>use-wlpcfg-liberty</id>
+            <!-- We installed Liberty earlier to run functional tests so use that install -->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <libertyInstallDirectory>${basedir}/../../gojava-wlpcfg/target</libertyInstallDirectory>
+            </properties>
+        </profile>
+
+
+        <profile>
+            <id>existing-install</id>
+            <activation>
+                <property>
+                    <name>install.directory</name>
+                </property>
+            </activation>
+            <properties>
+                <libertyInstallDirectory>${install.directory}</libertyInstallDirectory>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugins</artifactId>
+                        <version>1.4.1</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-directory</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireProperty>
+                                            <property>install.directory</property>
+                                            <message>The
+                                                install.directory
+                                                property must be
+                                                provided with this
+                                                profile and must point
+                                                to your Liberty install.</message>
+                                        </requireProperty>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
