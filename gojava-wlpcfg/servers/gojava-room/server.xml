@@ -13,8 +13,6 @@
   limitations under the License.-->
 <server description="Game On! Java-based Room">
 
-
-
     <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
         id="defaultHttpEndpoint" />
 

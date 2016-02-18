@@ -13,7 +13,7 @@
     <artifactId>gojava-localServer</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
-    
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -21,7 +21,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <scm>
         <connection>scm:git:git@github.com:WASdev/tool.artisan.core.git</connection>
         <developerConnection>scm:git@github.com:WASdev/tool.artisan.core.git</developerConnection>
@@ -44,6 +44,7 @@
         <testServerHttpPort>9080</testServerHttpPort>
         <testServerHttpsPort>9443</testServerHttpsPort>
         <warName>gojava-application-1.0-SNAPSHOT</warName>
+        <contextRoot></contextRoot>
     </properties>
 
     <build>
@@ -96,7 +97,7 @@
                             <tasks>
                                 <echo>************************************************************</echo>
                                 <echo>************************************************************</echo>
-                                <echo>Your application is running at http://localhost:${testServerHttpPort}/${warName}/</echo>
+                                <echo>Your application is running at http://localhost:${testServerHttpPort}/${contextRoot}</echo>
                                 <echo>************************************************************</echo>
                                 <echo>You will need to stop your server before running mvn install again:</echo>
                                 <echo>mvn clean -P stopServer</echo>
