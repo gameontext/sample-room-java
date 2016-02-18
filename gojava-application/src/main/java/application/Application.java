@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 import javax.crypto.Mac;
@@ -97,6 +98,8 @@ public class Application implements ServletContextListener {
     private static final String description = "You are in the worlds most simple room, there is nothing to do here.";
 
     private static long bookmark = 0;
+    
+    private final Set<Session> sessions = new CopyOnWriteArraySet<Session>();
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Room registration
@@ -164,32 +167,28 @@ public class Application implements ServletContextListener {
               
         // for running against the real remote gameon.
         String registrationUrl = "https://game-on.org/map/v1/sites";
-        String endPointUrl = "ws://<ip and port of host that gameon can reach>/rooms/simpleRoom";
-
-        // for when running in a docker container with game-on all running
-        // locally.
-        //String registrationUrl = "http://map:9080/map/v1/sites";
-        //String endPointUrl = "ws://simpleroom:9080/rooms/simpleRoom";
+        String endPointUrl;
 
         // credentials, obtained from the gameon instance to connect to.
         String userId = "twitter:281946000";
         String key = "C4BiYeU9R8CgD48JI7M1Un5+dhGUo0VTlRevA557W0g=";
-		
-		//if we're running in a cf, we should use the details from those environment vars.
-		String vcap_application = System.getenv("VCAP_APPLICATION");
-		if(vcap_application!=null){			
-			ServletContext sc = e.getServletContext();
-			String contextPath = sc.getContextPath();
-			
-			JsonObject vcapApplication = Json.createReader(new StringReader(vcap_application)).readObject();
-			JsonArray uris = vcapApplication.getJsonArray("application_uris");
-			JsonString firstUriAsString = uris.getJsonString(0);
-			endPointUrl = "ws://"+firstUriAsString.getString()+contextPath+"/simpleRoom";			
-			System.out.println("Using CF details of "+endPointUrl);
-		}else{
-			System.out.println("Hmm.. not running in CF?");
-			return;
-		}
+        
+        //if we're running in a cf, we should use the details from those environment vars.
+        String vcap_application = System.getenv("VCAP_APPLICATION");
+        if(vcap_application!=null){         
+            ServletContext sc = e.getServletContext();
+            String contextPath = sc.getContextPath();
+            
+            JsonObject vcapApplication = Json.createReader(new StringReader(vcap_application)).readObject();
+            JsonArray uris = vcapApplication.getJsonArray("application_uris");
+            JsonString firstUriAsString = uris.getJsonString(0);
+            endPointUrl = "ws://"+firstUriAsString.getString()+contextPath+"/simpleRoom";           
+            System.out.println("Using CF details of "+endPointUrl);
+        }else{
+            System.out.println("This room is intended to obtain it's configuration from the CF environment");
+			System.out.println("Please run this room as a CF app");
+            return;
+        }
 
 
         // check if we are already registered..
@@ -366,7 +365,10 @@ public class Application implements ServletContextListener {
     }
 
     @OnError
-    public void onError(Throwable t) {
+    public void onError(Session session, Throwable t) {
+        if(session!=null){
+            sessions.remove(session);
+        }
         System.out.println("Websocket connection has broken");
         t.printStackTrace();
     }
@@ -375,6 +377,7 @@ public class Application implements ServletContextListener {
     public void receiveMessage(String message, Session session) throws IOException {
         String[] contents = splitRouting(message);
         if (contents[0].equals("roomHello")) {
+            sessions.add(session);
             addNewPlayer(session, contents[2]);
             return;
         }
@@ -420,6 +423,7 @@ public class Application implements ServletContextListener {
 
     // remove a player from the room.
     private void removePlayer(Session session, String json) throws IOException {
+        sessions.remove(session);
         JsonObject msg = Json.createReader(new StringReader(json)).readObject();
         String username = getValue(msg.get(USERNAME));
         String userid = getValue(msg.get(USERID));
@@ -479,9 +483,13 @@ public class Application implements ServletContextListener {
         response.add(CONTENT, content.build());
         response.add(BOOKMARK, bookmark++);
 
-        String target = messageForRoom == null ? userid : "*";
-
-        session.getBasicRemote().sendText("player," + target + "," + response.build().toString());
+        if(messageForRoom==null){
+            session.getBasicRemote().sendText("player," + userid + "," + response.build().toString());
+        }else{
+            for(Session s : sessions){
+                s.getBasicRemote().sendText("player,*," + response.build().toString());
+            }
+        }
     }
 
     private void sendChatMessage(Session session, String message, String userid, String username) throws IOException {
@@ -490,7 +498,9 @@ public class Application implements ServletContextListener {
         response.add(USERNAME, username);
         response.add(CONTENT, message);
         response.add(BOOKMARK, bookmark++);
-        session.getBasicRemote().sendText("player," + "*" + "," + response.build().toString());
+        for(Session s : sessions){
+            s.getBasicRemote().sendText("player,*," + response.build().toString());
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
