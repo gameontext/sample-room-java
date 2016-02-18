@@ -66,18 +66,20 @@ mvn install -P bluemix \
     -Dcf.username=<your username> \
     -Dcf.password=<your password> \
     -Dcf.target=https://api.ng.bluemix.net \
+    -Dapp.name=<cf-app-name> \
     -Dgameon.id=<Your Game On! ID> \
-    -Dgameon.secret=<Your Game On! Shared Secret>
+    -Dgameon.secret=<Your Game On! Shared Secret> \
 ```
+
 
 ### Additional notes:
 
-* gameon.id and gameon.secret are those retrieved [earlier](https://github.com/cfsworkload/gameon-room-java#get-game-on-id-and-shared-secret).
+* `app.name` is a unique URL-friendly name for your deployed bluemix application.
+* `gameon.id` and `gameon.secret` are those retrieved [earlier](https://github.com/cfsworkload/gameon-room-java#get-game-on-id-and-shared-secret).
 * Advanced: if you have an existing Bluemix account or require different bluemix settings, you can set them on the command line. The default values that are applied:
   * `cf.context=eu-gb.mybluemix.net`
   * `cf.target=https://api.eu-gb.bluemix.net`
   * `cf.space=dev`
-  * `app.name=gameon-room-java`
 
 ## Access room on Game On!
 

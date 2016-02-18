@@ -48,9 +48,9 @@
         <!-- <cf.org></cf.org> -->
         <!-- <cf.username></cf.username> -->
         <!-- <cf.password></cf.password> -->
-        <app.name>gameon-room-java</app.name>
+        <!-- <app.name>gameon-room-java</app.name> -->
         <war.name>gojava-application-1.0-SNAPSHOT</war.name>
-        <cf.context.root>${app.name}.${cf.context}/${war.name}</cf.context.root>
+        <cf.context.root>${app.name}.${cf.context}/</cf.context.root>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
@@ -87,30 +87,27 @@
                             <rules>
                                 <requireProperty>
                                     <property>cf.org</property>
-                                    <message>The cf.org property must be
-                                        provided with the bluemix
-                                        profile.</message>
+                                    <message>The cf.org property must be provided with the bluemix profile.</message>
                                 </requireProperty>
                                 <requireProperty>
                                     <property>cf.username</property>
-                                    <message>The cf.username property
-                                        must be provided with the
-                                        bluemix profile.</message>
+                                    <message>The cf.username property must be provided with the bluemix profile.</message>
                                 </requireProperty>
                                 <requireProperty>
                                     <property>cf.password</property>
-                                    <message>The cf.password property
-                                        must be provided with the
-                                        bluemix profile.</message>
+                                    <message>The cf.password property must be provided with the bluemix profile.</message>
                                 </requireProperty>
                                 <requireProperty>
                                     <property>gameon.id</property>
-                                    <message>This is your Game On! user id.</message>
+                                    <message>The gameon.id property must be provided with your Game On! user id.</message>
                                 </requireProperty>
                                 <requireProperty>
                                     <property>gameon.secret</property>
-                                    <message>This is the Shared Secret
-                                        associated with your user id.</message>
+                                    <message>The gameon.secret property must be provided with the Shared Secret associated with your gameon.id.</message>
+                                </requireProperty>
+                                <requireProperty>
+                                    <property>app.name</property>
+                                    <message>The app.name property must be provided with a unique URL-friendly name for your deployed bluemix service.</message>
                                 </requireProperty>
                             </rules>
                         </configuration>

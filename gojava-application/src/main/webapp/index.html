@@ -15,13 +15,20 @@
 -->
 <!DOCTYPE html>
 <html>
-<body>
+<head>
+
+</head>
+<body style="width: 80%">
+
     <h1>Your room is running!</h1>
 
     <p>Consider this your primitive health check, well done!</p>
 
-    <p>Your websocket endpoint is ws://localhost:9080/room. Use browser
-        extensions to play with the WebSocket running locally.</p>
+    <p>Your websocket endpoint is <b><span id="socketUrl"></span></b>.
+        Use browser extensions to play with the WebSocket directly,
+        or go to <a href="http://game-on.org/">http://game-on.org/</a>
+        and check out the <code>/listmyrooms</code> command in
+        First Room.</p>
 
     <p>The <a href="https://gameontext.gitbooks.io/gameon-gitbook/content/microservices/WebsocketProtocol.html">WebSocket protocol</a>
         used by Game On! is documented in the <a href="https://gameontext.gitbooks.io/gameon-gitbook/content/">book</a>.</p>
@@ -39,8 +46,14 @@
         or is each an independent/transient sharded instance?
     </p><p>
         Want to try adding items? How do you track the state of those
-        items. In memory? In a shared cache? ...
+        items: In memory? In a shared cache? ...
     </p>
+
+    <p> Go play. Game On!</p>
+
+    <script>
+    document.getElementById('socketUrl').innerHTML = "ws://" + window.document.location.host + '/room';
+    </script>
 
 </body>
 </html>
