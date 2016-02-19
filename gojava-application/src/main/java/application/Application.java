@@ -16,6 +16,7 @@
 package application;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -42,7 +43,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.json.Json;
 import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonString;
@@ -59,11 +59,14 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.EncodeException;
 import javax.websocket.EndpointConfig;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
+import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
@@ -88,6 +91,8 @@ public class Application implements ServletContextListener {
     private final static String LOCATION = "location";
     private final static String TYPE = "type";
     private final static String NAME = "name";
+    private final static String EXIT = "exit";
+    private final static String EXIT_ID = "exitId";
     private final static String FULLNAME = "fullName";
     private final static String DESCRIPTION = "description";
 
@@ -97,8 +102,10 @@ public class Application implements ServletContextListener {
     private static final String fullName = "A Very Simple Room.";
     private static final String description = "You are in the worlds most simple room, there is nothing to do here.";
 
+    List<String> directions = Arrays.asList( "n", "s", "e", "w", "u", "d");
+
     private static long bookmark = 0;
-    
+
     private final Set<Session> sessions = new CopyOnWriteArraySet<Session>();
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,32 +176,32 @@ public class Application implements ServletContextListener {
         String registrationUrl = "https://game-on.org/map/v1/sites";
         String endPointUrl;
 
-        // credentials, read from the cf environment, and 
-		// originally obtained from the gameon instance to connect to.		
+        // credentials, read from the cf environment, and
+        // originally obtained from the gameon instance to connect to.
         String userId = System.getenv("GAMEON_ID");
         String key = System.getenv("GAMEON_SECRET");
-		if(userId == null || key == null){
-		    System.out.println("This room is intended to obtain it's configuration from the CF environment");
-			System.out.println("GameOn! userid or secret is missing from the environment.");
-			System.out.println("You should have supplied these via `-Dgameon.id=myid -Dgameon.secret=mysecret` when running mvn install");
-			System.out.println("Or you could configure them directly in the environment variables panel from your bluemix console for the app");
-			return;
-		}
-        
+        if(userId == null || key == null){
+            System.out.println("This room is intended to obtain it's configuration from the CF environment");
+            System.out.println("GameOn! userid or secret is missing from the environment.");
+            System.out.println("You should have supplied these via `-Dgameon.id=myid -Dgameon.secret=mysecret` when running mvn install");
+            System.out.println("Or you could configure them directly in the environment variables panel from your bluemix console for the app");
+            return;
+        }
+
         //if we're running in a cf, we should use the details from those environment vars.
         String vcap_application = System.getenv("VCAP_APPLICATION");
-        if(vcap_application!=null){         
+        if(vcap_application!=null){
             ServletContext sc = e.getServletContext();
             String contextPath = sc.getContextPath();
-            
+
             JsonObject vcapApplication = Json.createReader(new StringReader(vcap_application)).readObject();
             JsonArray uris = vcapApplication.getJsonArray("application_uris");
             JsonString firstUriAsString = uris.getJsonString(0);
-            endPointUrl = "ws://"+firstUriAsString.getString()+contextPath+"/room";           
+            endPointUrl = "ws://"+firstUriAsString.getString()+contextPath+"/room";
             System.out.println("Using CF details of "+endPointUrl);
         }else{
             System.out.println("This room is intended to obtain it's configuration from the CF environment");
-			System.out.println("Please run this room as a CF app");
+            System.out.println("Please run this room as a CF app");
             return;
         }
 
@@ -225,6 +232,7 @@ public class Application implements ServletContextListener {
 
             // build the complete query url..
             System.out.println("Querying room registration using url " + registrationUrl);
+
             URL u = new URL(registrationUrl + "?" + queryParams );
             HttpsURLConnection con = (HttpsURLConnection) u.openConnection();
             con.setHostnameVerifier(new TheNotVerySensibleHostnameVerifier());
@@ -263,6 +271,7 @@ public class Application implements ServletContextListener {
                 doors.add("u", "A spiral set of stairs, leading upward into the ceiling");
                 doors.add("d", "A tunnel, leading down into the earth");
                 registrationPayload.add("doors", doors.build());
+
                 // add the connection info for the room to connect back to us..
                 JsonObjectBuilder connInfo = Json.createObjectBuilder();
                 connInfo.add("type", "websocket"); // the only current supported
@@ -353,18 +362,9 @@ public class Application implements ServletContextListener {
     @OnOpen
     public void onOpen(Session session, EndpointConfig ec) {
         System.out.println("A new connection has been made to the room.");
+
         //send ack
-        try{
-            JsonObjectBuilder ack = Json.createObjectBuilder();
-            JsonArrayBuilder versions = Json.createArrayBuilder();
-            versions.add(1);
-            ack.add("version", versions.build());
-            String msg = "ack," + ack.build().toString();
-            session.getBasicRemote().sendText(msg);
-        }catch(IOException io){
-            System.out.println("Error sending initial room ack");
-            io.printStackTrace();
-        }
+        sendRemoteTextMessage(session, "ack,{\"version\":[1]}");
     }
 
     @OnClose
@@ -384,18 +384,19 @@ public class Application implements ServletContextListener {
     @OnMessage
     public void receiveMessage(String message, Session session) throws IOException {
         String[] contents = splitRouting(message);
-        if (contents[0].equals("roomHello")) {
-            sessions.add(session);
-            addNewPlayer(session, contents[2]);
-            return;
-        }
-        if (contents[0].equals("room")) {
-            processCommand(session, contents[2]);
-            return;
-        }
-        if (contents[0].equals("roomGoodbye")) {
-            removePlayer(session, contents[2]);
-            return;
+
+        // Who doesn't love switch on strings in Java 8?
+        switch(contents[0]) {
+            case "roomHello":
+                sessions.add(session);
+                addNewPlayer(session, contents[2]);
+                break;
+            case "room":
+                processCommand(session, contents[2]);
+                break;
+            case "roomGoodbye":
+                removePlayer(session, contents[2]);
+                break;
         }
     }
 
@@ -425,7 +426,7 @@ public class Application implements ServletContextListener {
             response.add(NAME, name);
             response.add(FULLNAME, fullName);
             response.add(DESCRIPTION, description);
-            session.getBasicRemote().sendText("player," + userid + "," + response.build().toString());
+            sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
         }
     }
 
@@ -446,22 +447,47 @@ public class Application implements ServletContextListener {
         JsonObject msg = Json.createReader(new StringReader(json)).readObject();
         String userid = getValue(msg.get(USERID));
         String username = getValue(msg.get(USERNAME));
-        String content = getValue(msg.get(CONTENT)).toString().toLowerCase();
+        String content = getValue(msg.get(CONTENT)).toString();
+        String lowerContent = content.toLowerCase();
+
         System.out.println("Command received from the user, " + content);
 
         // handle look command
-        if (content.equals("/look")) {
+        if (lowerContent.equals("/look")) {
             // resend the room description when we receive /look
             JsonObjectBuilder response = Json.createObjectBuilder();
             response.add(TYPE, LOCATION);
             response.add(NAME, name);
             response.add(DESCRIPTION, description);
-            session.getBasicRemote().sendText("player," + userid + "," + response.build().toString());
+
+            sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
+            return;
+        }
+
+        if (lowerContent.startsWith("/go")) {
+
+            String exitDirection = null;
+            if (lowerContent.length() > 4) {
+                exitDirection = lowerContent.substring(4).toLowerCase();
+            }
+
+            if ( exitDirection == null || !directions.contains(exitDirection) ) {
+                sendMessageToRoom(session, null, "Hmm. That direction didn't make sense. Try again?", userid);
+            } else {
+                // Trying to go somewhere, eh?
+                JsonObjectBuilder response = Json.createObjectBuilder();
+                response.add(TYPE, EXIT)
+                .add(EXIT_ID, exitDirection)
+                .add(BOOKMARK, bookmark++)
+                .add(CONTENT, "Run Away!");
+
+                sendRemoteTextMessage(session, "playerLocation," + userid + "," + response.build().toString());
+            }
             return;
         }
 
         // reject all unknown commands
-        if (content.startsWith("/")) {
+        if (lowerContent.startsWith("/")) {
             sendMessageToRoom(session, null, "Unrecognised command - sorry :-(", userid);
             return;
         }
@@ -492,11 +518,9 @@ public class Application implements ServletContextListener {
         response.add(BOOKMARK, bookmark++);
 
         if(messageForRoom==null){
-            session.getBasicRemote().sendText("player," + userid + "," + response.build().toString());
+            sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
         }else{
-            for(Session s : sessions){
-                s.getBasicRemote().sendText("player,*," + response.build().toString());
-            }
+            broadcast(sessions, "player,*," + response.build().toString());
         }
     }
 
@@ -506,9 +530,7 @@ public class Application implements ServletContextListener {
         response.add(USERNAME, username);
         response.add(CONTENT, message);
         response.add(BOOKMARK, bookmark++);
-        for(Session s : sessions){
-            s.getBasicRemote().sendText("player,*," + response.build().toString());
-        }
+        broadcast(sessions, "player,*," + response.build().toString());
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -537,6 +559,90 @@ public class Application implements ServletContextListener {
             return s.getString();
         } else {
             return value.toString();
+        }
+    }
+
+    /**
+     * Simple text based broadcast.
+     *
+     * @param session
+     *            Target session (used to find all related sessions)
+     * @param message
+     *            Message to send
+     * @see #sendRemoteTextMessage(Session, RoutedMessage)
+     */
+    public void broadcast(Set<Session> sessions, String message) {
+        for (Session s : sessions) {
+            sendRemoteTextMessage(s, message);
+        }
+    }
+
+    /**
+     * Try sending the {@link RoutedMessage} using
+     * {@link Session#getBasicRemote()}, {@link Basic#sendObject(Object)}.
+     *
+     * @param session
+     *            Session to send the message on
+     * @param message
+     *            Message to send
+     * @return true if send was successful, or false if it failed
+     */
+    public boolean sendRemoteTextMessage(Session session, String message) {
+        if (session.isOpen()) {
+            try {
+                session.getBasicRemote().sendText(message);
+                return true;
+            } catch (IOException ioe) {
+                // An IOException, on the other hand, suggests the connection is
+                // in a bad state.
+                System.out.println("Unexpected condition writing message: " + ioe);
+                tryToClose(session, new CloseReason(CloseCodes.UNEXPECTED_CONDITION, trimReason(ioe.toString())));
+            }
+        }
+        return false;
+    }
+
+    /**
+     * {@code CloseReason} can include a value, but the length of the text is
+     * limited.
+     *
+     * @param message
+     *            String to trim
+     * @return a string no longer than 123 characters.
+     */
+    private static String trimReason(String message) {
+        return message.length() > 123 ? message.substring(0, 123) : message;
+    }
+
+    /**
+     * Try to close the WebSocket session and give a reason for doing so.
+     *
+     * @param s
+     *            Session to close
+     * @param reason
+     *            {@link CloseReason} the WebSocket is closing.
+     */
+    public void tryToClose(Session s, CloseReason reason) {
+        try {
+            s.close(reason);
+        } catch (IOException e) {
+            tryToClose(s);
+        }
+    }
+
+    /**
+     * Try to close a {@code Closeable} (usually once an error has already
+     * occurred).
+     *
+     * @param c
+     *            Closable to close
+     */
+    public void tryToClose(Closeable c) {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (IOException e1) {
+            }
         }
     }
 
