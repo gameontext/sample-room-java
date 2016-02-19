@@ -13,7 +13,7 @@ This walkthrough will guide you through adding a room to a running Game On! micr
 
 ### Installation prerequisites
 
-When deployed using and instant runtime Gameon-room-java requires the following:
+When deployed using an instant runtime, Gameon-room-java requires the following:
 
 - [Bluemix account](https://console.ng.bluemix.net)
 - [IBM DevOps Services Account](https://hub.jazz.net/register)
