@@ -1,6 +1,6 @@
 # Microservices with a Game On! Room
 
-[Game On!](https://game-on.org/) is both a sample microservices application, and a throwback text adventure brought to you by the wasdev team at IBM. This application demonstrates how microservice architectures work from two points of view:
+[Game On!](https://game-on.org/) is both a sample microservices application, and a throwback text adventure brought to you by the WASdev team at IBM. This application demonstrates how microservice architectures work from two points of view:
 
 1. As a Player: navigate through a network/maze of rooms, where each room is a unique implementation of a common API. Each room supports chat, and interaction with items (some of which may be in the room, some of which might be separately defined services as well).
 2. As a Developer: learn about microservice architectures and their supporting infrastructure by extending the game with your own services. Write additional rooms or items and see how they interact with the rest of the system.
@@ -95,4 +95,4 @@ The Game On! host provides a set a universal commands:
 
 ### The First Room commands
 
-The First Room is usually where new users will start in Game On!. From there, additional commands are available and maintained by the Game On! host. For the list of current commands use the `/help` command.
+The First Room is usually where new users will start in Game On!. From there, additional commands are available and maintained by Game On!. For the list of current commands use the `/help` command.
