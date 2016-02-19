@@ -33,7 +33,7 @@ Sign up for Bluemix at https://console.ng.bluemix.net and DevOps Services at htt
 
 ## Get Game On! ID and Shared Secret
 
-For a new room to register with the Game-On server, you must first log in to game-on.org and sign in using one of several methods to get your **Game On! ID** and **Shared Secret**.
+For a new room to register with the Game-On application, you must first log in to game-on.org and sign in using one of several methods to get your **Game On! ID** and **Shared Secret**.
 
 1.  Go to [https://game-on.org/](https://game-on.org/) and click **Enter**.
 2.  Select an authentication method to log in with your username and password for that type.
