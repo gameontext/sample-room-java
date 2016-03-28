@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <groupId>org.gameon.walkthrough</groupId>
     <artifactId>gojava</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -10,68 +9,44 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
 
-    <dependencies>
-	<!--
-		<dependency>
-            <groupId>net.wasdev.wlp.starters</groupId>
-            <artifactId>liberty-starter-websocket</artifactId>
-            <version>0.0.1</version>
-            <type>pom</type>
-            <scope>provided</scope>
-        </dependency>
-		-->
-        <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.wasdev.wlp.starters</groupId>
-            <artifactId>liberty-starter-web</artifactId>
-            <version>0.0.1</version>
-            <type>pom</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.wasdev.wlp.starters</groupId>
-            <artifactId>liberty-starter-rest</artifactId>
-            <version>0.0.1</version>
-            <type>pom</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.wasdev.wlp.starters</groupId>
-            <artifactId>liberty-starter-websocket-config</artifactId>
-            <version>0.0.1</version>
-            <type>pom</type>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.wasdev.wlp.starters</groupId>
-            <artifactId>liberty-starter-rest-config</artifactId>
-            <version>0.0.1</version>
-            <type>pom</type>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.wasdev.wlp.starters</groupId>
-            <artifactId>liberty-starter-web-config</artifactId>
-            <version>0.0.1</version>
-            <type>pom</type>
-            <scope>runtime</scope>
-        </dependency>
-    </dependencies>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
+        <!-- Game On Room Creator ID and Secret -->
+        <gameon.id>test</gameon.id>
+        <gameon.secret>test</gameon.secret>
+
+        <!-- Liberty server properties -->
+        <wlpServerName>gojava-room</wlpServerName>
+        <testServerHttpPort>9080</testServerHttpPort>
+        <testServerHttpsPort>9443</testServerHttpsPort>
+        <warName>gojava-application</warName>
+        <warVersion>1.0-SNAPSHOT</warVersion>
+        <!--This is set in the ibm-web-ext.xml file -->
+        <warContext></warContext>
+
+        <!-- Cloud Foundry/Bluemix properties -->
+        <cf.context>eu-gb.mybluemix.net</cf.context>
+        <cf.target>https://api.eu-gb.bluemix.net</cf.target>
+        <cf.space>dev</cf.space>
+        <cf.context.root>${app.name}.${cf.context}/${warContext}</cf.context.root>
+
+        <!-- The Cloud Foundry or Bluemix organization, username and password can be
+            entered here. -->
+        <!-- <cf.org></cf.org> -->
+        <!-- <cf.username></cf.username> -->
+        <!-- <cf.password></cf.password> -->
+
+        <!-- This is the host for your app in Bluemix and what it will be called in the dashboard. -->
+        <app.name>gameon-room-java</app.name>
+    </properties>
 
     <repositories>
         <repository>
             <id>liberty-starter-maven-repo</id>
             <name>liberty-starter-maven-repo</name>
-            <url>http://liberty-starter.wasdev.developer.ibm.com/start/artifacts</url>
+            <url>http://liberty-starter.wasdev.developer.ibm.com/start/api/v1/repo</url>
         </repository>
     </repositories>
 
@@ -81,4 +56,66 @@
         <module>gojava-deploy</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>localServer</id>
+            <modules>
+                <module>gojava-deploy/gojava-localServer</module>
+            </modules>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>bluemix</id>
+            <modules>
+                <module>gojava-deploy/gojava-bluemix</module>
+            </modules>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.wasdev.wlp.starters.web</groupId>
+            <artifactId>provided-pom</artifactId>
+            <version>0.0.1</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.wasdev.wlp.starters.rest</groupId>
+            <artifactId>provided-pom</artifactId>
+            <version>0.0.1</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.wasdev.wlp.starters.websocket</groupId>
+            <artifactId>provided-pom</artifactId>
+            <version>0.0.2</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.wasdev.wlp.starters.web</groupId>
+            <artifactId>runtime-pom</artifactId>
+            <version>0.0.1</version>
+            <type>pom</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.wasdev.wlp.starters.rest</groupId>
+            <artifactId>runtime-pom</artifactId>
+            <version>0.0.1</version>
+            <type>pom</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.wasdev.wlp.starters.websocket</groupId>
+            <artifactId>runtime-pom</artifactId>
+            <version>0.0.2</version>
+            <type>pom</type>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
 </project>

@@ -17,26 +17,16 @@
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>https://raw.github.com/WASdev/tool.artisan.core/master/LICENSE</url>
+            <url>https://raw.github.com/WASdev/tool.accelerate.core/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:WASdev/tool.artisan.core.git</connection>
-        <developerConnection>scm:git@github.com:WASdev/tool.artisan.core.git</developerConnection>
-        <url>git@github.com:WASdev/tool.artisan.core.git</url>
+        <connection>scm:git:git@github.com:WASdev/tool.accelerate.core.git</connection>
+        <developerConnection>scm:git@github.com:WASdev/tool.accelerate.core.git</developerConnection>
+        <url>git@github.com:WASdev/tool.accelerate.core.git</url>
     </scm>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <wlpServerName>gojava-room</wlpServerName>
-        <testServerHttpPort>9080</testServerHttpPort>
-        <testServerHttpsPort>9443</testServerHttpsPort>
-        <warName>gojava-application</warName>
-        <warVersion>1.0-SNAPSHOT</warVersion>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -75,7 +65,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <includeGroupIds>net.wasdev.wlp.starters.servers</includeGroupIds>
+                    <includeArtifactIds>server-snippet</includeArtifactIds>
+                    <prependGroupId>true</prependGroupId>
                     <outputDirectory>${project.build.directory}/wlp/usr/servers/${wlpServerName}/configDropins/defaults</outputDirectory>
                 </configuration>
             </plugin>
@@ -125,6 +116,40 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- Plugin to run functional tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.18.1</version>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/it/**</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <liberty.test.port>${testServerHttpPort}</liberty.test.port>
+                                <war.name>${warContext}</war.name>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>verify-results</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <summaryFile>${project.build.directory}/test-reports/fvt/failsafe-summary.xml</summaryFile>
+                    <reportsDirectory>${project.build.directory}/test-reports/fvt</reportsDirectory>
+                </configuration>
             </plugin>
         </plugins>
     </build>

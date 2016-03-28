@@ -17,15 +17,15 @@
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>https://raw.github.com/WASdev/tool.artisan.core/master/LICENSE</url>
+            <url>https://raw.github.com/WASdev/tool.accelerate.core/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:WASdev/tool.artisan.core.git</connection>
-        <developerConnection>scm:git@github.com:WASdev/tool.artisan.core.git</developerConnection>
-        <url>git@github.com:WASdev/tool.artisan.core.git</url>
+        <connection>scm:git:git@github.com:WASdev/tool.accelerate.core.git</connection>
+        <developerConnection>scm:git@github.com:WASdev/tool.accelerate.core.git</developerConnection>
+        <url>git@github.com:WASdev/tool.accelerate.core.git</url>
     </scm>
 
     <dependencies>
@@ -36,18 +36,6 @@
             <type>liberty-assembly</type>
         </dependency>
     </dependencies>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <wlpServerName>gojava-room</wlpServerName>
-        <testServerHttpPort>9080</testServerHttpPort>
-        <testServerHttpsPort>9443</testServerHttpsPort>
-        <warName>gojava-application-1.0-SNAPSHOT</warName>
-        <contextRoot></contextRoot>
-        <gameon.id>test</gameon.id>
-        <gameon.secret>test</gameon.secret>
-    </properties>
 
     <build>
         <plugins>
@@ -88,6 +76,39 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Plugin to run functional tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.18.1</version>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <local.context.root>http://localhost:${testServerHttpPort}/${warContext}</local.context.root>
+                            </systemPropertyVariables>
+                            <includes>
+                                <include>**/fvt/**</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>verify-results</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <summaryFile>${project.build.directory}/test-reports/fvt/failsafe-summary.xml</summaryFile>
+                    <reportsDirectory>${project.build.directory}/test-reports/fvt</reportsDirectory>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -103,7 +124,7 @@
                             <tasks>
                                 <echo>************************************************************</echo>
                                 <echo>************************************************************</echo>
-                                <echo>Your application is running at http://localhost:${testServerHttpPort}/${contextRoot}</echo>
+                                <echo>Your application is running at http://localhost:${testServerHttpPort}/${warContext}</echo>
                                 <echo>************************************************************</echo>
                                 <echo>You will need to stop your server before running mvn install again:</echo>
                                 <echo>mvn clean -P stopServer</echo>
