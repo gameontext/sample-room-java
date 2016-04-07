@@ -2,14 +2,14 @@
 
 [Game On!](https://game-on.org/) is both a sample microservices application, and a throwback text adventure brought to you by the WASdev team at IBM. This application demonstrates how microservice architectures work from two points of view:
 
-1. As a Player: navigate through a network/maze of rooms, where each room is a unique implementation of a common API. Each room supports chat, and interaction with items (some of which may be in the room, some of which might be separately defined services as well).
-2. As a Developer: learn about microservice architectures and their supporting infrastructure by extending the game with your own services. Write additional rooms or items and see how they interact with the rest of the system.
+1. As a Player: navigate through a network/maze of rooms, where rooms are provided by autonomous microservice. Each room supports chat, and may provide interaction with items (some of which may be in the room, some of which might be separately defined services as well).
+2. As a Developer: learn about microservice architectures and their supporting infrastructure by creating your own microservices to extend the game.
 
 You can learn more about Game On! at [http://game-on.org/](http://game-on.org/).
 
 ## Introduction
 
-This walkthrough will guide you through adding a room to a running Game On! microservices application.  You will be shown how to setup a room that is implemented in the Java programming language using Websphere Liberty and deployed as a Cloud Foundry application in Bluemix.  
+This walkthrough will guide you through creating and deploying a microservice that adds a simple room to the running Game On! microservices application.  You will be shown how to setup a room that is implemented in the Java programming language using Websphere Liberty and deployed as a Cloud Foundry application in Bluemix.  
 
 ### Installation prerequisites
 
@@ -37,8 +37,9 @@ For a new room to register with the Game-On application, you must first log in t
 
 1.  Go to [https://game-on.org/](https://game-on.org/) and click **Enter**.
 2.  Select an authentication method to log in with your username and password for that type.
-3.  View your user profile using the link in the top right. It is either your username or a person icon.
-4.  You should now see your **Game On! ID** and **Shared Secret** near the bottom of the page.
+3.  If you've never played before, you'll need to choose a display name and favorite color, and click **Done**
+3.  Once you are in First room, view your user profile using the link in the top right. It is either your username or a person icon.
+4.  You should now see your **Game On! ID** and **Shared Secret** near the middle of the page.
 
 ## Getting the source code
 
@@ -57,13 +58,13 @@ The source code is located in GitHub, navigate to our [repository](https://githu
 3. Use a maven target profile to push the app to Bluemix:
 ```
 mvn install -P bluemix \
-    -Dcf.org= <your organization> \
+    -Dcf.org=<your organization> \
     -Dcf.username=<your username> \
     -Dcf.password=<your password> \
     -Dcf.target=https://api.ng.bluemix.net \
     -Dapp.name=<cf-app-name> \
     -Dgameon.id=<Your Game On! ID> \
-    -Dgameon.secret=<Your Game On! Shared Secret> \
+    -Dgameon.secret=<Your Game On! Shared Secret>
 ```
 
 
@@ -84,6 +85,12 @@ Once the room is set up and it has registered with Game On!, it will be accessib
 2. Use the Game On! command `/listmyrooms` from The First Room, to see your list of rooms. Once your room is registered, it will appear in that list.
 3. To get to your room, navigate through the network or go directly there by using the `/teleport` command from The First Room.
 4. Look at the Bluemix log console to see "A new connection has been made to the room"
+
+Congratulations, you've deployed a microservice that extended an existing microservices-based application so that it can do something new.
+
+Suggested activities: 
+* Make it more resilient -- add additional instances using the autoscaling add-on: https://console.ng.bluemix.net/catalog/services/auto-scaling
+* Consider how to allow chat messages to propagate between independent instances using a shared datastore or cache, or an event bus, or... 
 
 
 ### List of host provided commands
