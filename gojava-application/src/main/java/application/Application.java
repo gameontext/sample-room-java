@@ -262,14 +262,17 @@ public class Application implements ServletContextListener {
                 registrationPayload.add("fullName", fullName);
                 registrationPayload.add("description", description);
                 // add the doorway descriptions we'd like the game to use if it
-                // wires us to other rooms.
+                // wires us to other rooms. Note: you're describing the outside 
+                // of your room: What does the North wall+door of your room look
+                // like from the outside? Note that a traveller will be looking South
+                // when they view it!
                 JsonObjectBuilder doors = Json.createObjectBuilder();
-                doors.add("n", "A Large doorway to the north");
-                doors.add("s", "A winding path leading off to the south");
+                doors.add("n", "A Large doorway to the south");
+                doors.add("s", "A winding path leading off to the north");
                 doors.add("e", "An overgrown road, covered in brambles");
                 doors.add("w", "A shiny metal door, with a bright red handle");
-                doors.add("u", "A spiral set of stairs, leading upward into the ceiling");
-                doors.add("d", "A tunnel, leading down into the earth");
+                doors.add("u", "A tunnel, leading down into the earth");
+                doors.add("d", "A spiral set of stairs, leading upward into the ceiling");
                 registrationPayload.add("doors", doors.build());
 
                 // add the connection info for the room to connect back to us..
