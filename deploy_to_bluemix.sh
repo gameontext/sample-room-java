@@ -16,9 +16,9 @@ deploy_to_bluemix() {
       -Dcf.target=${CF_TARGET_URL} \
       -Dcf.org=${CF_ORG} \
       -Dcf.space=${CF_SPACE} \
+      -Dapp.name=${CF_APP} \
       -Dcf.username=${USERNAME} \
       -Dcf.password=${PASSWORD} \
-      -Dapp.name=${CF_APP} \
-      -Dgameon.id=${GO_ID} \
-      -Dgameon.secret=${GO_SECRET}
+      -Dgameon.id=${GAMEON_ID} \
+      -Dgameon.secret=${GAMEON_SECRET}
 }
