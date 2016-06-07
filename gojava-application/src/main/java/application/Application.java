@@ -488,6 +488,11 @@ public class Application implements ServletContextListener {
             }
             return;
         }
+        
+        if (lowerContent.startsWith("/hello")) {
+        	sendMessageToRoom(session, null, "Hello World!", userid);
+        	return;
+        }
 
         // reject all unknown commands
         if (lowerContent.startsWith("/")) {
