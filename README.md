@@ -109,3 +109,7 @@ The Game On! host provides a set a universal commands:
 ### The First Room commands
 
 The First Room is usually where new users will start in Game On!. From there, additional commands are available and maintained by Game On!. For the list of current commands use the `/help` command.
+
+### Adding your own commands
+
+To start adding your own commands to the room you can extend the `processCommands()` method. This branch shows an example of adding a `/hello` command that causes the room to print out "Hello World!".
