@@ -57,14 +57,14 @@ The source code is located in GitHub, navigate to our [repository](https://githu
 
   Use `mvn clean -P stopServer` to stop the server.
 
-3. Use a maven target profile to push the app to Bluemix:
+3. Use a maven target profile to push the app to Bluemix: (enter the below as one maven command)
 ```
-mvn install -P bluemix \
-    -Dcf.org=<your organization> \
-    -Dcf.username=<your username> \
-    -Dcf.password=<your password> \
-    -Dapp.name=<cf-app-name> \
-    -Dgameon.id=<Your Game On! ID> \
+mvn install -P bluemix 
+    -Dcf.org=<your organization> 
+    -Dcf.username=<your username> 
+    -Dcf.password=<your password> 
+    -Dapp.name=<cf-app-name> 
+    -Dgameon.id=<Your Game On! ID> 
     -Dgameon.secret=<Your Game On! Shared Secret>
 ```
 
