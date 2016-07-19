@@ -15,52 +15,29 @@
  *******************************************************************************/
 package application;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.InvalidKeyException;
-import java.security.KeyManagementException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.stream.Collectors;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.json.Json;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonString;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import javax.servlet.http.HttpServletResponse;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.EncodeException;
 import javax.websocket.EndpointConfig;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -70,15 +47,12 @@ import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.gameontext.util.reg.RegistrationUtility;
+import org.gameontext.util.reg.RegistrationUtility.HTTP_METHOD;
+
 /**
  * A very simple room.
  *
- * The intent of this file is to keep an entire room implementation within one Java file,
- * and to try to minimise its reliance on outside technologies, beyond those required by
- * gameon (WebSockets, Json)
- *
- * Although it would be trivial to refactor out into multiple classes, doing so can make it
- * harder to see 'everything' needed for a room in one go.
  */
 @ServerEndpoint("/room")
 @WebListener
@@ -95,12 +69,10 @@ public class Application implements ServletContextListener {
     private final static String EXIT_ID = "exitId";
     private final static String FULLNAME = "fullName";
     private final static String DESCRIPTION = "description";
-
+    
+    private Config config = null;
+    
     private Set<String> playersInRoom = Collections.synchronizedSet(new HashSet<String>());
-
-    private static final String name = "AnotherSimpleRoom";
-    private static final String fullName = "A Very Simple Room.";
-    private static final String description = "You are in the worlds most simple room, there is nothing to do here.";
 
     List<String> directions = Arrays.asList( "n", "s", "e", "w", "u", "d");
 
@@ -110,246 +82,38 @@ public class Application implements ServletContextListener {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Room registration
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * The gameon-signature method requires a hmac hash, this method calculates it.
-     * @param stuffToHash List of string values to apply to the hmac
-     * @param key The key to init the hmac with
-     * @return The hmac as a base64 encoded string.
-     * @throws NoSuchAlgorithmException if HmacSHA256 is not found
-     * @throws InvalidKeyException Should not be thrown unless there are internal hmac issues.
-     * @throws UnsupportedEncodingException If the keystring or hash string are not UTF-8
-     */
-    private String buildHmac(List<String> stuffToHash, String key) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException{
-        Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256"));
-
-        StringBuffer hashData = new StringBuffer();
-        for(String s: stuffToHash){
-            hashData.append(s);
-        }
-
-        return Base64.getEncoder().encodeToString( mac.doFinal(hashData.toString().getBytes("UTF-8")) );
-    }
-
-    /**
-     * The gameon-sig-body header requires the sha256 hash of the body content. This method calculates it.
-     * @param data The string to hash
-     * @return the sha256 hash as a base64 encoded string
-     * @throws NoSuchAlgorithmException If SHA-256 is not found
-     * @throws UnsupportedEncodingException If the String is not UTF-8
-     */
-    private String buildHash(String data) throws NoSuchAlgorithmException, UnsupportedEncodingException{
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(data.getBytes("UTF-8"));
-        byte[] digest = md.digest();
-        return Base64.getEncoder().encodeToString( digest );
-    }
-
-    /**
-     * A Trust Manager that trusts everyone.
-     */
-    public class TheVeryTrustingTrustManager implements X509TrustManager {
-        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {   }
-        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {   }
-    }
-    /**
-     * A Hostname verifier that agrees everything is verified.
-     */
-    public class TheNotVerySensibleHostnameVerifier implements HostnameVerifier {
-        public boolean verify(String string, SSLSession sslSession) {
-            return true;
-        }
-    }
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
     /**
      * Entry point at application start, we use this to test for & perform room registration.
      */
     @Override
     public final void contextInitialized(final ServletContextEvent e) {
-
-        // for running against the real remote gameon.
-        String registrationUrl = "https://game-on.org/map/v1/sites";
-        String endPointUrl;
-
-        // credentials, read from the cf environment, and
-        // originally obtained from the gameon instance to connect to.
-        String userId = System.getenv("GAMEON_ID");
-        String key = System.getenv("GAMEON_SECRET");
-        if(userId == null || key == null){
-            System.out.println("This room is intended to obtain it's configuration from the CF environment");
-            System.out.println("GameOn! userid or secret is missing from the environment.");
-            System.out.println("You should have supplied these via `-Dgameon.id=myid -Dgameon.secret=mysecret` when running mvn install");
-            System.out.println("Or you could configure them directly in the environment variables panel from your bluemix console for the app");
-            return;
-        }
-
-        //if we're running in a cf, we should use the details from those environment vars.
-        String vcap_application = System.getenv("VCAP_APPLICATION");
-        if(vcap_application!=null){
-            ServletContext sc = e.getServletContext();
-            String contextPath = sc.getContextPath();
-
-            JsonObject vcapApplication = Json.createReader(new StringReader(vcap_application)).readObject();
-            JsonArray uris = vcapApplication.getJsonArray("application_uris");
-            JsonString firstUriAsString = uris.getJsonString(0);
-            endPointUrl = "ws://"+firstUriAsString.getString()+contextPath+"/room";
-            System.out.println("Using CF details of "+endPointUrl);
-        }else{
-            System.out.println("This room is intended to obtain it's configuration from the CF environment");
-            System.out.println("Please run this room as a CF app");
-            return;
-        }
-
-
-        // check if we are already registered..
+    	//setup the registration with the config retrieved from the environment
+    	config = new Config(e);
+        RegistrationUtility regutil = new RegistrationUtility();
+        regutil.setId(config.getUserId());
+        regutil.setSecret(config.getKey());
+        regutil.setUrl(config.getRegistrationUrl());
+        
+        // attempt to regsiter this room
+        regutil.setMethod(HTTP_METHOD.POST);
+        regutil.setBody(config.getRoomJSON());
         try {
-            // build the query request.
-            String queryParams = "name=" + name + "&owner=" + userId;
-
-            TrustManager[] trustManager = new TrustManager[] {new TheVeryTrustingTrustManager()};
-
-            // We don't want to worry about importing the game-on cert into
-            // the jvm trust store.. so instead, we'll create an ssl config
-            // that no longer cares.
-            // This is handy for testing, but for production you'd probably
-            // want to goto the effort of setting up a truststore correctly.
-            SSLContext sslContext = null;
-            try {
-                sslContext = SSLContext.getInstance("SSL");
-                sslContext.init(null, trustManager, new java.security.SecureRandom());
-            } catch (NoSuchAlgorithmException ex) {
-                System.out.println("Error, unable to get algo SSL");
-            }catch (KeyManagementException ex) {
-                System.out.println("Key management exception!! ");
-            }
-
-            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-
-            // build the complete query url..
-            System.out.println("Querying room registration using url " + registrationUrl);
-
-            URL u = new URL(registrationUrl + "?" + queryParams );
-            HttpsURLConnection con = (HttpsURLConnection) u.openConnection();
-            con.setHostnameVerifier(new TheNotVerySensibleHostnameVerifier());
-            con.setDoOutput(true);
-            con.setDoInput(true);
-            con.setRequestProperty("Content-Type", "application/json;");
-            con.setRequestProperty("Accept", "application/json,text/plain");
-            con.setRequestProperty("Method", "GET");
-
-            //initiate the request.
-            int httpResult = con.getResponseCode();
-            if (httpResult == HttpURLConnection.HTTP_OK ) {
-                //if the result was 200, then we found a room with this id & owner..
-                //which is either a previous registration by us, or another room with
-                //the same owner & roomname
-                //We won't register our room in this case, although we _could_ choose
-                //do do an update instead.. (we'd need to parse the json response, and
-                //collect the room id, then do a PUT request with our new data.. )
-                System.out.println("We are already registered, there is no need to register this room");
-            } else {
-                System.out.println("Beginning registration.");
-
-                // build the registration payload (post data)
-                JsonObjectBuilder registrationPayload = Json.createObjectBuilder();
-                // add the basic room info.
-                registrationPayload.add("name", name);
-                registrationPayload.add("fullName", fullName);
-                registrationPayload.add("description", description);
-                // add the doorway descriptions we'd like the game to use if it
-                // wires us to other rooms. Note: you're describing the outside 
-                // of your room: What does the North wall+door of your room look
-                // like from the outside? Note that a traveller will be looking South
-                // when they view it!
-                JsonObjectBuilder doors = Json.createObjectBuilder();
-                doors.add("n", "A Large doorway to the south");
-                doors.add("s", "A winding path leading off to the north");
-                doors.add("e", "An overgrown road, covered in brambles");
-                doors.add("w", "A shiny metal door, with a bright red handle");
-                doors.add("u", "A tunnel, leading down into the earth");
-                doors.add("d", "A spiral set of stairs, leading upward into the ceiling");
-                registrationPayload.add("doors", doors.build());
-
-                // add the connection info for the room to connect back to us..
-                JsonObjectBuilder connInfo = Json.createObjectBuilder();
-                connInfo.add("type", "websocket"); // the only current supported
-                                                   // type.
-                connInfo.add("target", endPointUrl);
-                registrationPayload.add("connectionDetails", connInfo.build());
-
-                String registrationPayloadString = registrationPayload.build().toString();
-
-                Instant now = Instant.now();
-                String dateValue = now.toString();
-
-                String bodyHash = buildHash(registrationPayloadString);
-
-                System.out.println("Building hmac with "+userId+dateValue+bodyHash);
-                String hmac = buildHmac(Arrays.asList(new String[] {
-                                           userId,
-                                           dateValue,
-                                           bodyHash
-                                       }),key);
-
-
-                // build the complete registration url..
-                System.out.println("Beginning registration using url " + registrationUrl);
-                u = new URL(registrationUrl);
-                con = (HttpsURLConnection) u.openConnection();
-                con.setHostnameVerifier(new TheNotVerySensibleHostnameVerifier());
-                con.setDoOutput(true);
-                con.setDoInput(true);
-                con.setRequestProperty("Content-Type", "application/json;");
-                con.setRequestProperty("Accept", "application/json,text/plain");
-                con.setRequestProperty("Method", "POST");
-                con.setRequestProperty("gameon-id", userId);
-                con.setRequestProperty("gameon-date", dateValue);
-                con.setRequestProperty("gameon-sig-body", bodyHash);
-                con.setRequestProperty("gameon-signature", hmac);
-                OutputStream os = con.getOutputStream();
-
-                os.write(registrationPayloadString.getBytes("UTF-8"));
-                os.close();
-
-                System.out.println("RegistrationPayload :\n "+registrationPayloadString);
-
-                httpResult = con.getResponseCode();
-                if (httpResult == HttpURLConnection.HTTP_OK || httpResult == HttpURLConnection.HTTP_CREATED) {
-                    try (BufferedReader buffer = new BufferedReader(
-                            new InputStreamReader(con.getInputStream(), "UTF-8"))) {
-                        String response = buffer.lines().collect(Collectors.joining("\n"));
-                        System.out.println("Registration reports success.");
-                        System.out.println(response);
-                        // here we should remember the exits we're told about,
-                        // so we can
-                        // use them when the user does /go direction
-                        // But we're not dealing with exits here (yet)..
-                        // user's will have to /sos out of us .. (bad, but ok
-                        // for now)
-                    }
-                } else {
-                    System.out.println(
-                            "Registration gave http code: " + con.getResponseCode() + " " + con.getResponseMessage());
-                    // registration sends payload with info why registration
-                    // failed.
-                    try (BufferedReader buffer = new BufferedReader(
-                            new InputStreamReader(con.getErrorStream(), "UTF-8"))) {
-                        String response = buffer.lines().collect(Collectors.joining("\n"));
-                        System.out.println(response);
-                    }
-                    System.out.println("Room Registration FAILED .. this room has NOT been registered");
-                }
-
-            }
+	        switch(regutil.register()) {
+	        	case HttpServletResponse.SC_CONFLICT :
+	        		System.out.println("This room is already registered, so there is no need to re-register");
+	        		break;
+	        	case HttpServletResponse.SC_CREATED :
+	        		System.out.println("Room registered successfully.");
+	        		break;
+	        	default:
+	        		System.out.println("Failed to register room, see logs for more details");
+	        		break;
+	        }
         } catch (Exception ex) {
-            ex.printStackTrace();
+        	ex.printStackTrace();
             throw new RuntimeException(ex);
-        }
+        }        
     }
 
     @Override
@@ -426,9 +190,9 @@ public class Application implements ServletContextListener {
             // only reason we are in this method.
             JsonObjectBuilder response = Json.createObjectBuilder();
             response.add(TYPE, LOCATION);
-            response.add(NAME, name);
-            response.add(FULLNAME, fullName);
-            response.add(DESCRIPTION, description);
+            response.add(NAME, config.getName());
+            response.add(FULLNAME, config.getFullname());
+            response.add(DESCRIPTION, config.getDescription());
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
         }
     }
@@ -460,8 +224,8 @@ public class Application implements ServletContextListener {
             // resend the room description when we receive /look
             JsonObjectBuilder response = Json.createObjectBuilder();
             response.add(TYPE, LOCATION);
-            response.add(NAME, name);
-            response.add(DESCRIPTION, description);
+            response.add(NAME, config.getName());
+            response.add(DESCRIPTION, config.getDescription());
 
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
             return;

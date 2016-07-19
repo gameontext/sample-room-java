@@ -85,7 +85,12 @@
                         <default.http.port>${testServerHttpPort}</default.http.port>
                         <default.https.port>${testServerHttpsPort}</default.https.port>
                     </bootstrapProperties>
-                    <install />
+                    <assemblyArtifact>
+						<groupId>com.ibm.websphere.appserver.runtime</groupId>
+						<artifactId>wlp-webProfile7</artifactId>
+						<version>16.0.0.2</version>
+						<type>zip</type>
+					</assemblyArtifact> 
                 </configuration>
                 <executions>
                     <execution>
