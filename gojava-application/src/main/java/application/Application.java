@@ -52,6 +52,11 @@ import org.gameontext.util.reg.RegistrationUtility.HTTP_METHOD;
 
 /**
  * A very simple room.
+ * 
+ * All configuration for the room is contained / derived from the Config class.
+ * This application has the following library dependencies (which are managed by jitpack.io).
+ *
+ * - com.github.gameontext:regutil
  *
  */
 @ServerEndpoint("/room")
