@@ -59,15 +59,14 @@ The source code is located in GitHub, navigate to our [repository](https://githu
 
 3. Use a maven target profile to push the app to Bluemix: (enter the below as one maven command)
 ```
-mvn install -P bluemix 
-    -Dcf.org=<your organization> 
-    -Dcf.username=<your username> 
-    -Dcf.password=<your password> 
-    -Dapp.name=<cf-app-name> 
-    -Dgameon.id=<Your Game On! ID> 
+mvn install -P bluemix
+    -Dcf.org=<your organization>
+    -Dcf.username=<your username>
+    -Dcf.password=<your password>
+    -Dapp.name=<cf-app-name>
+    -Dgameon.id=<Your Game On! ID>
     -Dgameon.secret=<Your Game On! Shared Secret>
 ```
-
 
 ### Additional notes:
 
@@ -75,13 +74,53 @@ mvn install -P bluemix
 * `gameon.id` and `gameon.secret` are those retrieved [earlier](https://github.com/cfsworkload/gameon-room-java#get-game-on-id-and-shared-secret).
 * Advanced: if you have an existing Bluemix account or require different Bluemix settings, you can set them on the command line. The default values that are applied:
   * `cf.space=dev`
-  * Note values go in pairs for target and context: 
-    * London (default): 
+  * Note values go in pairs for target and context:
+    * London (default):
       * `cf.context=eu-gb.mybluemix.net`
       * `cf.target=https://api.eu-gb.bluemix.net`
-    * US South: 
+    * US South:
       * `-Dcf.target=https://api.ng.bluemix.net`
       * `-Dcf.context=mybluemix.net`
+
+
+## Deploying locally
+
+It is possible to deploy your room locally into a Docker container. This can be useful if you want to test aspects such as the room registration and configuration retrieval. Remember, this room will be running locally on your hardware so Game On will not be able to access it, unless your machine is also publicly accessible.
+
+### Installation prerequisites
+
+1. [Docker Engine](https://docs.docker.com/engine/installation/)
+2. [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Deploying
+
+Once docker is installed, then you deploy your room with
+
+1. `mvn package -P docker` to build your room.
+2. Create a file called `docker-compose.override.yml` which contains the folllowing
+
+```
+gojava:
+ volumes:
+   - './gojava-application/target/dropins:/opt/ibm/wlp/usr/servers/defaultServer/dropins'
+```
+3. `docker-compose build`
+4. `docker-compose up`
+
+After this you will have a docker container with your rooom, running Liberty, and listening on port 9080. A note about step 2 above, this is an override file that can be used to change, or add to, an existing docker build file. In this case, it maps the file system on the local machine into the dropins directory for the Liberty server running inside the container. The end result is that if you make some changes to your code and run `mvn package -P docker` again to rebuild your war file, then Liberty will see that the file has changed and automatically reload your room without having to build or restart the container.
+
+### Debugging your room
+
+It is possible to attach a debugger to your room so that you can set breakpoints and step through code. Add the following lines to the `docker-compose.override.yml` file
+
+```
+ports:
+ - "7777:7777"
+environment:
+ - LIBERTY_MODE: debug
+```
+
+The `ports` section instructs docker to expose the port 7777 from inside the container, so that the debugger can attach. The `environment` statement sets an environment variable called `LIBERTY_MODE` to debug. This variable is read by the Liberty startup script and controls how the server is started, in this case in debug mode.
 
 ## Access room on Game On!
 
@@ -94,9 +133,9 @@ Once the room is set up and it has registered with Game On!, it will be accessib
 
 Congratulations, you've deployed a microservice that extended an existing microservices-based application so that it can do something new.
 
-Suggested activities: 
+Suggested activities:
 * Make it more resilient -- add additional instances using the autoscaling add-on: https://console.ng.bluemix.net/catalog/services/auto-scaling
-* Consider how to allow chat messages to propagate between independent instances using a shared datastore or cache, or an event bus, or... 
+* Consider how to allow chat messages to propagate between independent instances using a shared datastore or cache, or an event bus, or...
 
 
 ### List of host provided commands
