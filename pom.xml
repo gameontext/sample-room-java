@@ -76,6 +76,12 @@
                 <module>gojava-deploy/gojava-bluemix</module>
             </modules>
         </profile>
+        <profile>
+            <id>docker</id>
+            <modules>
+                <module>gojava-application</module>
+            </modules>
+        </profile>
     </profiles>
 
     <dependencies>
