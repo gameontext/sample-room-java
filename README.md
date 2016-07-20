@@ -96,18 +96,17 @@ It is possible to deploy your room locally into a Docker container. This can be 
 
 Once docker is installed, then you deploy your room with
 
-1. `mvn package -P docker` to build your room.
-2. Create a file called `docker-compose.override.yml` which contains the folllowing
-
+* `mvn package -P docker` to build your room.
+* Create a file called `docker-compose.override.yml` which contains the folllowing
 ```
 gojava:
  volumes:
    - './gojava-application/target/dropins:/opt/ibm/wlp/usr/servers/defaultServer/dropins'
 ```
-3. `docker-compose build`
-4. `docker-compose up`
+* `docker-compose build`
+* `docker-compose up`
 
-After this you will have a docker container with your rooom, running Liberty, and listening on port 9080. A note about step 2 above, this is an override file that can be used to change, or add to, an existing docker build file. In this case, it maps the file system on the local machine into the dropins directory for the Liberty server running inside the container. The end result is that if you make some changes to your code and run `mvn package -P docker` again to rebuild your war file, then Liberty will see that the file has changed and automatically reload your room without having to build or restart the container.
+After this you will have a docker container with your rooom, running Liberty, and listening on port 9080. A note about `docker-compose.override.yml`, this is an override file that can be used to change, or add to, an existing docker build file. In this case, it maps the file system on the local machine into the dropins directory for the Liberty server running inside the container. The end result is that if you make some changes to your code and run `mvn package -P docker` again to rebuild your war file, then Liberty will see that the file has changed and automatically reload your room without having to build or restart the container.
 
 ### Debugging your room
 
