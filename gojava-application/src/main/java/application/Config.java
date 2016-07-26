@@ -43,7 +43,7 @@ public class Config {
     private String key;
     private final boolean valid;
 
-    public Config(final ServletContextEvent e) {
+    public Config() {
         // credentials, read from the cf environment, and
         // originally obtained from the gameon instance to connect to.
         userId = System.getenv("GAMEON_ID");
@@ -60,23 +60,6 @@ public class Config {
             valid = false;
             return;
         }
-
-        //if we're running in a cf, we should use the details from those environment vars.
-        String vcap_application = System.getenv("VCAP_APPLICATION");
-        if(vcap_application!=null){
-            ServletContext sc = e.getServletContext();
-            String contextPath = sc.getContextPath();
-
-            JsonObject vcapApplication = Json.createReader(new StringReader(vcap_application)).readObject();
-            JsonArray uris = vcapApplication.getJsonArray("application_uris");
-            JsonString firstUriAsString = uris.getJsonString(0);
-            endPointUrl = "ws://"+firstUriAsString.getString()+contextPath+"/room";
-            System.out.println("Using CF details of "+endPointUrl);
-        }else{
-            System.out.println("This room is intended to obtain it's configuration from the CF environment");
-            System.out.println("Assuming that this room is running on localhost port 9080 (this should match the config in server.xml)");
-            endPointUrl = "ws://localhost:9080/room";
-        }
         valid = true;
     }
     
@@ -84,10 +67,11 @@ public class Config {
      * Builds the JSON object which will be used for the room registration. You can change the values to customise
      * your room, at the very least, you should change the name of the room so that it stands out
      * from the other sample rooms.
+     * @param e 
      * 
      * @return JSON for the room registration
      */
-    public String getRoomJSON() {
+    public String getRoomJSON(ServletContextEvent e) {
     	// build the registration payload (post data)
         JsonObjectBuilder registrationPayload = Json.createObjectBuilder();
         // add the basic room info.
@@ -112,7 +96,7 @@ public class Config {
         JsonObjectBuilder connInfo = Json.createObjectBuilder();
         connInfo.add("type", "websocket"); // the only current supported
                                            // type.
-        connInfo.add("target", endPointUrl);
+        connInfo.add("target", getEndPointUrl(e));
         registrationPayload.add("connectionDetails", connInfo.build());
 
         return registrationPayload.build().toString();
@@ -122,12 +106,24 @@ public class Config {
 		return registrationUrl;
 	}
 
-	public String getEndPointUrl() {
-		return endPointUrl;
-	}
+	private String getEndPointUrl(ServletContextEvent e) {
+        //if we're running in a cf, we should use the details from those environment vars.
+        String vcap_application = System.getenv("VCAP_APPLICATION");
+        if(vcap_application!=null){
+            ServletContext sc = e.getServletContext();
+            String contextPath = sc.getContextPath();
 
-	public void setEndPointUrl(String endPointUrl) {
-		this.endPointUrl = endPointUrl;
+            JsonObject vcapApplication = Json.createReader(new StringReader(vcap_application)).readObject();
+            JsonArray uris = vcapApplication.getJsonArray("application_uris");
+            JsonString firstUriAsString = uris.getJsonString(0);
+            endPointUrl = "ws://"+firstUriAsString.getString()+contextPath+"/room";
+            System.out.println("Using CF details of "+endPointUrl);
+        }else{
+            System.out.println("This room is intended to obtain it's configuration from the CF environment");
+            System.out.println("Assuming that this room is running on localhost port 9080 (this should match the config in server.xml)");
+            endPointUrl = "ws://localhost:9080/room";
+        }
+		return endPointUrl;
 	}
 
 	/**
