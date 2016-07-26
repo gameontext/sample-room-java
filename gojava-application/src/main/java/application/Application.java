@@ -75,7 +75,7 @@ public class Application implements ServletContextListener {
     private final static String FULLNAME = "fullName";
     private final static String DESCRIPTION = "description";
     
-    private Config config = null;
+    private Config config = new Config();
     
     private Set<String> playersInRoom = Collections.synchronizedSet(new HashSet<String>());
 
@@ -94,31 +94,34 @@ public class Application implements ServletContextListener {
     @Override
     public final void contextInitialized(final ServletContextEvent e) {
     	//setup the registration with the config retrieved from the environment
-    	config = new Config(e);
-        RegistrationUtility regutil = new RegistrationUtility();
-        regutil.setId(config.getUserId());
-        regutil.setSecret(config.getKey());
-        regutil.setUrl(config.getRegistrationUrl());
-        
-        // attempt to regsiter this room
-        regutil.setMethod(HTTP_METHOD.POST);
-        regutil.setBody(config.getRoomJSON());
-        try {
-	        switch(regutil.register()) {
-	        	case HttpServletResponse.SC_CONFLICT :
-	        		System.out.println("This room is already registered, so there is no need to re-register");
-	        		break;
-	        	case HttpServletResponse.SC_CREATED :
-	        		System.out.println("Room registered successfully.");
-	        		break;
-	        	default:
-	        		System.out.println("Failed to register room, see logs for more details");
-	        		break;
+    	if (config.isValid()) {
+	        RegistrationUtility regutil = new RegistrationUtility();
+	        regutil.setId(config.getUserId());
+	        regutil.setSecret(config.getKey());
+	        regutil.setUrl(config.getRegistrationUrl());
+	        
+	        // attempt to regsiter this room
+	        regutil.setMethod(HTTP_METHOD.POST);
+	        regutil.setBody(config.getRoomJSON(e));
+	        try {
+		        switch(regutil.register()) {
+		        	case HttpServletResponse.SC_CONFLICT :
+		        		System.out.println("This room is already registered, so there is no need to re-register");
+		        		break;
+		        	case HttpServletResponse.SC_CREATED :
+		        		System.out.println("Room registered successfully.");
+		        		break;
+		        	default:
+		        		System.out.println("Failed to register room, see logs for more details");
+		        		break;
+		        }
+	        } catch (Exception ex) {
+	        	ex.printStackTrace();
+	            throw new RuntimeException(ex);
 	        }
-        } catch (Exception ex) {
-        	ex.printStackTrace();
-            throw new RuntimeException(ex);
-        }        
+    	} else {
+    		System.out.println("Not registering as no valid config is available");
+    	}
     }
 
     @Override
