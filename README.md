@@ -49,6 +49,8 @@ The source code is located in GitHub, navigate to our [repository](https://githu
 
 ## Build and deploy
 
+### Deploying to Bluemix as a Cloud Foundry app
+
 1. `cd gameon-room-java`
 2. `mvn install`
   After running this, you will have the server running locally at [http://localhost:9080/](http://localhost:9080/).
@@ -68,7 +70,7 @@ mvn install -P bluemix
     -Dgameon.secret=<Your Game On! Shared Secret>
 ```
 
-### Additional notes:
+#### Additional notes:
 
 * `app.name` is a unique, URL-friendly name for your deployed Bluemix app.
 * `gameon.id` and `gameon.secret` are those retrieved [earlier](https://github.com/cfsworkload/gameon-room-java#get-game-on-id-and-shared-secret).
@@ -82,17 +84,18 @@ mvn install -P bluemix
       * `-Dcf.target=https://api.ng.bluemix.net`
       * `-Dcf.context=mybluemix.net`
 
+### Deploy using Docker
 
-## Deploying locally
+#### Deploying locally
 
 It is possible to deploy your room locally into a Docker container. This can be useful if you want to test aspects such as the room registration and configuration retrieval. Remember, this room will be running locally on your hardware so Game On will not be able to access it, unless your machine is also publicly accessible.
 
-### Installation prerequisites
+##### Installation prerequisites
 
 1. [Docker Engine](https://docs.docker.com/engine/installation/)
 2. [Docker Compose](https://docs.docker.com/compose/install/)
 
-### Deploying
+##### Deploying
 
 Once docker is installed, then you deploy your room with
 
@@ -108,7 +111,7 @@ gojava:
 
 After this you will have a docker container with your rooom, running Liberty, and listening on port 9080. A note about `docker-compose.override.yml`, this is an override file that can be used to change, or add to, an existing docker build file. In this case, it maps the file system on the local machine into the dropins directory for the Liberty server running inside the container. The end result is that if you make some changes to your code and run `mvn package -P docker` again to rebuild your war file, then Liberty will see that the file has changed and automatically reload your room without having to build or restart the container.
 
-### Debugging your room
+##### Debugging your room
 
 It is possible to attach a debugger to your room so that you can set breakpoints and step through code. Add the following lines to the `docker-compose.override.yml` file
 
