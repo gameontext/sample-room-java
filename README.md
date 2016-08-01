@@ -105,11 +105,14 @@ Once docker is installed, then you deploy your room with
 gojava:
  volumes:
    - './gojava-application/target/dropins:/opt/ibm/wlp/usr/servers/defaultServer/dropins'
+ environment:
+   - GAMEON_ID=<Your Game On! ID>
+   - GAMEON_SECRET=<Your Game On! Shared Secret>
 ```
 * `docker-compose build`
 * `docker-compose up`
 
-After this you will have a docker container with your rooom, running Liberty, and listening on port 9080. A note about `docker-compose.override.yml`, this is an override file that can be used to change, or add to, an existing docker build file. In this case, it maps the file system on the local machine into the dropins directory for the Liberty server running inside the container. The end result is that if you make some changes to your code and run `mvn package -P docker` again to rebuild your war file, then Liberty will see that the file has changed and automatically reload your room without having to build or restart the container.
+After this you will have a docker container with your room, running Liberty, and listening on port 9080. A note about `docker-compose.override.yml`, this is an override file that can be used to change, or add to, an existing docker build file. In this case, it maps the file system on the local machine into the dropins directory for the Liberty server running inside the container. The end result is that if you make some changes to your code and run `mvn package -P docker` again to rebuild your war file, then Liberty will see that the file has changed and automatically reload your room without having to build or restart the container.
 
 ##### Debugging your room
 
@@ -123,6 +126,30 @@ environment:
 ```
 
 The `ports` section instructs docker to expose the port 7777 from inside the container, so that the debugger can attach. The `environment` statement sets an environment variable called `LIBERTY_MODE` to debug. This variable is read by the Liberty startup script and controls how the server is started, in this case in debug mode.
+
+#### Deploying to Bluemix with IBM Container Services
+
+##### Installation prerequisites
+
+1. [Cloud foundry API](https://github.com/cloudfoundry/cli/releases)
+2. [Install the IBM COntainers plugin](https://console.ng.bluemix.net/docs/containers/container_cli_cfic_install.html)
+
+##### Deploying
+
+1. Log in to the IBM container service. This needs to be done in two stages:
+  1. Log into the Cloud Foundry CLI using `cf login`. Ypu will need to specify the API endpoint as `api.ng.bluemix.net` for the US South server, or `api.eu-gb.bluemix.net` for the UK server.
+  2. After this run the command `cf ic login`. This will perform the authentication to the IBM Container Service.
+2. Build the container in the Bluemix registry by running the command  `cf ic build -t gojava .` from inside the `gojava-wlpcfg` directory.
+3. Run `cf ic images` and check your image is available.
+4. Start the container by running the command `cf ic run -p 9080 --name gojava <registry>/<namespace>/gojava`. You can find the full path from the output of `cf ic images`. An example would be:
+```
+cf ic run -p 9080 --name gojava registry.ng.bluemix.net/pavittr/gojava
+```
+5. While you are waiting for the container to start, request a public IP address using the command `cf ic ip request`. This will return you a public IP address you can bind to your container.
+6. With the returned IP address, bind it using the command `cf ic ip bind <ip address> gojava`.
+7. Issue `cf ic ps`, and wait for your container to go from "Networking" to "Running".
+8. Now you can go to http://<ip address>:9080 and access the Liberty welcome page.
+  
 
 ## Access room on Game On!
 
