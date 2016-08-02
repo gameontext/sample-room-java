@@ -4,22 +4,19 @@
 
 [Game On!](https://game-on.org/) is both a sample microservices application, and a throwback text adventure brought to you by the WASdev team at IBM. This application demonstrates how microservice architectures work from two points of view:
 
-1. As a Player: navigate through a network/maze of rooms, where rooms are provided by autonomous microservice. Each room supports chat, and may provide interaction with items (some of which may be in the room, some of which might be separately defined services as well).
+1. As a Player: navigate through a network/maze of rooms. Each room is an autonomous service, supports chat, and may provide interaction with items (some of which may be in the room, some of which might be separately defined services as well).
 2. As a Developer: learn about microservice architectures and their supporting infrastructure by creating your own microservices to extend the game.
 
 You can learn more about Game On! at [http://game-on.org/](http://game-on.org/).
 
 ## Introduction
 
-This walkthrough will guide you through creating and deploying a microservice that adds a simple room to the running Game On! microservices application.  You will be shown how to setup a room that is implemented in the Java programming language using Websphere Liberty and deployed as a Cloud Foundry application in Bluemix.  
+This walkthrough will guide you through creating and deploying a microservice that adds a simple room to the running Game On! microservices application.  You will be shown how to setup a room that is implemented in the Java programming language using Websphere Liberty and (a) deployed as a Cloud Foundry application in Bluemix, or (b) as a docker container that can be run locally or published to the IBM Container Service in Bluemix. 
 
 ### Installation prerequisites
 
-When deployed using an instant runtime, Gameon-room-java requires the following:
+For local development: 
 
-- [Bluemix account](https://console.ng.bluemix.net)
-- [IBM DevOps Services Account](https://hub.jazz.net/register)
-- [GitHub account](https://github.com/)
 - [Maven](https://maven.apache.org/install.html)
 - Java 8: Any compliant JVM should work.
   * [Java 8 JDK from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
@@ -27,7 +24,13 @@ When deployed using an instant runtime, Gameon-room-java requires the following:
     or [Download a Liberty server package](https://developer.ibm.com/assets/wasdev/#filter/assetTypeFilters=PRODUCT)
     that contains the IBM JDK (Windows, Linux)
 
-## Create Bluemix accounts and log in
+For deployment to Bluemix:
+
+- [Bluemix account](https://console.ng.bluemix.net)
+- [IBM DevOps Services Account](https://hub.jazz.net/register)
+- [GitHub account](https://github.com/)
+
+### Create Bluemix accounts and log in
 
 Sign up for Bluemix at https://console.ng.bluemix.net and DevOps Services at https://hub.jazz.net. When you sign up, you'll create an IBM ID, create an alias, and register with Bluemix.
 * Make a note of your username and org, as you will need both later.
@@ -40,19 +43,21 @@ For a new room to register with the Game-On application, you must first log in t
 1.  Go to [https://game-on.org/](https://game-on.org/) and click **Enter**.
 2.  Select an authentication method to log in with your username and password for that type.
 3.  If you've never played before, you'll need to choose a display name and favorite color, and click **Done**
-3.  Once you are in First room, view your user profile using the link in the top right. It is either your username or a person icon.
+3.  Once you are in First Room, view your user profile using the link in the top right. It is either your username or a person icon.
 4.  You should now see your **Game On! ID** and **Shared Secret** near the middle of the page.
 
 ## Registering your room
 
-In production its likely that multiple instances of your service will exist. As a result of this, by default the sample rooms do not register themselves (you need to provide the GAMEON_ID and GAMEON_SECRET to do this). The preferred way to register a room is either via the [command line regutil tool](https://github.com/gameontext/regutil) or via the interactive map. Below are the instructions for using the interactive map to register a new room in GameOn!.
+Microservices in production should support automatic scaling, with multiple instances of the room microservice running in parallel, with new instances starting or existing instances stopping at unpredictable times.  As a result of this, the room does not programmatically register itself by default. You can force it to do so by specifying the GAMEON_ID and GAMEON_SECRET environment variables.
+
+The preferred way to register a room is either via the [command line regutil tool](https://github.com/gameontext/regutil) or via the interactive map. Below are the instructions for using the interactive map to register a new room in GameOn!.
 
 1.  Go to the [interactive map service](https://game-on.org/interactivemap)
 2.  Under **Tools**, select **Room Developer**.
 3.  Set your Game On! id and Shared Secret fields that you obtained in the steps above, and then close the window.
 4.  From the **Tools** menu again, select **Create new room**.
 5.  Under the **Room** tab set the **Name**, **Full Name** and **Description**.
-6.  Under Connection, set the web socket url that your room will be avilable on. If you don't yet know this you can leave this blank and update it later.
+6.  Under Connection, set the public websocket url for your deployed service. If you don't yet know this you can leave the field blank and update it later.
 
 ## Getting the source code
 
