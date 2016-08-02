@@ -79,7 +79,7 @@ mvn install -P bluemix
     -Dapp.name=<cf-app-name>
 ```
 
-**Please Note:** If you want to register your room directly from here you can do this by setting the folilowing additionial properties:
+**Please Note:** If you want to register your room directly from here you can do this by setting the following additional properties:
 ```
     -Dgameon.id=<Your Game On! ID>
     -Dgameon.secret=<Your Game On! Shared Secret>
