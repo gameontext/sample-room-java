@@ -46,12 +46,13 @@ For a new room to register with the Game-On application, you must first log in t
 ## Registering your room
 
 In production its likely that multiple instances of your service will exist. As a result of this, by default the sample rooms do not register themselves (you need to provide the GAMEON_ID and GAMEON_SECRET to do this). The preferred way to register a room is either via the [command line regutil tool](https://github.com/gameontext/regutil) or via the interactive map. Below are the instructions for using the interactive map to register a new room in GameOn!.
-1. Go to the [interactive map service](https://game-on.org/interactivemap)
-2. Under **Tools**, select **Room Developer**.
-3. Set your Game On! id and Shared Secret fields that you obtained in the steps above, and then close the window.
-4. From the **Tools** menu again, select **Create new room**.
-5. Under the **Room** tab set the **Name**, **Full Name** and **Description**.
-6. Under Connection, set the web socket url that your room will be avilable on. If you don't yet know this you can leave this blank and update it later.
+
+1.  Go to the [interactive map service](https://game-on.org/interactivemap)
+2.  Under **Tools**, select **Room Developer**.
+3.  Set your Game On! id and Shared Secret fields that you obtained in the steps above, and then close the window.
+4.  From the **Tools** menu again, select **Create new room**.
+5.  Under the **Room** tab set the **Name**, **Full Name** and **Description**.
+6.  Under Connection, set the web socket url that your room will be avilable on. If you don't yet know this you can leave this blank and update it later.
 
 ## Getting the source code
 
