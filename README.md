@@ -45,7 +45,7 @@ For a new room to register with the Game-On application, you must first log in t
 
 ## Registering your room
 
-In production its liekly that multiple instances of your service will appear. As a result of this, by default the sample rooms do not register themselves (you need to provide the GAMEON_ID and GAMEON_SECRET to do this). Hence the preferred way to register a room is via the itneractive map.
+In production its likely that multiple instances of your service will exist. As a result of this, by default the sample rooms do not register themselves (you need to provide the GAMEON_ID and GAMEON_SECRET to do this). The preferred way to register a room is either via the [command line regutil tool](https://github.com/gameontext/regutil) or via the interactive map. Below are the instructions for using the interactive map to register a new room in GameOn!.
 1. Go to the [interactive map service](https://game-on.org/interactivemap)
 2. Under **Tools**, select **Room Developer**.
 3. Set your Game On! id and Shared Secret fields that you obtained in the steps above, and then close the window.
@@ -76,9 +76,14 @@ mvn install -P bluemix
     -Dcf.username=<your username>
     -Dcf.password=<your password>
     -Dapp.name=<cf-app-name>
+```
+
+**Please Note:** If you want to register your room directly from here you can do this by setting the folilowing additionial properties:
+```
     -Dgameon.id=<Your Game On! ID>
     -Dgameon.secret=<Your Game On! Shared Secret>
 ```
+
 
 #### Additional notes:
 
@@ -115,9 +120,6 @@ Once docker is installed, then you deploy your room with
 gojava:
  volumes:
    - './gojava-application/target/dropins:/opt/ibm/wlp/usr/servers/defaultServer/dropins'
- environment:
-   - GAMEON_ID=<Your Game On! ID>
-   - GAMEON_SECRET=<Your Game On! Shared Secret>
 ```
 * `docker-compose build`
 * `docker-compose up`
