@@ -78,9 +78,9 @@ The source code is located in GitHub, navigate to our [repository](https://githu
 3. Use a maven target profile to push the app to Bluemix: (enter the below as one maven command)
 ```
 mvn install -P bluemix
-    -Dcf.org=<your organization>
-    -Dcf.username=<your username>
-    -Dcf.password=<your password>
+    -Dcf.org=<your bluemix organization>
+    -Dcf.username=<bluemix username>
+    -Dcf.password=<bluemix password>
     -Dapp.name=<cf-app-name>
 ```
 
