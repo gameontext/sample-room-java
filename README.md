@@ -160,14 +160,29 @@ The `ports` section instructs docker to expose the port 7777 from inside the con
 2. Build the container in the Bluemix registry by running the command  `cf ic build -t gojava .` from inside the `gojava-wlpcfg` directory.
 3. Run `cf ic images` and check your image is available.
 4. Start the container by running the command `cf ic run -p 9080 --name gojava <registry>/<namespace>/gojava`. You can find the full path from the output of `cf ic images`. An example would be:
-```
-cf ic run -p 9080 --name gojava registry.ng.bluemix.net/pavittr/gojava
-```
+
+  `cf ic run -p 9080 --name gojava registry.ng.bluemix.net/pavittr/gojava`
+
 5. While you are waiting for the container to start, request a public IP address using the command `cf ic ip request`. This will return you a public IP address you can bind to your container.
 6. With the returned IP address, bind it using the command `cf ic ip bind <ip address> gojava`.
 7. Issue `cf ic ps`, and wait for your container to go from "Networking" to "Running".
-8. Now you can go to http://<ip address>:9080 and access the Liberty welcome page.
+8. Now you can go to `http://<ip address>:9080` and access the Liberty welcome page.
   
+#### Deploy as a container group
+
+Instead of deploying a container as a single instance, you can instead deploy a container group. A container group can be used to deploy multiple instances of the same container and load balance between them.
+
+1. Log in to the IBM container service. This needs to be done in two stages:
+  1. Log into the Cloud Foundry CLI using `cf login`. Ypu will need to specify the API endpoint as `api.ng.bluemix.net` for the US South server, or `api.eu-gb.bluemix.net` for the UK server.
+  2. After this run the command `cf ic login`. This will perform the authentication to the IBM Container Service.
+2. Run `cf ic images` and check the `gojava` image is available. If not, run the command `cf ic build -t gojava .` from inside the `gojava-wlpcfg` directory to create it.
+3. Create the container group by running `cf ic group create -p 9080 -n <appName> --name gojavagroup <registry>/<namespace>/gojava`. You can find the full path from the output of `cf ic images`. An example would be:
+
+  `cf ic group create -p 9080 --name gojavagroup registry.ng.bluemix.net/pavittr/gojava`
+
+4. Run the command ` cf ic route map -n <appHost> -d mybluemix.net  gojavagroup`. This will make your containers available at <appHost>.mybluemix.net.
+5. Run the command `cf ic group instances gojavagroup` to check the status of your instances. Once they are in "Running" state your group is ready to use.
+6. Now you can go to `http://<appHost>.mybluemix.net` and access the Liberty welcome page.
 
 ## Access room on Game On!
 
