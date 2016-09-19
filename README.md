@@ -51,8 +51,8 @@ For a new room to register with the Game-On application, you must first log in t
 1.  Go to [https://game-on.org/](https://game-on.org/) and click **Enter**.
 2.  Select an authentication method to log in with your username and password for that type.
 3.  If you've never played before, you'll need to choose a display name and favorite color, and click **Done**
-3.  Once you are in First Room, view your user profile using the link in the top right. It is either your username or a person icon.
-4.  You should now see your **Game On! ID** and **Shared Secret** near the middle of the page.
+3.  Once you are in First Room, view your user profile using the link in the top right. It is either your username or a person icon, then select "Edit Rooms" in the header
+4.  You should now see your **Game On! ID** and **Shared Secret**.
 
 ## Registering your room
 
@@ -61,8 +61,8 @@ Microservices in production should support automatic scaling, with multiple inst
 The preferred way to register a room is via the Edit Rooms dialog in GameOn (note you can also use the [command line regutil tool](https://github.com/gameontext/regutil) or the [interactive map](https://game-on.org/interactivemap)).
 
 1.  Go to [GameOn](https://game-on.org) and sign in.
-2.  Once you are signed in, go to the top right of the browser window and click on your username.
-3.  From this windows, again click the top right panel to select **Edit rooms**.
+2.  Once you are signed in, go to the top right of the browser window and click on your username (or person icon).
+3.  From this window, again click the top right panel to select **Edit rooms**.
 4.  Under **Select or create a room**, make sure **create a room** is selected from the dropdown.
 5.  Fill in the room information as specified. If you don't know all the details yet, such as endpoint, leave those blank and come back and fill them in later.
 6.  Click **Create** and the room will be created for you.
