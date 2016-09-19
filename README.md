@@ -58,14 +58,14 @@ For a new room to register with the Game-On application, you must first log in t
 
 Microservices in production should support automatic scaling, with multiple instances of the room microservice running in parallel, with new instances starting or existing instances stopping at unpredictable times.  As a result of this, the room does not programmatically register itself by default. You can force it to do so by specifying the GAMEON_ID and GAMEON_SECRET environment variables.
 
-The preferred way to register a room is either via the [command line regutil tool](https://github.com/gameontext/regutil) or via the interactive map. Below are the instructions for using the interactive map to register a new room in GameOn!.
+The preferred way to register a room is via the Edit Rooms dialog in GameOn (note you can also use the [command line regutil tool](https://github.com/gameontext/regutil) or the [interactive map](https://game-on.org/interactivemap)).
 
-1.  Go to the [interactive map service](https://game-on.org/interactivemap)
-2.  Under **Tools**, select **Room Developer**.
-3.  Set your Game On! id and Shared Secret fields that you obtained in the steps above, and then close the window.
-4.  From the **Tools** menu again, select **Create new room**.
-5.  Under the **Room** tab set the **Name**, **Full Name** and **Description**.
-6.  Under Connection, set the public websocket url for your deployed service. If you don't yet know this you can leave the field blank and update it later. 
+1.  Go to [GameOn](https://game-on.org) and sign in.
+2.  Once you are signed in, go to the top right of the browser window and click on your username.
+3.  From this windows, again click the top right panel to select **Edit rooms**.
+4.  Under **Select or create a room**, make sure **create a room** is selected from the dropdown.
+5.  Fill in the room information as specified. If you don't know all the details yet, such as endpoint, leave those blank and come back and fill them in later.
+6.  Click **Create** and the room will be created for you.
 
 ## Getting the source code
 
