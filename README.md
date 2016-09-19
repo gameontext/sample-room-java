@@ -57,7 +57,7 @@ The preferred way to register a room is either via the [command line regutil too
 3.  Set your Game On! id and Shared Secret fields that you obtained in the steps above, and then close the window.
 4.  From the **Tools** menu again, select **Create new room**.
 5.  Under the **Room** tab set the **Name**, **Full Name** and **Description**.
-6.  Under Connection, set the public websocket url for your deployed service. If you don't yet know this you can leave the field blank and update it later.
+6.  Under Connection, set the public websocket url for your deployed service. If you don't yet know this you can leave the field blank and update it later. 
 
 ## Getting the source code
 
@@ -83,6 +83,8 @@ mvn install -P bluemix
     -Dcf.password=<bluemix password>
     -Dapp.name=<cf-app-name>
 ```
+
+After your room has been pushed, your WebSocket should be specified as `ws://<cf-app-name>.eu-gb.mybluemix.net/room` (see the additional notes below).
 
 **Please Note:** If you want to register your room directly from here you can do this by setting the following additional properties:
 ```
