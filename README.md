@@ -79,7 +79,7 @@ The source code is located in GitHub, navigate to our [repository](https://githu
 2. `mvn install`
   After running this, you will have the server running locally at [http://localhost:9080/](http://localhost:9080/).
   You can use a browser extension to play with the WebSocket according to the
-  [Game On! WebSocket protocol](https://gameontext.gitbooks.io/gameon-gitbook/content/microservices/WebsocketProtocol.html").
+  [Game On! WebSocket protocol](https://book.game-on.org/microservices/WebSocketProtocol.html).
 
   Use `mvn clean -P stopServer` to stop the server.
 
