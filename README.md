@@ -81,8 +81,8 @@ The source code is located in GitHub, navigate to our [repository](https://githu
       * `cf.context=eu-gb.mybluemix.net`
       * `cf.target=https://api.eu-gb.bluemix.net`
     * US South:
-      * `-Dcf.target=https://api.ng.bluemix.net`
       * `-Dcf.context=mybluemix.net`
+      * `-Dcf.target=https://api.ng.bluemix.net`
     * From the Bluemix console, click on your username in the top right corner. You'll see the region displayed in the panel on the right side of the screen.
   * `cf-app-name` is an arbitrary name that will be part of your URL. It must not contain spaces or special characters.
 
