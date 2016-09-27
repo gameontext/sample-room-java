@@ -52,7 +52,7 @@ import org.gameontext.util.reg.RegistrationUtility.HTTP_METHOD;
 
 /**
  * A very simple room.
- * 
+ *
  * All configuration for the room is contained / derived from the Config class.
  * This application has the following library dependencies (which are managed by jitpack.io).
  *
@@ -74,9 +74,9 @@ public class Application implements ServletContextListener {
     private final static String EXIT_ID = "exitId";
     private final static String FULLNAME = "fullName";
     private final static String DESCRIPTION = "description";
-    
+
     private Config config = new Config();
-    
+
     private Set<String> playersInRoom = Collections.synchronizedSet(new HashSet<String>());
 
     List<String> directions = Arrays.asList( "n", "s", "e", "w", "u", "d");
@@ -87,41 +87,40 @@ public class Application implements ServletContextListener {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Room registration
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Entry point at application start, we use this to test for & perform room registration.
      */
     @Override
     public final void contextInitialized(final ServletContextEvent e) {
-    	//setup the registration with the config retrieved from the environment
-    	if (config.isValid()) {
-	        RegistrationUtility regutil = new RegistrationUtility();
-	        regutil.setId(config.getUserId());
-	        regutil.setSecret(config.getKey());
-	        regutil.setUrl(config.getRegistrationUrl());
-	        
-	        // attempt to regsiter this room
-	        regutil.setMethod(HTTP_METHOD.POST);
-	        regutil.setBody(config.getRoomJSON(e));
-	        try {
-		        switch(regutil.register()) {
-		        	case HttpServletResponse.SC_CONFLICT :
-		        		System.out.println("This room is already registered, so there is no need to re-register");
-		        		break;
-		        	case HttpServletResponse.SC_CREATED :
-		        		System.out.println("Room registered successfully.");
-		        		break;
-		        	default:
-		        		System.out.println("Failed to register room, see logs for more details");
-		        		break;
-		        }
-	        } catch (Exception ex) {
-	        	ex.printStackTrace();
-	            throw new RuntimeException(ex);
-	        }
-    	} else {
-    		System.out.println("Not registering as no valid config is available");
-    	}
+        //setup the registration with the config retrieved from the environment
+        if (config.isValid()) {
+            RegistrationUtility regutil = new RegistrationUtility();
+            regutil.setId(config.getUserId());
+            regutil.setSecret(config.getKey());
+            regutil.setUrl(config.getRegistrationUrl());
+            // attempt to regsiter this room
+            regutil.setMethod(HTTP_METHOD.POST);
+            regutil.setBody(config.getRoomJSON(e));
+            try {
+                switch(regutil.register()) {
+                case HttpServletResponse.SC_CONFLICT :
+                    System.out.println("This room is already registered, so there is no need to re-register");
+                    break;
+                case HttpServletResponse.SC_CREATED :
+                    System.out.println("Room registered successfully.");
+                    break;
+                default:
+                    System.out.println("Failed to register room, see logs for more details");
+                    break;
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
+        } else {
+            System.out.println("Not registering as no valid config is available");
+        }
     }
 
     @Override
@@ -162,16 +161,16 @@ public class Application implements ServletContextListener {
 
         // Who doesn't love switch on strings in Java 8?
         switch(contents[0]) {
-            case "roomHello":
-                sessions.add(session);
-                addNewPlayer(session, contents[2]);
-                break;
-            case "room":
-                processCommand(session, contents[2]);
-                break;
-            case "roomGoodbye":
-                removePlayer(session, contents[2]);
-                break;
+        case "roomHello":
+            sessions.add(session);
+            addNewPlayer(session, contents[2]);
+            break;
+        case "room":
+            processCommand(session, contents[2]);
+            break;
+        case "roomGoodbye":
+            removePlayer(session, contents[2]);
+            break;
         }
     }
 
@@ -191,7 +190,7 @@ public class Application implements ServletContextListener {
         if (playersInRoom.add(userid)) {
             // broadcast that the user has entered the room
             sendMessageToRoom(session, "Player " + username + " has entered the room", "You have entered the room",
-                    userid);
+                              userid);
 
             // now send the room info
             // this is the required response to a roomHello event, which is the
@@ -252,9 +251,9 @@ public class Application implements ServletContextListener {
                 // Trying to go somewhere, eh?
                 JsonObjectBuilder response = Json.createObjectBuilder();
                 response.add(TYPE, EXIT)
-                .add(EXIT_ID, exitDirection)
-                .add(BOOKMARK, bookmark++)
-                .add(CONTENT, "Run Away!");
+                    .add(EXIT_ID, exitDirection)
+                    .add(BOOKMARK, bookmark++)
+                    .add(CONTENT, "Run Away!");
 
                 sendRemoteTextMessage(session, "playerLocation," + userid + "," + response.build().toString());
             }
@@ -277,7 +276,7 @@ public class Application implements ServletContextListener {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void sendMessageToRoom(Session session, String messageForRoom, String messageForUser, String userid)
-            throws IOException {
+        throws IOException {
         JsonObjectBuilder response = Json.createObjectBuilder();
         response.add(TYPE, "event");
 
