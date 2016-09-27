@@ -26,16 +26,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 /**
- * Manages obtaining the configuration from the environment and 
+ * Manages obtaining the configuration from the environment and
  * generating any necessary data for a successful room registration.
- * 
+ *
  */
 public class Config {
-	//You should change this name to avoid confusion with other sample rooms registered with Game On.
+    //You should change this name to avoid confusion with other sample rooms registered with Game On.
     private final String name = "AnotherSimpleRoom";
     private final String fullName = "A Very Simple Room.";
     private final String description = "You are in the worlds most simple room, there is nothing to do here.";
-	
+
     //default registration is with the live site, although this can be changed via environment variables
     private String registrationUrl = "https://game-on.org/map/v1/sites";
     private String endPointUrl;
@@ -50,7 +50,7 @@ public class Config {
         key = System.getenv("GAMEON_SECRET");
         String url = System.getenv("GAMEON_MAP_URL");
         if(url != null) {
-        	registrationUrl = url;	//map registration URL has been overwritten by an env var
+            registrationUrl = url;  //map registration URL has been overwritten by an env var
         }
         if(userId == null || key == null){
             System.out.println("This room is intended to obtain it's configuration from the environment");
@@ -62,24 +62,24 @@ public class Config {
         }
         valid = true;
     }
-    
+
     /**
      * Builds the JSON object which will be used for the room registration. You can change the values to customise
      * your room, at the very least, you should change the name of the room so that it stands out
      * from the other sample rooms.
-     * @param e 
-     * 
+     * @param e
+     *
      * @return JSON for the room registration
      */
     public String getRoomJSON(ServletContextEvent e) {
-    	// build the registration payload (post data)
+        // build the registration payload (post data)
         JsonObjectBuilder registrationPayload = Json.createObjectBuilder();
         // add the basic room info.
         registrationPayload.add("name", name);
         registrationPayload.add("fullName", fullName);
         registrationPayload.add("description", description);
         // add the doorway descriptions we'd like the game to use if it
-        // wires us to other rooms. Note: you're describing the outside 
+        // wires us to other rooms. Note: you're describing the outside
         // of your room: What does the North wall+door of your room look
         // like from the outside? Note that a traveller will be looking South
         // when they view it!
@@ -102,11 +102,11 @@ public class Config {
         return registrationPayload.build().toString();
     }
 
-	public String getRegistrationUrl() {
-		return registrationUrl;
-	}
+    public String getRegistrationUrl() {
+        return registrationUrl;
+    }
 
-	private String getEndPointUrl(ServletContextEvent e) {
+    private String getEndPointUrl(ServletContextEvent e) {
         //if we're running in a cf, we should use the details from those environment vars.
         String vcap_application = System.getenv("VCAP_APPLICATION");
         if(vcap_application!=null){
@@ -123,38 +123,36 @@ public class Config {
             System.out.println("Assuming that this room is running on localhost port 9080 (this should match the config in server.xml)");
             endPointUrl = "ws://localhost:9080/room";
         }
-		return endPointUrl;
-	}
+        return endPointUrl;
+    }
 
-	/**
-	 * Determine if this configuration object is valid, i.e. has all it's required component
-	 * parts such as the Game On ID and shared secret. If the object isn't valid, then it's
-	 * likely an issue with the running environment.
-	 * @return
-	 */
-	public boolean isValid() {
-		return valid;
-	}
+    /**
+     * Determine if this configuration object is valid, i.e. has all it's required component
+     * parts such as the Game On ID and shared secret. If the object isn't valid, then it's
+     * likely an issue with the running environment.
+     * @return
+     */
+    public boolean isValid() {
+        return valid;
+    }
 
-	public String getUserId() {
-		return userId;
-	}
+    public String getUserId() {
+        return userId;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getFullname() {
-		return fullName;
-	}
+    public String getFullname() {
+        return fullName;
+    }
 
-	public String getDescription() {
-		return description;
-	}
-	
-	
+    public String getDescription() {
+        return description;
+    }
 }
