@@ -58,7 +58,7 @@
                         <id>start-server</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>start-server</goal>
+                            <goal>run-server</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -108,32 +108,6 @@
                     <summaryFile>${project.build.directory}/test-reports/fvt/failsafe-summary.xml</summaryFile>
                     <reportsDirectory>${project.build.directory}/test-reports/fvt</reportsDirectory>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
-                <executions>
-                    <execution>
-                        <id>echo_server_started</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <echo>************************************************************</echo>
-                                <echo>************************************************************</echo>
-                                <echo>Your application is running at http://localhost:${testServerHttpPort}/${warContext}</echo>
-                                <echo>************************************************************</echo>
-                                <echo>You will need to stop your server before running mvn install again:</echo>
-                                <echo>mvn clean -P stopServer</echo>
-                                <echo>************************************************************</echo>
-                                <echo>************************************************************</echo>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
