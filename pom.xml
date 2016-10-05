@@ -62,24 +62,15 @@
 
     <profiles>
         <profile>
-            <id>localServer</id>
+            <id>startLocal</id>
             <modules>
                 <module>gojava-deploy/gojava-localServer</module>
             </modules>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <id>bluemix</id>
             <modules>
                 <module>gojava-deploy/gojava-bluemix</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>docker</id>
-            <modules>
-                <module>gojava-application</module>
             </modules>
         </profile>
     </profiles>
