@@ -34,7 +34,55 @@ The source code is located in GitHub, navigate to our [repository](https://githu
   After running this, you will have the server running locally at [http://localhost:9080/](http://localhost:9080/).
   You can use a browser extension to play with the WebSocket according to the
   [Game On! WebSocket protocol](https://book.game-on.org/microservices/WebSocketProtocol.html).
-  
+
+## Deploying your room
+
+To deploy your room you can either:
+* [Deploy to Bluemix as a Cloud Foundry app](#deploying-to-bluemix-as-a-cloud-foundry-app)
+or
+* [Deploy using Docker](#deploy-using-docker)
+
+## Registering your room
+
+Microservices in production should support automatic scaling, with multiple instances of the room microservice running in parallel, with new instances starting or existing instances stopping at unpredictable times.  As a result of this, the room does not programmatically register itself by default. You can force it to do so by specifying the GAMEON_ID and GAMEON_SECRET environment variables.
+
+The preferred way to register a room is via the Edit Rooms dialog in Game On! (note you can also use the [command line regutil tool](https://github.com/gameontext/regutil) or the [interactive map](https://game-on.org/interactivemap)).
+
+1.  Go to [GameOn](https://game-on.org) and sign in.
+2.  Once you are signed in, go to the top right of the browser window and click on your username (or person icon).
+3.  From this window, again click the top right panel to select **Edit rooms**.
+4.  Under **Select or create a room**, make sure **create a room** is selected from the dropdown.
+5.  Fill in the room information as specified. If you don't know all the details yet, such as endpoint, leave those blank and come back and fill them in later.
+6.  Click **Create** and the room will be created for you.
+
+## Access room on Game On!
+
+Once the room is set up and it has registered with Game On!, it will be accessible on [Game On!](https://game-on.org/). It may take a moment for the room to appear.
+
+1. Log in to [Game On!](https://game-on.org/) using the authentication method you used to create your user ID and shared secret for the registered room.
+2. Use the Game On! command `/listmyrooms` from The First Room, to see your list of rooms. Once your room is registered, it will appear in that list.
+3. To get to your room, navigate through the network or go directly there by using the `/teleport` command from The First Room.
+4. Look at the Bluemix log console to see "A new connection has been made to the room"
+
+Congratulations, you've deployed a microservice that extended an existing microservices-based application so that it can do something new.
+
+Suggested activities:
+* Make it more resilient -- add additional instances using the autoscaling add-on: https://console.ng.bluemix.net/catalog/services/auto-scaling
+* Consider how to allow chat messages to propagate between independent instances using a shared datastore or cache, or an event bus, or...
+
+
+### List of host provided commands
+
+The Game On! host provides a set a universal commands:
+- **/exits** - List of all exits from the current room.
+- **/help** - List of all available commands for the current room.
+- **/sos** - Go back to The First Room.
+
+### The First Room commands
+
+The First Room is usually where new users will start in Game On!. From there, additional commands are available and maintained by Game On!. For the list of current commands use the `/help` command.
+
+
 ## Deploying to Bluemix as a Cloud Foundry app
 
 ### Prerequisites for Bluemix deployment
@@ -91,26 +139,10 @@ Your WebSocket URL will vary by region, but should look something like:
     -Dgameon.secret=<Your Game On! Shared Secret>
 ```
 
-
 #### Additional notes:
 
 * `app.name` is a unique, URL-friendly name for your deployed Bluemix app.
 * `gameon.id` and `gameon.secret` are those retrieved [earlier](https://github.com/cfsworkload/gameon-room-java#get-game-on-id-and-shared-secret).
-
-
-
-## Registering your room
-
-Microservices in production should support automatic scaling, with multiple instances of the room microservice running in parallel, with new instances starting or existing instances stopping at unpredictable times.  As a result of this, the room does not programmatically register itself by default. You can force it to do so by specifying the GAMEON_ID and GAMEON_SECRET environment variables.
-
-The preferred way to register a room is via the Edit Rooms dialog in Game On! (note you can also use the [command line regutil tool](https://github.com/gameontext/regutil) or the [interactive map](https://game-on.org/interactivemap)).
-
-1.  Go to [GameOn](https://game-on.org) and sign in.
-2.  Once you are signed in, go to the top right of the browser window and click on your username (or person icon).
-3.  From this window, again click the top right panel to select **Edit rooms**.
-4.  Under **Select or create a room**, make sure **create a room** is selected from the dropdown.
-5.  Fill in the room information as specified. If you don't know all the details yet, such as endpoint, leave those blank and come back and fill them in later.
-6.  Click **Create** and the room will be created for you.
 
 
 ## Deploy using Docker
@@ -192,29 +224,3 @@ Instead of deploying a container as a single instance, you can instead deploy a 
 5. Run the command `cf ic group instances gojavagroup` to check the status of your instances. Once they are in "Running" state your group is ready to use.
 6. Now you can go to `http://<appHost>.mybluemix.net` and access the Liberty welcome page.
 
-## Access room on Game On!
-
-Once the room is set up and it has registered with Game On!, it will be accessible on [Game On!](https://game-on.org/). It may take a moment for the room to appear.
-
-1. Log in to [Game On!](https://game-on.org/) using the authentication method you used to create your user ID and shared secret for the registered room.
-2. Use the Game On! command `/listmyrooms` from The First Room, to see your list of rooms. Once your room is registered, it will appear in that list.
-3. To get to your room, navigate through the network or go directly there by using the `/teleport` command from The First Room.
-4. Look at the Bluemix log console to see "A new connection has been made to the room"
-
-Congratulations, you've deployed a microservice that extended an existing microservices-based application so that it can do something new.
-
-Suggested activities:
-* Make it more resilient -- add additional instances using the autoscaling add-on: https://console.ng.bluemix.net/catalog/services/auto-scaling
-* Consider how to allow chat messages to propagate between independent instances using a shared datastore or cache, or an event bus, or...
-
-
-### List of host provided commands
-
-The Game On! host provides a set a universal commands:
-- **/exits** - List of all exits from the current room.
-- **/help** - List of all available commands for the current room.
-- **/sos** - Go back to The First Room.
-
-### The First Room commands
-
-The First Room is usually where new users will start in Game On!. From there, additional commands are available and maintained by Game On!. For the list of current commands use the `/help` command.
