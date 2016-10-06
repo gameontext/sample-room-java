@@ -15,8 +15,6 @@ This walkthrough will guide you through creating and deploying a microservice th
 
 ## Installation prerequisites
 
-For local development: 
-
 - [Maven](https://maven.apache.org/install.html)
 - Java 8: Any compliant JVM should work.
   * [Java 8 JDK from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
@@ -115,18 +113,18 @@ The preferred way to register a room is via the Edit Rooms dialog in Game On! (n
 6.  Click **Create** and the room will be created for you.
 
 
-### Deploy using Docker
+## Deploy using Docker
 
-#### Deploying locally
+### Deploying locally
 
 It is possible to deploy your room locally into a Docker container. This can be useful if you want to test aspects such as the room registration and configuration retrieval. Remember, this room will be running locally on your hardware so Game On will not be able to access it, unless your machine is also publicly accessible.
 
-##### Installation prerequisites
+#### Installation prerequisites
 
 1. [Docker Engine](https://docs.docker.com/engine/installation/)
 2. [Docker Compose](https://docs.docker.com/compose/install/)
 
-##### Deploying
+#### Deploying
 
 Once docker is installed, then you deploy your room with
 
@@ -142,7 +140,7 @@ gojava:
 
 After this you will have a docker container with your room, running Liberty, and listening on port 9080. A note about `docker-compose.override.yml`, this is an override file that can be used to change, or add to, an existing docker build file. In this case, it maps the file system on the local machine into the dropins directory for the Liberty server running inside the container. The end result is that if you make some changes to your code and run `mvn package` again to rebuild your war file, then Liberty will see that the file has changed and automatically reload your room without having to build or restart the container.
 
-##### Debugging your room
+#### Debugging your room
 
 It is possible to attach a debugger to your room so that you can set breakpoints and step through code. Add the following lines to the `docker-compose.override.yml` file
 
@@ -155,14 +153,14 @@ environment:
 
 The `ports` section instructs docker to expose the port 7777 from inside the container, so that the debugger can attach. The `environment` statement sets an environment variable called `LIBERTY_MODE` to debug. This variable is read by the Liberty startup script and controls how the server is started, in this case in debug mode.
 
-#### Deploying to Bluemix with IBM Container Services
+### Deploying to Bluemix with IBM Container Services
 
-##### Installation prerequisites
+#### Installation prerequisites
 
 1. [Cloud foundry API](https://github.com/cloudfoundry/cli/releases)
 2. [Install the IBM COntainers plugin](https://console.ng.bluemix.net/docs/containers/container_cli_cfic_install.html)
 
-##### Deploying
+#### Deploying
 
 1. Log in to the IBM container service. This needs to be done in two stages:
   1. Log into the Cloud Foundry CLI using `cf login`. Ypu will need to specify the API endpoint as `api.ng.bluemix.net` for the US South server, or `api.eu-gb.bluemix.net` for the UK server.
@@ -178,7 +176,7 @@ The `ports` section instructs docker to expose the port 7777 from inside the con
 7. Issue `cf ic ps`, and wait for your container to go from "Networking" to "Running".
 8. Now you can go to `http://<ip address>:9080` and access the Liberty welcome page.
   
-#### Deploy as a container group
+### Deploy as a container group
 
 Instead of deploying a container as a single instance, you can instead deploy a container group. A container group can be used to deploy multiple instances of the same container and load balance between them.
 
