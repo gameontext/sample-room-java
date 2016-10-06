@@ -1,13 +1,5 @@
 # Microservices with a Game On! Room
 
-## Are you at JavaOne 2016?
-
-Customize your room between now and Wednesday (21 Sept 2016) and win prizes!
-It's as easy as linking rooms you create with the JavaOne contest. 
-For more information: http://bit.ly/gameonjone2016  
-
-----
-
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4d099084aab34a57893e8fd29df79ae3)](https://www.codacy.com/app/gameontext/gameon-room-java?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gameontext/gameon-room-java&amp;utm_campaign=Badge_Grade)
 
 [Game On!](https://game-on.org/) is both a sample microservices application, and a throwback text adventure brought to you by the WASdev team at IBM. This application demonstrates how microservice architectures work from two points of view:
