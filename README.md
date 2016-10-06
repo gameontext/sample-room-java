@@ -13,7 +13,7 @@ You can learn more about Game On! at [http://game-on.org/](http://game-on.org/).
 
 This walkthrough will guide you through creating and deploying a microservice that adds a simple room to the running Game On! microservices application.  You will be shown how to setup a room that is implemented in the Java programming language using Websphere Liberty and (a) deployed as a Cloud Foundry application in Bluemix, or (b) as a docker container that can be run locally or published to the IBM Container Service in Bluemix. 
 
-### Installation prerequisites
+## Installation prerequisites
 
 For local development: 
 
@@ -23,8 +23,23 @@ For local development:
   * [Java 8 JDK from IBM (AIX, Linux, z/OS, IBM i)](http://www.ibm.com/developerworks/java/jdk/),  
     or [Download a Liberty server package](https://developer.ibm.com/assets/wasdev/#filter/assetTypeFilters=PRODUCT)
     that contains the IBM JDK (Windows, Linux)
+    
+## Getting the source code
 
-For deployment to Bluemix:
+The source code is located in GitHub, navigate to our [repository](https://github.com/gameontext/gameon-room-java.git) and create a fork of the repository into your own repo. Navigate to your new fork and clone the repository with `git clone https://github.com/<<yourGitHubId>>/gameon-room-java.git`. Alternatively you can download the ZIP file and unzip the code on to your local machine.
+
+## Building the app locally
+
+1. `cd gameon-room-java`
+2. `mvn install`
+3. `mvn package -PstartLocal`
+  After running this, you will have the server running locally at [http://localhost:9080/](http://localhost:9080/).
+  You can use a browser extension to play with the WebSocket according to the
+  [Game On! WebSocket protocol](https://book.game-on.org/microservices/WebSocketProtocol.html).
+  
+## Deploying to Bluemix as a Cloud Foundry app
+
+### Prerequisites for Bluemix deployment
 
 - [Bluemix account](https://console.ng.bluemix.net)
 - [IBM DevOps Services Account](https://hub.jazz.net/register)
@@ -37,45 +52,22 @@ Sign up for Bluemix at https://console.ng.bluemix.net and DevOps Services at htt
   * By default, the space is dev and the org is the project creator's user name. For example, if sara@example.com signs in to Bluemix for the first time, the active space is dev and the org is sara@example.com.
 * Make a note of your region! (US South, United Kingdom, or Australia)
   * When you log into Bluemix, your logged in username, organization, and space are shown in the top right. If you click in the top right corner, you'll see the region displayed in the panel displayed on the right side of the screen.
+  
+### Deploying the app
 
-## Registering your room
-
-Microservices in production should support automatic scaling, with multiple instances of the room microservice running in parallel, with new instances starting or existing instances stopping at unpredictable times.  As a result of this, the room does not programmatically register itself by default. You can force it to do so by specifying the GAMEON_ID and GAMEON_SECRET environment variables.
-
-The preferred way to register a room is via the Edit Rooms dialog in Game On! (note you can also use the [command line regutil tool](https://github.com/gameontext/regutil) or the [interactive map](https://game-on.org/interactivemap)).
-
-1.  Go to [GameOn](https://game-on.org) and sign in.
-2.  Once you are signed in, go to the top right of the browser window and click on your username (or person icon).
-3.  From this window, again click the top right panel to select **Edit rooms**.
-4.  Under **Select or create a room**, make sure **create a room** is selected from the dropdown.
-5.  Fill in the room information as specified. If you don't know all the details yet, such as endpoint, leave those blank and come back and fill them in later.
-6.  Click **Create** and the room will be created for you.
-
-## Getting the source code
-
-The source code is located in GitHub, navigate to our [repository](https://github.com/gameontext/gameon-room-java.git) and download the ZIP file and unzip the code on to your local machine. Alternatively you can use the GitHub CLI to clone the repository with `git clone https://github.com/gameontext/gameon-room-java.git`.
-
-## Build and deploy
-
-### Deploying to Bluemix as a Cloud Foundry app
-
-1. `cd gameon-room-java`
-2. `mvn install`
-3. `mvn package -PstartLocal`
-  After running this, you will have the server running locally at [http://localhost:9080/](http://localhost:9080/).
-  You can use a browser extension to play with the WebSocket according to the
-  [Game On! WebSocket protocol](https://book.game-on.org/microservices/WebSocketProtocol.html).
-
-3. Use a maven target profile to push the app to Bluemix: (enter the below as one maven command)
-  * You'll need to use the following values depending on the region you're in: 
-    * London (default):
+**To deploy to Bluemix you need to know the following:**
+* Bluemix organization (`cf.org`)
+* Context and API target for the region to deploy to:
+  * London (default):
       * `cf.context=eu-gb.mybluemix.net`
       * `cf.target=https://api.eu-gb.bluemix.net`
     * US South:
       * `-Dcf.context=mybluemix.net`
       * `-Dcf.target=https://api.ng.bluemix.net`
-    * From the Bluemix console, click on your username in the top right corner. You'll see the region displayed in the panel on the right side of the screen.
-  * `cf-app-name` is an arbitrary name that will be part of your URL. It must not contain spaces or special characters.
+      * From the Bluemix console, click on your username in the top right corner. You'll see the region displayed in the panel on the right side of the screen.
+* A unique app name to be included as part of the URL (`cf-app-name`). It must not contain spaces or special characters.
+
+To deploy the app enter the below as one command:
 
 ```
 mvn install -P bluemix
@@ -87,7 +79,11 @@ mvn install -P bluemix
     -Dapp.name=<cf-app-name>
 ```
 
-After your room has been pushed, your WebSocket URL will vary by region, but should look something like: 
+After your room has been pushed, you should be able to view it at:
+  * US South: `http://<cf-app-name>.mybluemix.net/`
+  * United Kingdom: `http://<cf-app-name>.eu-gb.mybluemix.net/` 
+  
+Your WebSocket URL will vary by region, but should look something like: 
   * US South: `ws://<cf-app-name>.mybluemix.net/room`
   * United Kingdom: `ws://<cf-app-name>.eu-gb.mybluemix.net/room` 
 
@@ -102,7 +98,22 @@ After your room has been pushed, your WebSocket URL will vary by region, but sho
 
 * `app.name` is a unique, URL-friendly name for your deployed Bluemix app.
 * `gameon.id` and `gameon.secret` are those retrieved [earlier](https://github.com/cfsworkload/gameon-room-java#get-game-on-id-and-shared-secret).
-* 
+
+
+
+## Registering your room
+
+Microservices in production should support automatic scaling, with multiple instances of the room microservice running in parallel, with new instances starting or existing instances stopping at unpredictable times.  As a result of this, the room does not programmatically register itself by default. You can force it to do so by specifying the GAMEON_ID and GAMEON_SECRET environment variables.
+
+The preferred way to register a room is via the Edit Rooms dialog in Game On! (note you can also use the [command line regutil tool](https://github.com/gameontext/regutil) or the [interactive map](https://game-on.org/interactivemap)).
+
+1.  Go to [GameOn](https://game-on.org) and sign in.
+2.  Once you are signed in, go to the top right of the browser window and click on your username (or person icon).
+3.  From this window, again click the top right panel to select **Edit rooms**.
+4.  Under **Select or create a room**, make sure **create a room** is selected from the dropdown.
+5.  Fill in the room information as specified. If you don't know all the details yet, such as endpoint, leave those blank and come back and fill them in later.
+6.  Click **Create** and the room will be created for you.
+
 
 ### Deploy using Docker
 
