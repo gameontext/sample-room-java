@@ -90,6 +90,7 @@ The First Room is usually where new users will start in Game On!. From there, ad
 - [Bluemix account](https://console.ng.bluemix.net)
 - [IBM DevOps Services Account](https://hub.jazz.net/register)
 - [GitHub account](https://github.com/)
+- [Cloud Foundry command line](https://docs.cloudfoundry.org/cf-cli/)
 
 ### Create Bluemix accounts and log in
 
@@ -101,42 +102,36 @@ Sign up for Bluemix at https://console.ng.bluemix.net and DevOps Services at htt
   
 ### Deploying the app
 
-**To deploy to Bluemix you need to know the following:**
-* Bluemix organization (`cf.org`)
-* Context and API target for the region to deploy to:
+1. Login to the Cloud Foundry command line: `cf login`
+2. Enter Bluemix API
   * London (default):
-      * `cf.context=eu-gb.mybluemix.net`
       * `cf.target=https://api.eu-gb.bluemix.net`
     * US South:
-      * `-Dcf.context=mybluemix.net`
       * `-Dcf.target=https://api.ng.bluemix.net`
       * From the Bluemix console, click on your username in the top right corner. You'll see the region displayed in the panel on the right side of the screen.
-* A unique app name to be included as part of the URL (`cf-app-name`). It must not contain spaces or special characters.
+3. Enter email and password for Bluemix login
+4. Enter the Bluemix organization
+5. Enter the Bluemix space
+6. `cd gojava-wlpcfg/target/wlp/usr/servers/gojava-room`
+7. `cf push <cf-app-name> -p gojava-room.zip`
 
-To deploy the app enter the below as one command:
-
-```
-mvn install -P bluemix
-    -Dcf.org=<your bluemix organization>
-    -Dcf.context=<context for region: above>
-    -Dcf.target=<api target for region: above>
-    -Dcf.username=<bluemix username>
-    -Dcf.password=<bluemix password>
-    -Dapp.name=<cf-app-name>
-```
+**NOTE:** Choose a unique app name to be included as part of the URL (`cf-app-name`). It must not contain spaces or special characters.
 
 After your room has been pushed, you should be able to view it at:
   * US South: `http://<cf-app-name>.mybluemix.net/`
   * United Kingdom: `http://<cf-app-name>.eu-gb.mybluemix.net/` 
-  
-Your WebSocket URL will vary by region, but should look something like: 
-  * US South: `ws://<cf-app-name>.mybluemix.net/room`
-  * United Kingdom: `ws://<cf-app-name>.eu-gb.mybluemix.net/room` 
 
 #### Additional notes:
 
 * `app.name` is a unique, URL-friendly name for your deployed Bluemix app.
-* `gameon.id` and `gameon.secret` are those retrieved [earlier](https://github.com/cfsworkload/gameon-room-java#get-game-on-id-and-shared-secret).
+* `gameon.id` and `gameon.secret` are those retrieved [earlier](https://github.com/cfsworkload/gameon-room-java#get-game-on-id-and-shared-secret).  
+
+### Next step
+
+Now you need to [register your room](#registering-your-room) using the Websocket URL. This will vary by region, but should look something like:
+  * US South: `ws://<cf-app-name>.mybluemix.net/room`
+  * United Kingdom: `ws://<cf-app-name>.eu-gb.mybluemix.net/room` 
+
 
 
 ## Deploy using Docker
