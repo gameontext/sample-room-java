@@ -44,9 +44,9 @@ or
 
 ## Registering your room
 
-Microservices in production should support automatic scaling, with multiple instances of the room microservice running in parallel, with new instances starting or existing instances stopping at unpredictable times.  As a result of this, the room does not programmatically register itself by default. You can force it to do so by specifying the GAMEON_ID and GAMEON_SECRET environment variables.
+Microservices in production should support automatic scaling, with multiple instances of the room microservice running in parallel, with new instances starting or existing instances stopping at unpredictable times.
 
-The preferred way to register a room is via the Edit Rooms dialog in Game On! (note you can also use the [command line regutil tool](https://github.com/gameontext/regutil) or the [interactive map](https://game-on.org/interactivemap)).
+Use the Edit Rooms dialog in Game On! to register your room:
 
 1.  Go to [GameOn](https://game-on.org) and sign in.
 2.  Once you are signed in, go to the top right of the browser window and click on your username (or person icon).
@@ -55,20 +55,20 @@ The preferred way to register a room is via the Edit Rooms dialog in Game On! (n
 5.  Fill in the room information as specified. If you don't know all the details yet, such as endpoint, leave those blank and come back and fill them in later.
 6.  Click **Create** and the room will be created for you.
 
-## Access room on Game On!
+## Visit your room in the game
 
-Once the room is set up and it has registered with Game On!, it will be accessible on [Game On!](https://game-on.org/). It may take a moment for the room to appear.
+Once the room is set up and it has registered with Game On!, it will be accessible as a room in the game.
 
-1. Log in to [Game On!](https://game-on.org/) using the authentication method you used to create your user ID and shared secret for the registered room.
-2. Use the Game On! command `/listmyrooms` from The First Room, to see your list of rooms. Once your room is registered, it will appear in that list.
-3. To get to your room, navigate through the network or go directly there by using the `/teleport` command from The First Room.
-4. Look at the Bluemix log console to see "A new connection has been made to the room"
+1. If you aren't in The First Room, use `/sos` to return there.
+2. Use the Game On! command `/listmyrooms` from The First Room, to see your list of rooms. Your newly registered room should appear in that list.
+3. Use the `/teleport` command to go directly to your room from The First Room to see it in action.
 
 Congratulations, you've deployed a microservice that extended an existing microservices-based application so that it can do something new.
 
 Suggested activities:
 * Make it more resilient -- add additional instances using the autoscaling add-on: https://console.ng.bluemix.net/catalog/services/auto-scaling
 * Consider how to allow chat messages to propagate between independent instances using a shared datastore or cache, or an event bus, or...
+* Want some more ideas, check out the [Advanced Adventures section](https://gameontext.gitbooks.io/gameon-gitbook/content/walkthroughs/createMore.html) of our GitBook.
 
 
 ### List of host provided commands
@@ -132,12 +132,6 @@ After your room has been pushed, you should be able to view it at:
 Your WebSocket URL will vary by region, but should look something like: 
   * US South: `ws://<cf-app-name>.mybluemix.net/room`
   * United Kingdom: `ws://<cf-app-name>.eu-gb.mybluemix.net/room` 
-
-**Please Note:** If you want to register your room directly from here you can do this by setting the following additional properties:
-```
-    -Dgameon.id=<Your Game On! ID>
-    -Dgameon.secret=<Your Game On! Shared Secret>
-```
 
 #### Additional notes:
 
