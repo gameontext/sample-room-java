@@ -110,17 +110,14 @@ Sign up for Bluemix at https://console.ng.bluemix.net and DevOps Services at htt
 ### Deploying the app
 
 1. Login to the Cloud Foundry command line: `cf login`
-2. Enter Bluemix API
-  * London (default):
-      * `cf.target=https://api.eu-gb.bluemix.net`
-    * US South:
-      * `-Dcf.target=https://api.ng.bluemix.net`
-      * From the Bluemix console, click on your username in the top right corner. You'll see the region displayed in the panel on the right side of the screen.
+2. Enter Bluemix API endpoint
+  * From the Bluemix console, click on your username in the top right corner. You'll see the region displayed in the panel on the right side of the screen.
+  * US South: `https://api.ng.bluemix.net`
+  * London: `https://api.eu-gb.bluemix.net`
 3. Enter email and password for Bluemix login
 4. Enter the Bluemix organization
 5. Enter the Bluemix space
-6. `cd gojava-wlpcfg/target/wlp/usr/servers/gojava-room`
-7. `cf push <cf-app-name> -p gojava-room.zip`
+6. `cf push <cf-app-name> -p gojava-wlpcfg/target/wlp/usr/servers/gojava-room/gojava-room.zip`
 
 **NOTE:** Choose a unique app name to be included as part of the URL (`cf-app-name`). It must not contain spaces or special characters.
 
