@@ -46,13 +46,20 @@ or
 
 Microservices in production should support automatic scaling, with multiple instances of the room microservice running in parallel, with new instances starting or existing instances stopping at unpredictable times.
 
+To register your room you need the websocket endpoint. This will vary depending on where you have deployed your app, but should look something like:
+* Bluemix/Container group in IBM Container Service:
+  * US South: `ws://<cf-app-name>.mybluemix.net/room`
+  * United Kingdom: `ws://<cf-app-name>.eu-gb.mybluemix.net/room`
+* Single container instance in IBM Container Service
+  * `ws://<ip address>:9080/room`
+
 Use the Edit Rooms dialog in Game On! to register your room:
 
 1.  Go to [GameOn](https://game-on.org) and sign in.
 2.  Once you are signed in, go to the top right of the browser window and click on your username (or person icon).
 3.  From this window, again click the top right panel to select **Edit rooms**.
 4.  Under **Select or create a room**, make sure **create a room** is selected from the dropdown.
-5.  Fill in the room information as specified. If you don't know all the details yet, such as endpoint, leave those blank and come back and fill them in later.
+5.  Fill in the room information as specified. If you don't know all the details yet, leave those blank and come back and fill them in later.
 6.  Click **Create** and the room will be created for you.
 
 ## Visit your room in the game
