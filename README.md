@@ -123,7 +123,7 @@ Sign up for Bluemix at https://console.ng.bluemix.net and DevOps Services at htt
 
 After your room has been pushed, you should be able to view it at:
   * US South: `http://<cf-app-name>.mybluemix.net/`
-  * United Kingdom: `http://<cf-app-name>.eu-gb.mybluemix.net/` 
+  * United Kingdom: `http://<cf-app-name>.eu-gb.mybluemix.net/`
 
 #### Additional notes:
 
@@ -132,7 +132,7 @@ After your room has been pushed, you should be able to view it at:
 
 ### Next step
 
-Now you need to [register your room](#registering-your-room) using the Websocket URL. This will vary by region, but should look something like:
+Now you need to [register your room](#registering-your-room) using the Websocket URL. Go to your app endpoint, either by going directly to the URL or by clicking on the route in your Bluemix Dashboard to see your Websocket URL. This will vary by region, but should look something like:
   * US South: `ws://<cf-app-name>.mybluemix.net/room`
   * United Kingdom: `ws://<cf-app-name>.eu-gb.mybluemix.net/room` 
 
