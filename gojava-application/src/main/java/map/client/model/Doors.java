@@ -19,12 +19,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Doors {
-    String n;
-    String s;
-    String e;
-    String w;
-    String u;
-    String d;
+    private String n;
+    private String s;
+    private String e;
+    private String w;
+    private String u;
+    private String d;
 
     public String getN() {
         return n;

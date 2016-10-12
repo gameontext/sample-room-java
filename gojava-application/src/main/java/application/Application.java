@@ -61,7 +61,7 @@ import map.client.model.Site;
 public class Application {
 	
 	@Inject
-	MapClient mapClient;
+	private MapClient mapClient;
 
     private final static String USERNAME = "username";
     private final static String USERID = "userId";
@@ -82,7 +82,7 @@ public class Application {
     private final Set<Session> sessions = new CopyOnWriteArraySet<Session>();
 
     // Set this so that the room can find out where it is
-	String siteId = "";
+	private String siteId = "";
 	
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Websocket methods..
