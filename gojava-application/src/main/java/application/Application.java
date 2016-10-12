@@ -81,7 +81,9 @@ public class Application {
 
     private final Set<Session> sessions = new CopyOnWriteArraySet<Session>();
 
-	String siteId = "832c6ee16c0b788bea94b980fae61620";
+    // Set this so that the room can find out where it is
+	String siteId = "";
+	
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Websocket methods..
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -158,7 +160,8 @@ public class Application {
             	// only reason we are in this method.
             	response.add(NAME, roomInfo.getName());
             	response.add(FULLNAME, roomInfo.getFullName());
-            	response.add(DESCRIPTION, roomInfo.getDescription());
+            	String description = roomInfo.getDescription();
+            	response.add(DESCRIPTION, (description == null) ? "A badly described room" : description);
             }
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
         }
@@ -194,7 +197,10 @@ public class Application {
             RoomInfo roomInfo = getRoomInfo();
             if (roomInfo != null) {
             	response.add(NAME, roomInfo.getName());
-            	response.add(DESCRIPTION, roomInfo.getDescription());
+            	String description = roomInfo.getDescription();
+            	response.add(DESCRIPTION, (description == null) ? "A badly described room" : description);
+            } else {
+            	sendMessageToRoom(session, null, "The room doesn't seem to know who it is. Perhaps it needs to find out its site id?", userid);
             }
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
             return;
@@ -238,7 +244,7 @@ public class Application {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private RoomInfo getRoomInfo() {
-    	if (siteId != null) {
+    	if (siteId != null && !siteId.trim().isEmpty()) {
     		Site site = mapClient.getSite(siteId);
     		if (site != null) {
     			RoomInfo roomInfo = site.getInfo();
