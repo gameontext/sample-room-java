@@ -49,9 +49,9 @@
             <url>http://liberty-starter.wasdev.developer.ibm.com/start/api/v1/repo</url>
         </repository>
         <repository>
-    		    <id>jitpack.io</id>
-    		    <url>https://jitpack.io</url>
-    		</repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <modules>

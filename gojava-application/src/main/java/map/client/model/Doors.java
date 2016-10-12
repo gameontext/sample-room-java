@@ -15,9 +15,6 @@
  *******************************************************************************/
 package map.client.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Doors {
     private String n;
     private String s;

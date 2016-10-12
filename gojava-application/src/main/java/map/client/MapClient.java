@@ -48,7 +48,7 @@ import map.client.model.Site;
 @ApplicationScoped
 public class MapClient {
 
-	private static final String mapLocation = "https://game-on.org/map/v1/sites";
+    private static final String mapLocation = "https://game-on.org/map/v1/sites";
 
     /**
      * The root target used to define the root path and common query parameters
@@ -88,7 +88,7 @@ public class MapClient {
     public Site getSite(String siteId) {
         WebTarget target = this.queryRoot.path(siteId);
         Site ns = getSite(target);
-    	return ns;
+        return ns;
     }
     /**
      * Invoke the provided {@code WebTarget}, and resolve/parse the result into

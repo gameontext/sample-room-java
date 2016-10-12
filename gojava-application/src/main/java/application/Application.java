@@ -59,9 +59,9 @@ import map.client.model.Site;
 @ServerEndpoint("/room")
 @ApplicationScoped
 public class Application {
-	
-	@Inject
-	private MapClient mapClient;
+    
+    @Inject
+    private MapClient mapClient;
 
     private final static String USERNAME = "username";
     private final static String USERID = "userId";
@@ -75,15 +75,15 @@ public class Application {
     private final static String FULLNAME = "fullName";
     private final static String DESCRIPTION = "description";
 
-	private Set<String> playersInRoom = Collections.synchronizedSet(new HashSet<String>());
+    private Set<String> playersInRoom = Collections.synchronizedSet(new HashSet<String>());
 
     private static long bookmark = 0;
 
     private final Set<Session> sessions = new CopyOnWriteArraySet<Session>();
 
     // Set this so that the room can find out where it is
-	private String siteId = "";
-	
+    private String siteId = "";
+    
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Websocket methods..
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,19 +155,19 @@ public class Application {
             // If the site id was provided, get the room info
             RoomInfo roomInfo = getRoomInfo();
             if (roomInfo != null) {
-            	// now send the room info
-            	// this is the required response to a roomHello event, which is the
-            	// only reason we are in this method.
-            	response.add(NAME, roomInfo.getName());
-            	response.add(FULLNAME, roomInfo.getFullName());
-            	String description = roomInfo.getDescription();
-            	response.add(DESCRIPTION, (description == null) ? "A badly described room" : description);
+                // now send the room info
+                // this is the required response to a roomHello event, which is the
+                // only reason we are in this method.
+                response.add(NAME, roomInfo.getName());
+                response.add(FULLNAME, roomInfo.getFullName());
+                String description = roomInfo.getDescription();
+                response.add(DESCRIPTION, (description == null) ? "A badly described room" : description);
             }
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
         }
     }
 
-	// remove a player from the room.
+    // remove a player from the room.
     private void removePlayer(Session session, String json) throws IOException {
         sessions.remove(session);
         JsonObject msg = Json.createReader(new StringReader(json)).readObject();
@@ -196,11 +196,11 @@ public class Application {
             response.add(TYPE, LOCATION);
             RoomInfo roomInfo = getRoomInfo();
             if (roomInfo != null) {
-            	response.add(NAME, roomInfo.getName());
-            	String description = roomInfo.getDescription();
-            	response.add(DESCRIPTION, (description == null) ? "A badly described room" : description);
+                response.add(NAME, roomInfo.getName());
+                String description = roomInfo.getDescription();
+                response.add(DESCRIPTION, (description == null) ? "A badly described room" : description);
             } else {
-            	sendMessageToRoom(session, null, "The room doesn't seem to know who it is. Perhaps it needs to find out its site id?", userid);
+                sendMessageToRoom(session, null, "The room doesn't seem to know who it is. Perhaps it needs to find out its site id?", userid);
             }
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
             return;
@@ -244,17 +244,17 @@ public class Application {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private RoomInfo getRoomInfo() {
-    	if (siteId != null && !siteId.trim().isEmpty()) {
-    		Site site = mapClient.getSite(siteId);
-    		if (site != null) {
-    			RoomInfo roomInfo = site.getInfo();
-            	return roomInfo;
-        	}
-    	}
-		return null;
-	}
+        if (siteId != null && !siteId.trim().isEmpty()) {
+            Site site = mapClient.getSite(siteId);
+            if (site != null) {
+                RoomInfo roomInfo = site.getInfo();
+                return roomInfo;
+            }
+        }
+        return null;
+    }
 
-	private void sendMessageToRoom(Session session, String messageForRoom, String messageForUser, String userid)
+    private void sendMessageToRoom(Session session, String messageForRoom, String messageForUser, String userid)
             throws IOException {
         JsonObjectBuilder response = Json.createObjectBuilder();
         response.add(TYPE, "event");
