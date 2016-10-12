@@ -9,10 +9,8 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.gameon.walkthrough</groupId>
     <artifactId>gojava-localServer</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
 
     <licenses>
         <license>
