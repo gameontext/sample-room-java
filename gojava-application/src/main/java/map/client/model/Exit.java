@@ -15,75 +15,17 @@
  *******************************************************************************/
 package map.client.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Exit {
-    @JsonProperty("_id")
-    String id;
-    String name;
-    String fullName;
-    String door = null;
-    ConnectionDetails connectionDetails = null;
+    private String id;
+    private String name;
+    private String fullName;
+    private String door = null;
+    private ConnectionDetails connectionDetails = null;
 
-    public Exit() {}
-
-    public Exit(Site targetSite, String direction) {
-        this.id = targetSite.getId();
-
-        if ( targetSite.getInfo() != null ) {
-            this.name = targetSite.getInfo().getName();
-            this.fullName = targetSite.getInfo().getFullName();
-            this.connectionDetails = targetSite.getInfo().getConnectionDetails();
-
-            if ( targetSite.getInfo().getDoors() != null ) {
-                switch(direction.toLowerCase()) {
-                    case "n" :
-                        this.door = targetSite.getInfo().getDoors().getN();
-                        break;
-                    case "s" :
-                        this.door = targetSite.getInfo().getDoors().getS();
-                        break;
-                    case "e" :
-                        this.door = targetSite.getInfo().getDoors().getE();
-                        break;
-                    case "w" :
-                        this.door = targetSite.getInfo().getDoors().getW();
-                        break;
-                    case "u" :
-                        this.door = targetSite.getInfo().getDoors().getU();
-                        break;
-                    case "d" :
-                        this.door = targetSite.getInfo().getDoors().getD();
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unknown direction for the exit: " + direction);
-                }
-            }
-
-            // Really generic. They gave us nothing interesting.
-            if ( this.door == null )
-                this.door = "A door";
-
-            // This won't be the prettiest. ew.
-            if ( this.fullName == null )
-                this.fullName = this.name;
-
-        } else {
-            // Empty/placeholder room. Still navigable if very unclear.
-            this.name = "Nether space";
-            this.fullName = "Nether space";
-            this.door = "Tenuous doorway filled with gray fog";
-        }
-    }
-
-    @JsonProperty("_id")
     public String getId() {
         return id;
     }
 
-    @JsonProperty("_id")
     public void setId(String id) {
         this.id = id;
     }

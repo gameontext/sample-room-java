@@ -16,11 +16,11 @@
 package map.client.model;
 
 public class RoomInfo {
-    String name;
-    ConnectionDetails connectionDetails = null;
-    String fullName;
-    String description;
-    Doors doors;
+    private String name;
+    private ConnectionDetails connectionDetails = null;
+    private String fullName;
+    private String description;
+    private Doors doors;
 
     public RoomInfo() {}
 

@@ -19,20 +19,13 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(Include.NON_EMPTY)
 public class Exits {
-    Exit n;
-    Exit s;
-    Exit e;
-    Exit w;
-    Exit u;
-    Exit d;
+    private Exit n;
+    private Exit s;
+    private Exit e;
+    private Exit w;
+    private Exit u;
+    private Exit d;
 
     public Exit getN() {
         return n;
@@ -82,7 +75,6 @@ public class Exits {
         this.d = d;
     }
 
-    @JsonIgnore
     public Exit getExit(String direction) {
         switch (direction.toLowerCase()) {
             case "n": {
@@ -110,7 +102,6 @@ public class Exits {
         }
     }
 
-    @JsonIgnore
     public JsonObject toSimpleJsonList() {
 
         JsonObjectBuilder content = Json.createObjectBuilder();

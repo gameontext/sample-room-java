@@ -22,10 +22,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_EMPTY)
 public class ConnectionDetails {
-    String type;
-    String target;
-    String token;
-    boolean shared;
+    private String type;
+    private String target;
+    private String token;
+    private boolean shared;
 
     public String getType() {
         return type;

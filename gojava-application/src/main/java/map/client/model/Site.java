@@ -17,13 +17,13 @@ package map.client.model;
 
 public class Site {
 
-    String id;
+    private String id;
 
-    RoomInfo info;
-    Exits exits;
-    String owner;
+    private RoomInfo info;
+    private Exits exits;
+    private String owner;
 
-    String type;
+    private String type;
 
     public Site() {}
 
@@ -33,7 +33,7 @@ public class Site {
      * @param exit
      */
     public Site(Exit exit) {
-        this.id = exit.id;
+        this.id = exit.getId();
         this.info = new RoomInfo(exit);
         this.exits = new Exits();
     }
@@ -45,7 +45,7 @@ public class Site {
      * @param exit
      */
     public Site(Exit sourceExit, Exits fallbackExits) {
-        this.id = sourceExit.id;
+        this.id = sourceExit.getId();
         this.info = new RoomInfo(sourceExit);
         this.exits = fallbackExits;
     }
