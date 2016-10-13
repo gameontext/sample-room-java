@@ -142,4 +142,5 @@ public class MapResponseReader implements MessageBodyReader<Site> {
     private String sanitiseNull(JsonString jsonString) {
         return (jsonString == null) ? null : jsonString.getString();
     }
+    
 }

@@ -48,7 +48,7 @@ import map.client.model.Site;
 @ApplicationScoped
 public class MapClient {
 
-    private static final String mapLocation = "https://game-on.org/map/v1/sites";
+    private static String mapLocation = null;
 
     /**
      * The root target used to define the root path and common query parameters
@@ -68,10 +68,16 @@ public class MapClient {
      */
     @PostConstruct
     public void initClient() {
-        if ( mapLocation == null ) {
-            throw new IllegalStateException("Map client can not be initialized, 'mapUrl' is not defined");
+        String mapUrlEnv = System.getenv("MAP_URL");
+        if (mapUrlEnv == null) {
+            Log.log(Level.INFO, this, "No MAP_URL environment variable provided. Will use default");
+            mapLocation = "";
+        } else {
+            mapLocation = mapUrlEnv;
         }
-
+        
+        Log.log(Level.INFO, this, "Map URL set to {0}", mapLocation);
+        
         Client queryClient = ClientBuilder.newBuilder()
                                           .property("com.ibm.ws.jaxrs.client.ssl.config", "DefaultSSLSettings")
                                           .property("com.ibm.ws.jaxrs.client.disableCNCheck", true)
@@ -82,7 +88,7 @@ public class MapClient {
         // create the jax-rs 2.0 client
         this.queryRoot = queryClient.target(mapLocation);
 
-        Log.log(Level.FINER, this, "Map client initialized with url {0}", mapLocation);
+        Log.log(Level.FINER, this, "Map client initialized");
     }
 
     public Site getSite(String siteId) {

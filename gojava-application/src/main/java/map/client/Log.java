@@ -24,8 +24,9 @@ import java.util.logging.Logger;
  *
  */
 public class Log {
-    private final static Logger log = Logger.getLogger("net.wasdev.gameon.mediator");
+    private final static Logger log = Logger.getLogger("map.client");
     private static final String endpoint_log_format = ": %-8x : %s";
+    private static final boolean NO_LOG_LEVEL_PROMOTION = Boolean.valueOf(System.getenv("NO_LOG_LEVEL_PROMOTION"));
 
     public static void log(Level level, Object source, String message, Object... args) {
         if (log.isLoggable(level)) {
@@ -55,7 +56,10 @@ public class Log {
      * @return Original Level or INFO level, whichever is greater
      */
     private static Level useLevel(Level level) {
-        if ( level.intValue() < Level.INFO.intValue() ) {
+        // The "not not" here isn't great, but it makes the environment variable
+        // much easier to read if the default behaviour is to have this level
+        // promotion switched on
+        if ( level.intValue() < Level.INFO.intValue() && !NO_LOG_LEVEL_PROMOTION) {
             return Level.INFO;
         }
         return level;

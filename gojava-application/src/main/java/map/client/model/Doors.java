@@ -15,59 +15,62 @@
  *******************************************************************************/
 package map.client.model;
 
-public class Doors {
-    private String n;
-    private String s;
-    private String e;
-    private String w;
-    private String u;
-    private String d;
+import java.util.HashMap;
+import java.util.Map;
 
+public class Doors {
+    
+    private Map<String, String> directions = new HashMap<String, String>();
+    
     public String getN() {
-        return n;
+        return directions.get("n");
     }
 
     public void setN(String n) {
-        this.n = n;
+        directions.put("n", n);
     }
 
     public String getS() {
-        return s;
+        return directions.get("s");
     }
 
     public void setS(String s) {
-        this.s = s;
+        directions.put("s", s);
     }
 
     public String getE() {
-        return e;
+        return directions.get("e");
     }
 
     public void setE(String e) {
-        this.e = e;
+        directions.put("e", e);
     }
 
     public String getW() {
-        return w;
+        return directions.get("w");
     }
 
     public void setW(String w) {
-        this.w = w;
+        directions.put("w", w);
     }
 
     public String getU() {
-        return u;
+        return directions.get("u");
     }
 
     public void setU(String u) {
-        this.u = u;
+        directions.put("u", u);
     }
 
     public String getD() {
-        return d;
+        return directions.get("d");
     }
 
     public void setD(String d) {
-        this.d = d;
+        directions.put("d", d);
+    }
+
+    public String getDoor(String exitDirection) {
+        return directions.get(exitDirection);
     }
 }

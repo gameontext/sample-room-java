@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
@@ -81,8 +82,39 @@ public class Application {
 
     private final Set<Session> sessions = new CopyOnWriteArraySet<Session>();
 
+    private RoomInfo roomInfo;
     // Set this so that the room can find out where it is
     private String siteId = "";
+    
+    @PostConstruct
+    public void init() {
+        if (siteId != null && !siteId.trim().isEmpty()) {
+            Site site = mapClient.getSite(siteId);
+            if (site != null) {
+                roomInfo = site.getInfo();
+            }
+        } else {
+            System.out.println("The room has no Site Id. Please set the Site Id so that the room can get information about itself");
+        }
+
+        // If the room doesn;t knwo these things, use defaults
+        if (roomInfo == null) {
+            roomInfo = new RoomInfo();
+        }
+        
+        if (roomInfo.getName() == null) {
+            roomInfo.setName("A room with no name.");
+        }
+        
+        if (roomInfo.getFullName() == null) {
+            roomInfo.setFullName("A room with no full name");
+        }
+        
+        if (roomInfo.getDescription() == null) {
+            roomInfo.setDescription("A room with no description");
+        }
+    }
+    
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Websocket methods..
@@ -152,17 +184,12 @@ public class Application {
             // only reason we are in this method.
             JsonObjectBuilder response = Json.createObjectBuilder();
             response.add(TYPE, LOCATION);
-            // If the site id was provided, get the room info
-            RoomInfo roomInfo = getRoomInfo();
-            if (roomInfo != null) {
-                // now send the room info
-                // this is the required response to a roomHello event, which is the
-                // only reason we are in this method.
-                response.add(NAME, roomInfo.getName());
-                response.add(FULLNAME, roomInfo.getFullName());
-                String description = roomInfo.getDescription();
-                response.add(DESCRIPTION, (description == null) ? "A badly described room" : description);
-            }
+            // now send the room info
+            // this is the required response to a roomHello event, which is the
+            // only reason we are in this method.
+            response.add(NAME, roomInfo.getName());
+            response.add(FULLNAME, roomInfo.getFullName());
+            response.add(DESCRIPTION, roomInfo.getDescription());
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
         }
     }
@@ -194,14 +221,8 @@ public class Application {
             // resend the room description when we receive /look
             JsonObjectBuilder response = Json.createObjectBuilder();
             response.add(TYPE, LOCATION);
-            RoomInfo roomInfo = getRoomInfo();
-            if (roomInfo != null) {
-                response.add(NAME, roomInfo.getName());
-                String description = roomInfo.getDescription();
-                response.add(DESCRIPTION, (description == null) ? "A badly described room" : description);
-            } else {
-                sendMessageToRoom(session, null, "The room doesn't seem to know who it is. Perhaps it needs to find out its site id?", userid);
-            }
+            response.add(NAME, roomInfo.getName());
+            response.add(DESCRIPTION, roomInfo.getDescription());
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
             return;
         }
@@ -213,8 +234,11 @@ public class Application {
                 exitDirection = lowerContent.substring(4).toLowerCase();
             }
 
+            
             if ( exitDirection == null) {
-                sendMessageToRoom(session, null, "Hmm. That direction didn't make sense. Try again?", userid);
+                sendMessageToRoom(session, null, "Hmm. Looks like you need to specify a direction. Try again?", userid);
+            } else if (roomInfo.getDoors().getDoor(exitDirection) == null) {
+                sendMessageToRoom(session, null, "Hmm. There is no "+ exitDirection + " door. Try again?", userid);
             } else {
                 // Trying to go somewhere, eh?
                 JsonObjectBuilder response = Json.createObjectBuilder();
@@ -242,18 +266,6 @@ public class Application {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Reply methods..
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private RoomInfo getRoomInfo() {
-        if (siteId != null && !siteId.trim().isEmpty()) {
-            Site site = mapClient.getSite(siteId);
-            if (site != null) {
-                RoomInfo roomInfo = site.getInfo();
-                return roomInfo;
-            }
-        }
-        return null;
-    }
-
     private void sendMessageToRoom(Session session, String messageForRoom, String messageForUser, String userid)
             throws IOException {
         JsonObjectBuilder response = Json.createObjectBuilder();
