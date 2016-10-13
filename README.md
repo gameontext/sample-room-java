@@ -158,12 +158,18 @@ Once docker is installed, then you deploy your room with
 ```
 gojava:
  volumes:
-   - './gojava-application/target/dropins:/opt/ibm/wlp/usr/servers/defaultServer/dropins'
+   - './gojava-wlpcfg/target/wlp/usr/servers/gojava-room:/opt/ibm/wlp/usr/servers/defaultServer'
 ```
 * `docker-compose build`
-* `docker-compose up -d`
+* `docker-compose up`
 
-After this you will have a docker container with your room, running Liberty, and listening on port 9080. A note about `docker-compose.override.yml`, this is an override file that can be used to change, or add to, an existing docker build file. In this case, it maps the file system on the local machine into the dropins directory for the Liberty server running inside the container. The end result is that if you make some changes to your code and run `mvn package` again to rebuild your war file, then Liberty will see that the file has changed and automatically reload your room without having to build or restart the container.
+Note: you can optionally use `docker-compose up -d` to run the container as a background process. Use `docker-compose stop` to stop the container.
+
+After this you will have a docker container with your room, running Liberty, and listening on port 9080.
+* If you’re running a \*nix variant, you can access it at http://127.0.0.1:9080
+* If you’re running Mac or Windows, access it using the [IP of the host](https://gameontext.gitbooks.io/gameon-gitbook/content/walkthroughs/local-docker.html#dockerhost)
+
+A note about `docker-compose.override.yml`, this is an override file that can be used to change, or add to, an existing docker build file. In this case, it maps the file system on the local machine into the dropins directory for the Liberty server running inside the container. The end result is that if you make some changes to your code and run `mvn package` again to rebuild your war file, then Liberty will see that the file has changed and automatically reload your room without having to build or restart the container.
 
 #### Debugging your room
 
@@ -206,7 +212,7 @@ The `ports` section instructs docker to expose the port 7777 from inside the con
 Instead of deploying a container as a single instance, you can instead deploy a container group. A container group can be used to deploy multiple instances of the same container and load balance between them.
 
 1. Log in to the IBM container service. This needs to be done in two stages:
-  1. Log into the Cloud Foundry CLI using `cf login`. Ypu will need to specify the API endpoint as `api.ng.bluemix.net` for the US South server, or `api.eu-gb.bluemix.net` for the UK server.
+  1. Log into the Cloud Foundry CLI using `cf login`. You will need to specify the API endpoint as `api.ng.bluemix.net` for the US South server, or `api.eu-gb.bluemix.net` for the UK server.
   2. After this run the command `cf ic login`. This will perform the authentication to the IBM Container Service.
 2. Run `cf ic images` and check the `gojava` image is available. If not, run the command `cf ic build -t gojava .` from inside the `gojava-wlpcfg` directory to create it.
 3. Create the container group by running `cf ic group create -p 9080 -n <appName> --name gojavagroup <registry>/<namespace>/gojava`. You can find the full path from the output of `cf ic images`. An example would be:
