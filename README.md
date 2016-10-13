@@ -212,7 +212,7 @@ The `ports` section instructs docker to expose the port 7777 from inside the con
 Instead of deploying a container as a single instance, you can instead deploy a container group. A container group can be used to deploy multiple instances of the same container and load balance between them.
 
 1. Log in to the IBM container service. This needs to be done in two stages:
-  1. Log into the Cloud Foundry CLI using `cf login`. Ypu will need to specify the API endpoint as `api.ng.bluemix.net` for the US South server, or `api.eu-gb.bluemix.net` for the UK server.
+  1. Log into the Cloud Foundry CLI using `cf login`. You will need to specify the API endpoint as `api.ng.bluemix.net` for the US South server, or `api.eu-gb.bluemix.net` for the UK server.
   2. After this run the command `cf ic login`. This will perform the authentication to the IBM Container Service.
 2. Run `cf ic images` and check the `gojava` image is available. If not, run the command `cf ic build -t gojava .` from inside the `gojava-wlpcfg` directory to create it.
 3. Create the container group by running `cf ic group create -p 9080 -n <appName> --name gojavagroup <registry>/<namespace>/gojava`. You can find the full path from the output of `cf ic images`. An example would be:
