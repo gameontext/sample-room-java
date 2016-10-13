@@ -19,23 +19,20 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonString;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpServletResponse;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.EndpointConfig;
@@ -47,8 +44,9 @@ import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import org.gameontext.util.reg.RegistrationUtility;
-import org.gameontext.util.reg.RegistrationUtility.HTTP_METHOD;
+import map.client.MapClient;
+import map.client.model.RoomInfo;
+import map.client.model.Site;
 
 /**
  * A very simple room.
@@ -60,8 +58,11 @@ import org.gameontext.util.reg.RegistrationUtility.HTTP_METHOD;
  *
  */
 @ServerEndpoint("/room")
-@WebListener
-public class Application implements ServletContextListener {
+@ApplicationScoped
+public class Application {
+    
+    @Inject
+    private MapClient mapClient;
 
     private final static String USERNAME = "username";
     private final static String USERID = "userId";
@@ -75,60 +76,46 @@ public class Application implements ServletContextListener {
     private final static String FULLNAME = "fullName";
     private final static String DESCRIPTION = "description";
 
-    private Config config = new Config();
-
     private Set<String> playersInRoom = Collections.synchronizedSet(new HashSet<String>());
-
-    List<String> directions = Arrays.asList( "n", "s", "e", "w", "u", "d");
 
     private static long bookmark = 0;
 
     private final Set<Session> sessions = new CopyOnWriteArraySet<Session>();
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Room registration
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * Entry point at application start, we use this to test for & perform room registration.
-     */
-    @Override
-    public final void contextInitialized(final ServletContextEvent e) {
-        //setup the registration with the config retrieved from the environment
-        if (config.isValid()) {
-            RegistrationUtility regutil = new RegistrationUtility();
-            regutil.setId(config.getUserId());
-            regutil.setSecret(config.getKey());
-            regutil.setUrl(config.getRegistrationUrl());
-            // attempt to regsiter this room
-            regutil.setMethod(HTTP_METHOD.POST);
-            regutil.setBody(config.getRoomJSON(e));
-            try {
-                switch(regutil.register()) {
-                case HttpServletResponse.SC_CONFLICT :
-                    System.out.println("This room is already registered, so there is no need to re-register");
-                    break;
-                case HttpServletResponse.SC_CREATED :
-                    System.out.println("Room registered successfully.");
-                    break;
-                default:
-                    System.out.println("Failed to register room, see logs for more details");
-                    break;
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                throw new RuntimeException(ex);
+    private RoomInfo roomInfo;
+    // Set this so that the room can find out where it is
+    private String siteId = "";
+    
+    @PostConstruct
+    public void init() {
+        if (siteId != null && !siteId.trim().isEmpty()) {
+            Site site = mapClient.getSite(siteId);
+            if (site != null) {
+                roomInfo = site.getInfo();
             }
         } else {
-            System.out.println("Not registering as no valid config is available");
+            System.out.println("The room has no Site Id. Please set the Site Id so that the room can get information about itself");
+        }
+
+        // If the room doesn;t knwo these things, use defaults
+        if (roomInfo == null) {
+            roomInfo = new RoomInfo();
+        }
+        
+        if (roomInfo.getName() == null) {
+            roomInfo.setName("A room with no name.");
+        }
+        
+        if (roomInfo.getFullName() == null) {
+            roomInfo.setFullName("A room with no full name");
+        }
+        
+        if (roomInfo.getDescription() == null) {
+            roomInfo.setDescription("A room with no description");
         }
     }
-
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        // Here we could deregister, if we wanted.. we'd need to read the registration/query
-        // response to cache the room id, so we could remove it as we shut down.
-    }
-
+    
+    
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Websocket methods..
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,9 +184,12 @@ public class Application implements ServletContextListener {
             // only reason we are in this method.
             JsonObjectBuilder response = Json.createObjectBuilder();
             response.add(TYPE, LOCATION);
-            response.add(NAME, config.getName());
-            response.add(FULLNAME, config.getFullname());
-            response.add(DESCRIPTION, config.getDescription());
+            // now send the room info
+            // this is the required response to a roomHello event, which is the
+            // only reason we are in this method.
+            response.add(NAME, roomInfo.getName());
+            response.add(FULLNAME, roomInfo.getFullName());
+            response.add(DESCRIPTION, roomInfo.getDescription());
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
         }
     }
@@ -231,9 +221,8 @@ public class Application implements ServletContextListener {
             // resend the room description when we receive /look
             JsonObjectBuilder response = Json.createObjectBuilder();
             response.add(TYPE, LOCATION);
-            response.add(NAME, config.getName());
-            response.add(DESCRIPTION, config.getDescription());
-
+            response.add(NAME, roomInfo.getName());
+            response.add(DESCRIPTION, roomInfo.getDescription());
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
             return;
         }
@@ -245,8 +234,11 @@ public class Application implements ServletContextListener {
                 exitDirection = lowerContent.substring(4).toLowerCase();
             }
 
-            if ( exitDirection == null || !directions.contains(exitDirection) ) {
-                sendMessageToRoom(session, null, "Hmm. That direction didn't make sense. Try again?", userid);
+            
+            if ( exitDirection == null) {
+                sendMessageToRoom(session, null, "Hmm. Looks like you need to specify a direction. Try again?", userid);
+            } else if (roomInfo.getDoors().getDoor(exitDirection) == null) {
+                sendMessageToRoom(session, null, "Hmm. There is no "+ exitDirection + " door. Try again?", userid);
             } else {
                 // Trying to go somewhere, eh?
                 JsonObjectBuilder response = Json.createObjectBuilder();
@@ -274,9 +266,8 @@ public class Application implements ServletContextListener {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Reply methods..
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     private void sendMessageToRoom(Session session, String messageForRoom, String messageForUser, String userid)
-        throws IOException {
+            throws IOException {
         JsonObjectBuilder response = Json.createObjectBuilder();
         response.add(TYPE, "event");
 
