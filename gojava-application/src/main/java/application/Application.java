@@ -84,6 +84,7 @@ public class Application {
 
     private RoomInfo roomInfo;
     // Set this so that the room can find out where it is
+    // This id can be found using /listmyrooms in First room or in the 'Edit rooms' tab in Game On!
     private String siteId = "";
     
     @PostConstruct
@@ -97,7 +98,7 @@ public class Application {
             System.out.println("The room has no Site Id. Please set the Site Id so that the room can get information about itself");
         }
 
-        // If the room doesn;t knwo these things, use defaults
+        // If the room doesn't know these things, use defaults
         if (roomInfo == null) {
             roomInfo = new RoomInfo();
         }
