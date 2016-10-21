@@ -18,6 +18,7 @@ package map.client;
 import java.util.logging.Level;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
@@ -47,8 +48,14 @@ import map.client.model.Site;
  */
 @ApplicationScoped
 public class MapClient {
-
-    private static String mapLocation = null;
+	
+	/**
+	 * The URL for the target map service.
+	 * This is set via the environment variable MAP_URL. This value is read
+	 * in server.xml. 
+	 */
+	@Resource(lookup = "mapUrl")
+    private String mapLocation;
 
     /**
      * The root target used to define the root path and common query parameters
@@ -68,12 +75,9 @@ public class MapClient {
      */
     @PostConstruct
     public void initClient() {
-        String mapUrlEnv = System.getenv("MAP_URL");
-        if (mapUrlEnv == null) {
-            Log.log(Level.INFO, this, "No MAP_URL environment variable provided. Will use default.");
+        if (mapLocation == null) {
+            Log.log(Level.FINER, this, "No MAP_URL environment variable provided. Will use default.");
             mapLocation = "https://game-on.org/map/v1/sites";
-        } else {
-            mapLocation = mapUrlEnv;
         }
         
         Log.log(Level.INFO, this, "Map URL set to {0}", mapLocation);
