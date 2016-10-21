@@ -70,8 +70,8 @@ public class MapClient {
     public void initClient() {
         String mapUrlEnv = System.getenv("MAP_URL");
         if (mapUrlEnv == null) {
-            Log.log(Level.INFO, this, "No MAP_URL environment variable provided. Will use default");
-            mapLocation = "";
+            Log.log(Level.INFO, this, "No MAP_URL environment variable provided. Will use default.");
+            mapLocation = "https://game-on.org/map/v1/sites";
         } else {
             mapLocation = mapUrlEnv;
         }
