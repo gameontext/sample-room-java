@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -78,13 +79,15 @@ public class Application {
 
     private Set<String> playersInRoom = Collections.synchronizedSet(new HashSet<String>());
 
-    private static long bookmark = 0;
+    private AtomicLong bookmark = new AtomicLong(0);
 
     private final Set<Session> sessions = new CopyOnWriteArraySet<Session>();
 
     private RoomInfo roomInfo;
-    // Set this so that the room can find out where it is
-    // This id can be found using /listmyrooms in First room or in the 'Edit rooms' tab in Game On!
+    /**
+     * Set this so that the room can find out where it is
+     * This id can be found using /listmyrooms in First room or in the 'Edit rooms' tab in Game On!
+    */
     private String siteId = "";
     
     @PostConstruct
@@ -245,7 +248,7 @@ public class Application {
                 JsonObjectBuilder response = Json.createObjectBuilder();
                 response.add(TYPE, EXIT)
                     .add(EXIT_ID, exitDirection)
-                    .add(BOOKMARK, bookmark++)
+                    .add(BOOKMARK, "room-"+bookmark.incrementAndGet())
                     .add(CONTENT, "Run Away!");
 
                 sendRemoteTextMessage(session, "playerLocation," + userid + "," + response.build().toString());
@@ -281,7 +284,7 @@ public class Application {
         }
 
         response.add(CONTENT, content.build());
-        response.add(BOOKMARK, bookmark++);
+        response.add(BOOKMARK, "room-"+bookmark.incrementAndGet());
 
         if(messageForRoom==null){
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
@@ -295,7 +298,7 @@ public class Application {
         response.add(TYPE, "chat");
         response.add(USERNAME, username);
         response.add(CONTENT, message);
-        response.add(BOOKMARK, bookmark++);
+        response.add(BOOKMARK, "room-"+bookmark.incrementAndGet());
         broadcast(sessions, "player,*," + response.build().toString());
     }
 
