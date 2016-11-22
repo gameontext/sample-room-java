@@ -13,39 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package map.client.model;
+package org.gameontext.sample.protocol;
 
-public class ConnectionDetails {
-    private String type;
-    private String target;
-    private String token;
-    private boolean shared;
+import javax.websocket.EncodeException;
+import javax.websocket.Encoder;
+import javax.websocket.EndpointConfig;
 
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
+/**
+ * All magic to convert the on-the-wire protocol for messages
+ * is contained in the {@link Message} class
+ */
+public class MessageEncoder implements Encoder.Text<Message> {
 
-    public String getTarget() {
-        return target;
-    }
-    public void setTarget(String target) {
-        this.target = target;
+    @Override
+    public void init(EndpointConfig config) {
+        // no set-up
     }
 
-    public String getToken() {
-        return token;
-    }
-    public void setToken(String token) {
-        this.token = token;
+    @Override
+    public void destroy() {
+        // no tear-down
     }
 
-    public boolean isShared() {
-        return shared;
-    }
-    public void setShared(boolean shared) {
-        this.shared = shared;
+    @Override
+    public String encode(Message msg) throws EncodeException {
+        return msg.toString();
     }
 }

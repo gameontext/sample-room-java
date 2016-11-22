@@ -13,60 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package map.client.model;
+package org.gameontext.sample.map.client;
 
-public class RoomInfo {
+public class MapData {
+
     private String name;
-    private ConnectionDetails connectionDetails = null;
     private String fullName;
     private String description;
-    private Doors doors;
-
-    public RoomInfo() {}
-
-    public RoomInfo(Exit exit) {
-        this.name = exit.getName();
-        this.fullName = exit.getFullName();
-        this.connectionDetails = exit.getConnectionDetails();
-    }
 
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public ConnectionDetails getConnectionDetails() {
-        return connectionDetails;
-    }
-
-    public void setConnectionDetails(ConnectionDetails connectionDetails) {
-        this.connectionDetails = connectionDetails;
     }
 
     public String getFullName() {
         return fullName;
     }
-
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
 
+
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Doors getDoors() {
-        return doors;
-    }
-
-    public void setDoors(Doors doors) {
-        this.doors = doors;
     }
 }
