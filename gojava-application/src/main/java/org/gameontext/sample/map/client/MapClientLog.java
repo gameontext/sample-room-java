@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package map.client;
+package org.gameontext.sample.map.client;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,21 +23,22 @@ import java.util.logging.Logger;
  * identify different endpoints in the messages
  *
  */
-public class Log {
+public class MapClientLog {
     private final static Logger log = Logger.getLogger("map.client");
-    private static final String endpoint_log_format = ": %-8x : %s";
+    private static final String log_format = ": %-8x : %s";
+
     private static final boolean NO_LOG_LEVEL_PROMOTION = Boolean.valueOf(System.getenv("NO_LOG_LEVEL_PROMOTION"));
 
     public static void log(Level level, Object source, String message, Object... args) {
         if (log.isLoggable(level)) {
-            String msg = String.format(endpoint_log_format, getHash(source), message);
+            String msg = String.format(log_format, getHash(source), message);
             log.log(useLevel(level), msg, args);
         }
     }
 
     public static void log(Level level, Object source, String message, Throwable thrown) {
         if (log.isLoggable(level)) {
-            String msg = String.format(endpoint_log_format, getHash(source), message);
+            String msg = String.format(log_format, getHash(source), message);
             log.log(useLevel(level), msg, thrown);
         }
     }

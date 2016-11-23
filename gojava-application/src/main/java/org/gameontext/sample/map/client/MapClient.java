@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package map.client;
+package org.gameontext.sample.map.client;
 
 import java.util.logging.Level;
 
@@ -28,8 +28,6 @@ import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import map.client.model.Site;
 
 /**
  * A wrapped/encapsulation of outbound REST requests to the map service.
@@ -48,13 +46,15 @@ import map.client.model.Site;
  */
 @ApplicationScoped
 public class MapClient {
-	
-	/**
-	 * The URL for the target map service.
-	 * This is set via the environment variable MAP_URL. This value is read
-	 * in server.xml. 
-	 */
-	@Resource(lookup = "mapUrl")
+
+    public static final String DEFAULT_MAP_URL = "https://game-on.org/map/v1/sites";
+
+    /**
+     * The URL for the target map service.
+     * This is set via the environment variable MAP_URL. This value is read
+     * in server.xml.
+     */
+    @Resource(lookup = "mapUrl")
     private String mapLocation;
 
     /**
@@ -76,63 +76,46 @@ public class MapClient {
     @PostConstruct
     public void initClient() {
         if (mapLocation == null) {
-            Log.log(Level.FINER, this, "No MAP_URL environment variable provided. Will use default.");
-            mapLocation = "https://game-on.org/map/v1/sites";
+            MapClientLog.log(Level.FINER, this, "No MAP_URL environment variable provided. Will use default.");
+            mapLocation = DEFAULT_MAP_URL;
         }
-        
-        Log.log(Level.INFO, this, "Map URL set to {0}", mapLocation);
-        
+
+        MapClientLog.log(Level.INFO, this, "Map URL set to {0}", mapLocation);
+
         Client queryClient = ClientBuilder.newBuilder()
-                                          .property("com.ibm.ws.jaxrs.client.ssl.config", "DefaultSSLSettings")
-                                          .property("com.ibm.ws.jaxrs.client.disableCNCheck", true)
-                                          .build();
+                .property("com.ibm.ws.jaxrs.client.ssl.config", "DefaultSSLSettings")
+                .property("com.ibm.ws.jaxrs.client.disableCNCheck", true)
+                .build();
 
         queryClient.register(MapResponseReader.class);
 
         // create the jax-rs 2.0 client
         this.queryRoot = queryClient.target(mapLocation);
 
-        Log.log(Level.FINER, this, "Map client initialized");
+        MapClientLog.log(Level.FINER, this, "Map client initialized");
     }
 
-    public Site getSite(String siteId) {
+    public MapData getMapData(String siteId) {
         WebTarget target = this.queryRoot.path(siteId);
-        Site ns = getSite(target);
-        return ns;
-    }
-    /**
-     * Invoke the provided {@code WebTarget}, and resolve/parse the result into
-     * a {@code Site} that the caller can use to create a new
-     * connection to the target room.
-     *
-     * @param target
-     *            {@code WebTarget} that includes the required parameters to
-     *            retrieve information about available or specified exits. All
-     *            of the REST requests that find or work with exits return the
-     *            same result structure
-     * @return A populated {@code Site}, or null if the request
-     *         failed.
-     */
-    private Site getSite(WebTarget target) {
-        Log.log(Level.FINER, this, "making request to {0} for room", target.getUri().toString());
+        MapClientLog.log(Level.FINER, this, "making request to {0} for room", target.getUri().toString());
         Response r = null;
         try {
             r = target.request(MediaType.APPLICATION_JSON).get();
             if (r.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-                Site site = r.readEntity(Site.class);
-                return site;
+                MapData data = r.readEntity(MapData.class);
+                return data;
             }
             return null;
         } catch (ResponseProcessingException rpe) {
             Response response = rpe.getResponse();
-            Log.log(Level.FINER, this, "Exception fetching room list uri: {0} resp code: {1} ",
+            MapClientLog.log(Level.FINER, this, "Exception fetching room list uri: {0} resp code: {1} ",
                     target.getUri().toString(),
                     response.getStatusInfo().getStatusCode() + " " + response.getStatusInfo().getReasonPhrase());
-            Log.log(Level.FINEST, this, "Exception fetching room list", rpe);
+            MapClientLog.log(Level.FINEST, this, "Exception fetching room list", rpe);
         } catch (ProcessingException e) {
-            Log.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", e);
+            MapClientLog.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", e);
         } catch (WebApplicationException ex) {
-            Log.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", ex);
+            MapClientLog.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", ex);
         }
         // Sadly, badness happened while trying to get the endpoints
         return null;
