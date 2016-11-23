@@ -24,8 +24,8 @@ public class RoomCommandsTest {
     @Rule
     public TestName testName = new TestName();
 
-    RoomImplementation roomImpl;
-    RoomDescription roomDescription;
+    private RoomImplementation roomImpl;
+    private RoomDescription roomDescription;
 
     @Before
     public void before() {

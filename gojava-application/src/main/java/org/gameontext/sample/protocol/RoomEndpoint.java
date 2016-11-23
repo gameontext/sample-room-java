@@ -46,7 +46,7 @@ decoders = MessageDecoder.class, encoders = MessageEncoder.class)
 public class RoomEndpoint {
 
     @Inject
-    RoomImplementation roomImplementation;
+    private RoomImplementation roomImplementation;
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig ec) {

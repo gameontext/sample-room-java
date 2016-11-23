@@ -37,6 +37,6 @@ public class MessageEncoder implements Encoder.Text<Message> {
 
     @Override
     public String encode(Message msg) throws EncodeException {
-        return msg.toString();
+        return msg.encode();
     }
 }

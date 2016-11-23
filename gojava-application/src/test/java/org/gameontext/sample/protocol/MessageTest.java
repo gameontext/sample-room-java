@@ -40,7 +40,7 @@ public class MessageTest {
     @Test
     public void testCreateSpecificEventMessage() throws Exception {
         Message m1 = Message.createSpecificEvent("user1", "Message for user1");
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"event\",\"content\":{\"user1\""));
@@ -53,7 +53,7 @@ public class MessageTest {
     @Test
     public void testCreateBroadcastEventMessage() throws Exception {
         Message m1 = Message.createBroadcastEvent("EVERYTHING", "user1", "Message for user1");
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,*,{\"type\":\"event\",\"content\":{"));
@@ -67,7 +67,7 @@ public class MessageTest {
     @Test
     public void testCreateBroadcastEventMessageGeneralOnly() throws Exception {
         Message m1 = Message.createBroadcastEvent("EVERYTHING");
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,*,{\"type\":\"event\",\"content\":{"));
@@ -81,7 +81,7 @@ public class MessageTest {
     @Test
     public void testCreateBroadcastEventMessageMismatch() throws Exception {
         Message m1 = Message.createBroadcastEvent("EVERYTHING","user1");
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,*,{\"type\":\"event\",\"content\":{"));
@@ -95,7 +95,7 @@ public class MessageTest {
     @Test
     public void testCreateChatMessage() throws Exception {
         Message m1 = Message.createChatMessage("userName", "Message from userName");
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,*,{\"type\":\"chat\""));
@@ -111,7 +111,7 @@ public class MessageTest {
         RoomDescription roomDescription = new RoomDescription();
 
         Message m1 = Message.createLocationMessage("user1", roomDescription);
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
@@ -131,7 +131,7 @@ public class MessageTest {
         data.setDescription("c");
 
         Message m1 = Message.createLocationMessage("user1", new RoomDescription(data));
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
@@ -151,7 +151,7 @@ public class MessageTest {
         data.setDescription("c");
 
         Message m1 = Message.createLocationMessage("user1", new RoomDescription(data));
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
@@ -171,7 +171,7 @@ public class MessageTest {
         data.setDescription(null);
 
         Message m1 = Message.createLocationMessage("user1", new RoomDescription(data));
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
@@ -195,7 +195,7 @@ public class MessageTest {
         roomDescription.addCommand("/command", "description");
 
         Message m1 = Message.createLocationMessage("user1", roomDescription);
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
@@ -215,7 +215,7 @@ public class MessageTest {
         roomDescription.addItem("Squashy Chair");
 
         Message m1 = Message.createLocationMessage("user1", roomDescription);
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
@@ -232,7 +232,7 @@ public class MessageTest {
     @Test
     public void testCreatePlayerLocationMessage() throws Exception {
         Message m1 = Message.createExitMessage("user1", "N", "So long, and thanks for all the fish");
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("playerLocation,user1,{\"type\":\"exit\""));
@@ -252,7 +252,7 @@ public class MessageTest {
     @Test
     public void testCreatePlayerLocationMessageNullMessage() throws Exception {
         Message m1 = Message.createExitMessage("user1", "N", null);
-        String s = m1.toString();
+        String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("playerLocation,user1,{\"type\":\"exit\""));

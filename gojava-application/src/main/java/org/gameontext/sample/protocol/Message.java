@@ -374,17 +374,17 @@ public class Message {
      * Target for the message
      * @see Target
      */
-    private Target target;
+    private final Target target;
 
     /**
      * Target for the message (This room, specific player, or '*')
      */
-    private String targetId;
+    private final String targetId;
 
     /**
      * Stringified JSON payload
      */
-    private String payload;
+    private final String payload;
 
     /**
      * Parse a string read from the WebSocket, and convert it into
@@ -468,8 +468,7 @@ public class Message {
      * Convert message to a string for use as an outbound message over the WebSocket
      * @see MessageEncoder#encode(Message)
      */
-    @Override
-    public String toString() {
+    public String encode() {
         StringBuilder result = new StringBuilder();
         result.append(target).append(',');
 
@@ -483,12 +482,17 @@ public class Message {
     }
 
     @Override
+    public String toString() {
+        return encode();
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((payload == null) ? 0 : payload.hashCode());
-        result = prime * result + ((target == null) ? 0 : target.hashCode());
-        result = prime * result + ((targetId == null) ? 0 : targetId.hashCode());
+        result = prime * result + payload.hashCode();
+        result = prime * result + target.hashCode();
+        result = prime * result + targetId.hashCode();
         return result;
     }
 
@@ -500,19 +504,13 @@ public class Message {
             return false;
         if (getClass() != obj.getClass())
             return false;
+
+        // Private constructor, none of these are ever null.
         Message other = (Message) obj;
-        if (payload == null) {
-            if (other.payload != null)
-                return false;
-        } else if (!payload.equals(other.payload))
-            return false;
-        if (target != other.target)
-            return false;
-        if (targetId == null) {
-            if (other.targetId != null)
-                return false;
-        } else if (!targetId.equals(other.targetId))
-            return false;
-        return true;
+
+        // Private constructor, none of these are ever null.
+        return payload.equals(other.payload)
+                && target.equals(other.target)
+                && targetId.equals(other.targetId);
     }
 }

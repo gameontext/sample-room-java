@@ -15,9 +15,9 @@ import org.gameontext.sample.map.client.MapData;
 
 /**
  * This is how our room is described.
- *  a) Use post-construct to go fill some of this in by asking the map
- *  b) Assign this dynamically on the fly as the room is used
- *  
+ *  a) Use post-construct in {@link RoomImplementation} to fill some of this in by asking the map
+ *  b) Update attributes dynamically in {@link RoomImplementation} as the room is used
+ *
  *  @see RoomImplementation
  */
 public class RoomDescription {
@@ -154,6 +154,7 @@ public class RoomDescription {
         itemObj = null;
     }
 
+    @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append("name=").append(name);
