@@ -189,98 +189,112 @@ public class RoomImplementation {
         }
 
         switch(firstWord) {
-        case "/go":
-            // See RoomCommandsTest#testHandle*Go*
-            // Always process the /go command.
-            String direction = getDirection(remainder);
+            case "/go":
+                // See RoomCommandsTest#testHandle*Go*
+                // Always process the /go command.
+                String exitId = getExitId(remainder);
 
-            if ( direction == null ) {
-                // Send error only to source session
-                if ( remainder == null ) {
+                if ( exitId == null ) {
+                    // Send error only to source session
+                    if ( remainder == null ) {
+                        endpoint.sendMessage(session,
+                                Message.createSpecificEvent(userId, UNSPECIFIED_DIRECTION));
+                    } else {
+                        endpoint.sendMessage(session,
+                                Message.createSpecificEvent(userId, String.format(UNKNOWN_DIRECTION, remainder)));
+                    }
+                } else {
+                    // Allow the exit
                     endpoint.sendMessage(session,
-                            Message.createSpecificEvent(userId, UNSPECIFIED_DIRECTION));
+                            Message.createExitMessage(userId, exitId, String.format(GO_FORTH, prettyDirection(exitId))));
+                }
+                break;
+
+            case "/look":
+            case "/examine":
+                // See RoomCommandsTest#testHandle*Look*
+
+                // Treat look and examine the same (though you could make them do different things)
+                if ( remainder == null || remainder.contains("room") ) {
+                    // This is looking at or examining the entire room. Send the player location message,
+                    // which includes the room description and inventory
+                    endpoint.sendMessage(session, Message.createLocationMessage(userId, roomDescription));
                 } else {
                     endpoint.sendMessage(session,
-                            Message.createSpecificEvent(userId, String.format(UNKNOWN_DIRECTION, remainder)));
+                            Message.createSpecificEvent(userId, LOOK_UNKNOWN));
                 }
-            } else {
-                // Allow the exit
+                break;
+
+            case "/ping":
+                // Custom command! /ping is added to the room description in the @PostConstruct method
+                // See RoomCommandsTest#testHandlePing*
+
+                if ( remainder == null ) {
+                    endpoint.sendMessage(session,
+                            Message.createBroadcastEvent("Ping! Pong sent to " + username, userId, "Ping! Pong!"));
+                } else {
+                    endpoint.sendMessage(session,
+                            Message.createBroadcastEvent("Ping! Pong sent to " + username + ": " + remainder, userId, "Ping! Pong! " + remainder));
+                }
+
+                break;
+
+            default:
                 endpoint.sendMessage(session,
-                        Message.createExitMessage(userId, direction, String.format(GO_FORTH, longDirection(direction))));
-            }
-            break;
-
-        case "/look":
-        case "/examine":
-            // See RoomCommandsTest#testHandle*Look*
-
-            // Treat look and examine the same (though you could make them do different things)
-            if ( remainder == null || remainder.contains("room") ) {
-                // This is looking at or examining the entire room. Send the player location message,
-                // which includes the room description and inventory
-                endpoint.sendMessage(session, Message.createLocationMessage(userId, roomDescription));
-            } else {
-                endpoint.sendMessage(session,
-                        Message.createSpecificEvent(userId, LOOK_UNKNOWN));
-            }
-            break;
-
-        case "/ping":
-            // Custom command! /ping is added to the room description in the @PostConstruct method
-            // See RoomCommandsTest#testHandlePing*
-
-            if ( remainder == null ) {
-                endpoint.sendMessage(session,
-                        Message.createBroadcastEvent("Ping! Pong sent to " + username, userId, "Ping! Pong!"));
-            } else {
-                endpoint.sendMessage(session,
-                        Message.createBroadcastEvent("Ping! Pong sent to " + username + ": " + remainder, userId, "Ping! Pong! " + remainder));
-            }
-
-            break;
-
-        default:
-            endpoint.sendMessage(session,
-                    Message.createSpecificEvent(userId, String.format(UNKNOWN_COMMAND, content)));
-            break;
+                        Message.createSpecificEvent(userId, String.format(UNKNOWN_COMMAND, content)));
+                break;
         }
     }
 
 
-    protected String getDirection(String lowerDirection) {
+    /**
+     * Given a lower case string describing the direction someone wants
+     * to go (/go N, or /go North), filter or transform that into a recognizable
+     * id that can be used as an index into a known list of exits. Always valid
+     * are n, s, e, w. If the string doesn't match a known exit direction,
+     * return null.
+     *
+     * @param lowerDirection String read from the provided message
+     * @return exit id or null
+     */
+    protected String getExitId(String lowerDirection) {
         if (lowerDirection == null) {
             return null;
         }
 
         switch(lowerDirection) {
-        case "north" :
-        case "south" :
-        case "east" :
-        case "west" :
-            return lowerDirection.substring(0,1);
+            case "north" :
+            case "south" :
+            case "east" :
+            case "west" :
+                return lowerDirection.substring(0,1);
 
-        case "n" :
-        case "s" :
-        case "e" :
-        case "w" :
-            // Assume N/S/E/W are managed by the map service.
-            return lowerDirection;
+            case "n" :
+            case "s" :
+            case "e" :
+            case "w" :
+                // Assume N/S/E/W are managed by the map service.
+                return lowerDirection;
 
-        default  :
-            // Otherwise unknown direction
-            return null;
+            default  :
+                // Otherwise unknown direction
+                return null;
         }
     }
 
-    protected String longDirection(String lowerDirection) {
-        switch(lowerDirection) {
-        case "n" : return "North";
-        case "s" : return "South";
-        case "e" : return "East";
-        case "w" : return "West";
-        case "u" : return "Up";
-        case "d" : return "Down";
-        default  : return lowerDirection;
+    /**
+     * From the direction we used as a key
+     * @param exitId The exitId in lower case
+     * @return A pretty version of the direction for use in the exit message.
+     */
+    protected String prettyDirection(String exitId) {
+        switch(exitId) {
+            case "n" : return "North";
+            case "s" : return "South";
+            case "e" : return "East";
+            case "w" : return "West";
+
+            default  : return exitId;
         }
     }
 }

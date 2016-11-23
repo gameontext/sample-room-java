@@ -47,10 +47,12 @@ import javax.ws.rs.core.Response;
 @ApplicationScoped
 public class MapClient {
 
+    public static final String DEFAULT_MAP_URL = "https://game-on.org/map/v1/sites";
+
     /**
      * The URL for the target map service.
      * This is set via the environment variable MAP_URL. This value is read
-     * in server.xml. 
+     * in server.xml.
      */
     @Resource(lookup = "mapUrl")
     private String mapLocation;
@@ -75,7 +77,7 @@ public class MapClient {
     public void initClient() {
         if (mapLocation == null) {
             MapClientLog.log(Level.FINER, this, "No MAP_URL environment variable provided. Will use default.");
-            mapLocation = "https://game-on.org/map/v1/sites";
+            mapLocation = DEFAULT_MAP_URL;
         }
 
         MapClientLog.log(Level.INFO, this, "Map URL set to {0}", mapLocation);

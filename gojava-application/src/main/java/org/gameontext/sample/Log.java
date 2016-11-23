@@ -60,7 +60,7 @@ public class Log {
         // The "not not" here isn't great, but it makes the environment variable
         // much easier to read if the default behaviour is to have this level
         // promotion switched on
-        if ( level.intValue() < Level.INFO.intValue() && !NO_LOG_LEVEL_PROMOTION) {
+        if ( !NO_LOG_LEVEL_PROMOTION && level.intValue() < Level.INFO.intValue() ) {
             return Level.INFO;
         }
         return level;

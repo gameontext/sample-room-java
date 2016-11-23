@@ -67,8 +67,8 @@ public class Message {
     };
 
     /**
-     * Ack message: this supports version 1 & 2
-     * {@code ack,{\"version\":[1]}}
+     * Ack message: this supports both version 1 & 2
+     * {@code ack,{\"version\":[1,2]}}
      */
     public static final Message ACK_MSG = new Message(Target.ack, "", "{\"version\":[1,2]}");
 
@@ -135,8 +135,8 @@ public class Message {
         //		    },
         //		    "bookmark": "String representing last message seen"
         //		}
-        JsonObjectBuilder oayload = Json.createObjectBuilder();
-        oayload.add(TYPE, EVENT);
+        JsonObjectBuilder payload = Json.createObjectBuilder();
+        payload.add(TYPE, EVENT);
 
         JsonObjectBuilder content = Json.createObjectBuilder();
         if ( allContent != null ) {
@@ -153,10 +153,10 @@ public class Message {
                         (Object[]) pairs);
             }
         }
-        oayload.add(CONTENT, content.build());
+        payload.add(CONTENT, content.build());
 
-        oayload.add(BOOKMARK, PREFIX + bookmark.incrementAndGet());
-        return new Message(Target.player, ALL, oayload.build().toString());
+        payload.add(BOOKMARK, PREFIX + bookmark.incrementAndGet());
+        return new Message(Target.player, ALL, payload.build().toString());
     }
 
     /**
@@ -468,6 +468,7 @@ public class Message {
      * Convert message to a string for use as an outbound message over the WebSocket
      * @see MessageEncoder#encode(Message)
      */
+    @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append(target).append(',');

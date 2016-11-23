@@ -25,7 +25,6 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
-import javax.json.JsonStructure;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -55,8 +54,7 @@ public class MapResponseReader implements MessageBodyReader<MapData> {
         JsonReader rdr = null;
         try {
             rdr = Json.createReader(entityStream);
-            JsonStructure json = rdr.read();
-            JsonObject returnedJson = (JsonObject) json;
+            JsonObject returnedJson = rdr.readObject();
             JsonObject info = returnedJson.getJsonObject("info");
 
             MapData data = new MapData();

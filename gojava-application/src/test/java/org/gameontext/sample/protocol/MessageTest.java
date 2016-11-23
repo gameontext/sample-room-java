@@ -17,7 +17,6 @@ package org.gameontext.sample.protocol;
 
 import org.gameontext.sample.RoomDescription;
 import org.gameontext.sample.map.client.MapData;
-import org.gameontext.sample.protocol.Message;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;

@@ -1,9 +1,9 @@
 package org.gameontext.sample;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -16,7 +16,9 @@ import org.gameontext.sample.map.client.MapData;
 /**
  * This is how our room is described.
  *  a) Use post-construct to go fill some of this in by asking the map
- *  b) Assign this dynamically on the fly as the room is used.
+ *  b) Assign this dynamically on the fly as the room is used
+ *  
+ *  @see RoomImplementation
  */
 public class RoomDescription {
 
@@ -27,10 +29,10 @@ public class RoomDescription {
     private String fullName = "A room with no full name";
     private String description = "An undescribed room (or perhaps the data hasn't been fetched from the map)";
 
-    private Map<String, String> commands = new HashMap<>();
+    private Map<String, String> commands = new ConcurrentHashMap<>();
     private JsonObject commandObj = null;
 
-    private Set<String> items = new HashSet<>();
+    private Set<String> items = new CopyOnWriteArraySet<>();
     private JsonArray itemObj = null;
 
     public RoomDescription() {}
