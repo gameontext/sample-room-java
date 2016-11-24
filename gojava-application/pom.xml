@@ -33,11 +33,6 @@
 
     <dependencies>
       <dependency>
-        <groupId>com.github.gameontext</groupId>
-        <artifactId>regutil</artifactId>
-        <version>v2.0.1</version>
-      </dependency>
-      <dependency>
         <groupId>org.jmockit</groupId>
         <artifactId>jmockit</artifactId>
         <version>1.29</version>

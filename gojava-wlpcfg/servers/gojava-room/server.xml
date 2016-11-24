@@ -26,6 +26,4 @@
     <httpEndpoint host="*" httpPort="9080" httpsPort="-1" id="defaultHttpEndpoint" />
     
     <jndiEntry jndiName="mapUrl" value="${env.MAP_URL}"/>
-
-    <applicationMonitor updateTrigger="mbean" />
 </server>
