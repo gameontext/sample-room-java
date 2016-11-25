@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corp.
+ * Copyright (c) 2016 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  *******************************************************************************/
 package org.gameontext.sample.map.client;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -28,6 +30,10 @@ import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import net.jodah.failsafe.CircuitBreaker;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * A wrapped/encapsulation of outbound REST requests to the map service.
@@ -64,6 +70,15 @@ public class MapClient {
      * @see WebTarget
      */
     private WebTarget queryRoot;
+    
+    /**
+     * The retry policy for failsafe.
+     */
+    private RetryPolicy retryPolicy;
+    /**
+     * The circuit breaker for failsafe.
+     */
+    private CircuitBreaker breaker;
 
     /**
      * The {@code @PostConstruct} annotation indicates that this method should
@@ -73,6 +88,7 @@ public class MapClient {
      * @see PostConstruct
      * @see ApplicationScoped
      */
+    @SuppressWarnings("unchecked")
     @PostConstruct
     public void initClient() {
         if (mapLocation == null) {
@@ -91,6 +107,17 @@ public class MapClient {
 
         // create the jax-rs 2.0 client
         this.queryRoot = queryClient.target(mapLocation);
+        
+        // create the retry policy & circuit breaker for failsafe.
+        retryPolicy = new RetryPolicy()
+                .retryOn(ServiceUnavailableException.class)
+                .withDelay(1, TimeUnit.SECONDS)
+                .withMaxRetries(3);
+        breaker = new CircuitBreaker()
+                .withFailureThreshold(3, 10)
+                .withSuccessThreshold(5)
+                .withDelay(1,  TimeUnit.MINUTES)
+                ;
 
         MapClientLog.log(Level.FINER, this, "Map client initialized");
     }
@@ -98,26 +125,34 @@ public class MapClient {
     public MapData getMapData(String siteId) {
         WebTarget target = this.queryRoot.path(siteId);
         MapClientLog.log(Level.FINER, this, "making request to {0} for room", target.getUri().toString());
-        Response r = null;
-        try {
-            r = target.request(MediaType.APPLICATION_JSON).get();
-            if (r.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-                MapData data = r.readEntity(MapData.class);
-                return data;
+        
+        return Failsafe.with(retryPolicy).with(breaker).get( () -> {
+            try {
+                Response r = null;
+                r = target.request(MediaType.APPLICATION_JSON).get();
+                if (r.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+                    MapData data = r.readEntity(MapData.class);
+                    return data;
+                }
+                return null;
+            } catch (ResponseProcessingException rpe) {
+                Response response = rpe.getResponse();
+                MapClientLog.log(Level.FINER, this, "Exception fetching room list uri: {0} resp code: {1} ",
+                        target.getUri().toString(),
+                        response.getStatusInfo().getStatusCode() + " " + response.getStatusInfo().getReasonPhrase());
+                if(503 == response.getStatusInfo().getStatusCode()){
+                    throw new ServiceUnavailableException();
+                }
+                MapClientLog.log(Level.FINEST, this, "Exception fetching room list", rpe);
+            } catch (ProcessingException e) {
+                MapClientLog.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", e);
+            } catch (WebApplicationException ex) {
+                MapClientLog.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", ex);
             }
+            // Sadly, badness happened while trying to get the endpoints
             return null;
-        } catch (ResponseProcessingException rpe) {
-            Response response = rpe.getResponse();
-            MapClientLog.log(Level.FINER, this, "Exception fetching room list uri: {0} resp code: {1} ",
-                    target.getUri().toString(),
-                    response.getStatusInfo().getStatusCode() + " " + response.getStatusInfo().getReasonPhrase());
-            MapClientLog.log(Level.FINEST, this, "Exception fetching room list", rpe);
-        } catch (ProcessingException e) {
-            MapClientLog.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", e);
-        } catch (WebApplicationException ex) {
-            MapClientLog.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", ex);
-        }
-        // Sadly, badness happened while trying to get the endpoints
-        return null;
+            
+        });
+        
     }
 }
