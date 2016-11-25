@@ -4,7 +4,21 @@
     <groupId>org.gameon.walkthrough</groupId>
     <artifactId>gojava</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>war</packaging>
+    
+    <licenses>
+      <license>
+        <name>The Apache Software License, Version 2.0</name>
+        <url>https://raw.github.com/WASdev/tool.accelerate.core/master/LICENSE</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+
+    <scm>
+      <connection>scm:git:git@github.com:WASdev/tool.accelerate.core.git</connection>
+      <developerConnection>scm:git@github.com:WASdev/tool.accelerate.core.git</developerConnection>
+      <url>git@github.com:WASdev/tool.accelerate.core.git</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,10 +35,10 @@
         <wlpServerName>gojava-room</wlpServerName>
         <testServerHttpPort>9080</testServerHttpPort>
         <testServerHttpsPort>9443</testServerHttpsPort>
-        <warName>gojava-application</warName>
-        <warVersion>1.0-SNAPSHOT</warVersion>
         <!--This is set in the ibm-web-ext.xml file -->
         <warContext></warContext>
+        <package.file>${project.build.directory}/${app.name}.zip</package.file>
+        <packaging.type>usr</packaging.type>
 
         <!-- Cloud Foundry/Bluemix properties -->
         <cf.context>eu-gb.mybluemix.net</cf.context>
@@ -39,6 +53,10 @@
         <!-- <cf.password></cf.password> -->
 
         <!-- This is the host for your app in Bluemix and what it will be called in the dashboard. -->
+        <cf.host>${app.name}</cf.host>
+        
+        <!-- Overriden in the Bluemix profile -->
+        <running.bluemix>false</running.bluemix>
         <app.name>gameon-room-java</app.name>
     </properties>
 
@@ -54,28 +72,230 @@
         </repository>
     </repositories>
 
-    <modules>
-        <module>gojava-application</module>
-        <module>gojava-wlpcfg</module>
-        <module>gojava-deploy</module>
-    </modules>
-
     <profiles>
         <profile>
-            <id>startLocal</id>
-            <modules>
-                <module>gojava-deploy/gojava-localServer</module>
-            </modules>
+            <id>bluemix</id>
+            <properties>
+                <running.bluemix>true</running.bluemix>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>1.4.1</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-bluemix-credentials</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireProperty>
+                                            <property>cf.org</property>
+                                            <message>The cf.org property must be
+                                                provided with the bluemix
+                                                profile.</message>
+                                        </requireProperty>
+                                        <requireProperty>
+                                            <property>cf.username</property>
+                                            <message>The cf.username property
+                                                must be provided with the
+                                                bluemix profile.</message>
+                                        </requireProperty>
+                                        <requireProperty>
+                                            <property>cf.password</property>
+                                            <message>The cf.password property
+                                                must be provided with the
+                                                bluemix profile.</message>
+                                        </requireProperty>
+                                        <requireProperty>
+                                            <property>gameon.id</property>
+                                            <message>The gameon.id property must be provided with your Game On! user id.</message>
+                                        </requireProperty>
+                                        <requireProperty>
+                                            <property>gameon.secret</property>
+                                            <message>The gameon.secret property must be provided with the Shared Secret associated with your gameon.id.</message>
+                                        </requireProperty>
+                                        <requireProperty>
+                                            <property>app.name</property>
+                                            <message>The app.name property must be provided with a unique URL-friendly name for your deployed bluemix service.</message>
+                                        </requireProperty>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo>Running bluemix profile with the following properties:
+                                            cf.target=${cf.target}
+                                            cf.space=${cf.space}
+                                            cf.org=${cf.org}
+                                            cf.username=${cf.username}
+                                            The application will be accessed at context root ${cf.context.root}</echo>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.cloudfoundry</groupId>
+                        <artifactId>cf-maven-plugin</artifactId>
+                        <version>1.1.3</version>
+                        <configuration>
+                            <target>${cf.target}</target>
+                            <org>${cf.org}</org>
+                            <space>${cf.space}</space>
+                            <username>${cf.username}</username>
+                            <password>${cf.password}</password>
+                            <appname>${cf.host}</appname>
+                            <memory>512</memory>
+                            <env>
+                                <GAMEON_ID>${gameon.id}</GAMEON_ID>
+                                <GAMEON_SECRET>${gameon.secret}</GAMEON_SECRET>
+                            </env>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>push</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>push</goal>
+                                </goals>
+                                <configuration>
+                                    <path>${package.file}</path>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
-            <id>bluemix</id>
-            <modules>
-                <module>gojava-deploy/gojava-bluemix</module>
-            </modules>
+            <id>runnable</id>
+            <properties>
+                <package.file>${project.build.directory}/${app.name}.jar</package.file>
+                <packaging.type>runnable</packaging.type>
+            </properties>
+        </profile>
+        <profile>
+            <id>liberty-test</id>
+
+            <!--Do not start the server unless testing-->
+
+            <activation>
+                <property>
+                    <name>!skipTests</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>net.wasdev.wlp.maven.plugins</groupId>
+                        <artifactId>liberty-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>start-server</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>start-server</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop-server</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop-server</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>existing-install</id>
+            <activation>
+                <property>
+                    <name>install.directory</name>
+                </property>
+            </activation>
+            <properties>
+                <libertyInstallDirectory>${install.directory}</libertyInstallDirectory>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugins</artifactId>
+                        <version>1.4.1</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-directory</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireProperty>
+                                            <property>install.directory</property>
+                                            <message>The
+                                                install.directory
+                                                property must be
+                                                provided with this
+                                                profile and must point
+                                                to your Liberty install.</message>
+                                        </requireProperty>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
     <dependencies>
+        <dependency>
+          <groupId>org.jmockit</groupId>
+          <artifactId>jmockit</artifactId>
+          <version>1.29</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-client</artifactId>
+            <version>3.1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.0.4</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
@@ -111,4 +331,167 @@
             <scope>runtime</scope>
         </dependency>
     </dependencies>
+    
+     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <packagingExcludes>pom.xml</packagingExcludes>
+                </configuration>
+            </plugin>
+            <!-- Plugin to run unit tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <id>default-test</id>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/it/**</exclude>
+                            </excludes>
+                            <argLine>-javaagent:${org.jmockit:jmockit:jar}</argLine>
+                            <reportsDirectory>${project.build.directory}/test-reports/unit</reportsDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+                <executions>
+                    <execution>
+                      <id>getClasspathFilenames</id>
+                      <goals>
+                          <goal>properties</goal>
+                      </goals>
+                    </execution>
+                    <execution>
+                        <id>copy-server-files</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>server-snippet</includeArtifactIds>
+                            <prependGroupId>true</prependGroupId>
+                            <outputDirectory>${project.build.directory}/wlp/usr/servers/${wlpServerName}/configDropins/defaults</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <id>copy-app</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                          <outputDirectory>${project.build.directory}/wlp/usr/servers/${wlpServerName}/dropins</outputDirectory>
+                          <resources>
+                            <resource>
+                              <directory>${project.build.directory}</directory>
+                              <includes>
+                                <include>${project.artifactId}-${project.version}.war</include>
+                              </includes>
+                            </resource>
+                          </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Enable liberty-maven plugin -->
+            <plugin>
+                <groupId>net.wasdev.wlp.maven.plugins</groupId>
+                <artifactId>liberty-maven-plugin</artifactId>
+                <version>1.2</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverName>${wlpServerName}</serverName>
+                    <assemblyArtifact>
+                        <groupId>com.ibm.websphere.appserver.runtime</groupId>
+                        <artifactId>wlp-webProfile7</artifactId>
+                        <version>16.0.0.3</version>
+                        <type>zip</type>
+                    </assemblyArtifact>
+                    <assemblyInstallDirectory>${project.build.directory}</assemblyInstallDirectory>
+                    <configFile>src/main/liberty/config/server.xml</configFile>
+                    <packageFile>${package.file}</packageFile>
+                    <include>${packaging.type}</include>
+                    <bootstrapProperties>
+                        <default.http.port>${testServerHttpPort}</default.http.port>
+                        <default.https.port>${testServerHttpsPort}</default.https.port>
+                    </bootstrapProperties>
+                    <jvmOptions>
+                        <param>-Dgameon.id=${gameon.id}</param>
+                        <param>-Dgameon.secret=${gameon.secret}</param>
+                    </jvmOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>intall-liberty</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>install-server</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>package-app</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>package-server</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Plugin to run functional tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.18.1</version>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/it/**</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <liberty.test.port>${testServerHttpPort}</liberty.test.port>
+                                <war.name>${warContext}</war.name>
+                                <running.bluemix>${running.bluemix}</running.bluemix>
+                                <cf.context.root>${cf.context.root}</cf.context.root>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>verify-results</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <summaryFile>${project.build.directory}/test-reports/it/failsafe-summary.xml</summaryFile>
+                    <reportsDirectory>${project.build.directory}/test-reports/it</reportsDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -2,3 +2,4 @@
 /.settings
 docker-compose.override.yml
 .gradle
+/target

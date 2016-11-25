@@ -30,7 +30,7 @@ The source code is located in GitHub, navigate to our [repository](https://githu
 
 1. `cd gameon-room-java`
 2. `mvn install`
-3. `mvn package -PstartLocal`
+3. `mvn liberty:run-server`
   After running this, you will have the server running locally at [http://localhost:9080/](http://localhost:9080/).
   You can use a browser extension to play with the WebSocket according to the
   [Game On! WebSocket protocol](https://book.game-on.org/microservices/WebSocketProtocol.html).
@@ -117,7 +117,7 @@ Sign up for Bluemix at https://console.ng.bluemix.net and DevOps Services at htt
 3. Enter email and password for Bluemix login
 4. Enter the Bluemix organization
 5. Enter the Bluemix space
-6. `cf push <cf-app-name> -p gojava-wlpcfg/target/wlp/usr/servers/gojava-room/gojava-room.zip`
+6. `cf push <cf-app-name> -p target/gojava-room.zip`
 
 **NOTE:** Choose a unique app name to be included as part of the URL (`cf-app-name`). It must not contain spaces or special characters.
 
@@ -158,7 +158,7 @@ Once docker is installed, then you deploy your room with
 ```
 gojava:
  volumes:
-   - './gojava-wlpcfg/target/wlp/usr/servers/gojava-room:/opt/ibm/wlp/usr/servers/defaultServer'
+   - './target/wlp/usr/servers/gojava-room:/opt/ibm/wlp/usr/servers/defaultServer'
 ```
 * `docker-compose build`
 * `docker-compose up`
@@ -196,7 +196,7 @@ The `ports` section instructs docker to expose the port 7777 from inside the con
 1. Log in to the IBM container service. This needs to be done in two stages:
   1. Log into the Cloud Foundry CLI using `cf login`. Ypu will need to specify the API endpoint as `api.ng.bluemix.net` for the US South server, or `api.eu-gb.bluemix.net` for the UK server.
   2. After this run the command `cf ic login`. This will perform the authentication to the IBM Container Service.
-2. Build the container in the Bluemix registry by running the command  `cf ic build -t gojava .` from inside the `gojava-wlpcfg` directory.
+2. Build the container in the Bluemix registry by running the command  `cf ic build -t gojava .`.
 3. Run `cf ic images` and check your image is available.
 4. Start the container by running the command `cf ic run -p 9080 --name gojava <registry>/<namespace>/gojava`. You can find the full path from the output of `cf ic images`. An example would be:
 
@@ -214,7 +214,7 @@ Instead of deploying a container as a single instance, you can instead deploy a 
 1. Log in to the IBM container service. This needs to be done in two stages:
   1. Log into the Cloud Foundry CLI using `cf login`. You will need to specify the API endpoint as `api.ng.bluemix.net` for the US South server, or `api.eu-gb.bluemix.net` for the UK server.
   2. After this run the command `cf ic login`. This will perform the authentication to the IBM Container Service.
-2. Run `cf ic images` and check the `gojava` image is available. If not, run the command `cf ic build -t gojava .` from inside the `gojava-wlpcfg` directory to create it.
+2. Run `cf ic images` and check the `gojava` image is available. If not, run the command `cf ic build -t gojava .` to create it.
 3. Create the container group by running `cf ic group create -p 9080 -n <appName> --name gojavagroup <registry>/<namespace>/gojava`. You can find the full path from the output of `cf ic images`. An example would be:
 
   `cf ic group create -p 9080 --name gojavagroup registry.ng.bluemix.net/pavittr/gojava`
