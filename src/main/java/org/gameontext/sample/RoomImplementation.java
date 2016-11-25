@@ -42,8 +42,7 @@ import org.gameontext.sample.protocol.RoomEndpoint;
 public class RoomImplementation {
 
     /** The id of the room: you can retrieve this from the room editing view in the UI */
-    public static final String ROOM_ID = "8ed314ab20718bbc870e3a522baf291b";
-    
+    public static final String ROOM_ID = "TheGeneratedIdOfThisRoom";
     public static final String LOOK_UNKNOWN = "It doesn't look interesting";
     public static final String UNKNOWN_COMMAND = "This room is a basic model. It doesn't understand `%s`";
     public static final String UNSPECIFIED_DIRECTION = "You didn't say which way you wanted to go.";
@@ -62,14 +61,8 @@ public class RoomImplementation {
     @PostConstruct
     protected void postConstruct() {
 
-    	if ( mapClient != null )
-    		mapClient.getMapData(ROOM_ID);
-    	
-        roomDescription.addCommand("/use", "Use something on or with something else");
-        roomDescription.addItem("red teddy bear");
-        roomDescription.addItem("big pile of mud");
-        roomDescription.addItem("moon diagram");
-        roomDescription.addItem("bookshelf");
+        // Customize the room
+        roomDescription.addCommand("/ping", "Does this work?");
 
         Log.log(Level.INFO, this, "Room initialized: {0}", roomDescription);
     }
