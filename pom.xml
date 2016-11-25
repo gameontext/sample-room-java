@@ -95,21 +95,15 @@
                                     <rules>
                                         <requireProperty>
                                             <property>cf.org</property>
-                                            <message>The cf.org property must be
-                                                provided with the bluemix
-                                                profile.</message>
+                                            <message>The cf.org property must be provided with the bluemix profile.</message>
                                         </requireProperty>
                                         <requireProperty>
                                             <property>cf.username</property>
-                                            <message>The cf.username property
-                                                must be provided with the
-                                                bluemix profile.</message>
+                                            <message>The cf.username property must be provided with the bluemix profile.</message>
                                         </requireProperty>
                                         <requireProperty>
                                             <property>cf.password</property>
-                                            <message>The cf.password property
-                                                must be provided with the
-                                                bluemix profile.</message>
+                                            <message>The cf.password property must be provided with the bluemix profile.</message>
                                         </requireProperty>
                                         <requireProperty>
                                             <property>gameon.id</property>
@@ -228,20 +222,53 @@
             </build>
         </profile>
         <profile>
-            <id>existing-install</id>
+            <id>downloadLiberty</id>
             <activation>
-                <property>
-                    <name>install.directory</name>
-                </property>
+                <property><name>!liberty.install</name></property>
             </activation>
             <properties>
-                <libertyInstallDirectory>${install.directory}</libertyInstallDirectory>
+                <liberty.install.dir>${project.build.directory}/wlp</liberty.install.dir>
             </properties>
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>net.wasdev.wlp.maven.plugins</groupId>
+                        <artifactId>liberty-maven-plugin</artifactId>
+                        <configuration>
+                            <assemblyInstallDirectory>${project.build.directory}</assemblyInstallDirectory>
+                            <assemblyArtifact>
+                                <groupId>com.ibm.websphere.appserver.runtime</groupId>
+                                <artifactId>wlp-webProfile7</artifactId>
+                                <version>16.0.0.3</version>
+                                <type>zip</type>
+                            </assemblyArtifact>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>existing-install</id>
+            <activation>
+                <property>
+                    <name>liberty.install</name>
+                </property>
+            </activation>
+            <properties>
+                <liberty.install.dir>${liberty.install}</liberty.install.dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>net.wasdev.wlp.maven.plugins</groupId>
+                        <artifactId>liberty-maven-plugin</artifactId>
+                        <configuration>
+                            <installDirectory>${liberty.install}</installDirectory>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugins</artifactId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
                         <version>1.4.1</version>
                         <executions>
                             <execution>
@@ -253,13 +280,8 @@
                                 <configuration>
                                     <rules>
                                         <requireProperty>
-                                            <property>install.directory</property>
-                                            <message>The
-                                                install.directory
-                                                property must be
-                                                provided with this
-                                                profile and must point
-                                                to your Liberty install.</message>
+                                            <property>liberty.install</property>
+                                            <message>The liberty.install property must be provided with this profile and must point to your Liberty install.</message>
                                         </requireProperty>
                                     </rules>
                                 </configuration>
@@ -382,7 +404,7 @@
                         <configuration>
                             <includeArtifactIds>server-snippet</includeArtifactIds>
                             <prependGroupId>true</prependGroupId>
-                            <outputDirectory>${project.build.directory}/wlp/usr/servers/${wlpServerName}/configDropins/defaults</outputDirectory>
+                            <outputDirectory>${liberty.install.dir}/usr/servers/${wlpServerName}/configDropins/defaults</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -399,7 +421,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                          <outputDirectory>${project.build.directory}/wlp/usr/servers/${wlpServerName}/dropins</outputDirectory>
+                          <outputDirectory>${liberty.install.dir}/usr/servers/${wlpServerName}/dropins</outputDirectory>
                           <resources>
                             <resource>
                               <directory>${project.build.directory}</directory>
@@ -420,13 +442,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <serverName>${wlpServerName}</serverName>
-                    <assemblyArtifact>
-                        <groupId>com.ibm.websphere.appserver.runtime</groupId>
-                        <artifactId>wlp-webProfile7</artifactId>
-                        <version>16.0.0.3</version>
-                        <type>zip</type>
-                    </assemblyArtifact>
-                    <assemblyInstallDirectory>${project.build.directory}</assemblyInstallDirectory>
                     <configFile>src/main/liberty/config/server.xml</configFile>
                     <packageFile>${package.file}</packageFile>
                     <include>${packaging.type}</include>
