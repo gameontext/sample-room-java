@@ -117,7 +117,7 @@ Sign up for Bluemix at https://console.ng.bluemix.net and DevOps Services at htt
 3. Enter email and password for Bluemix login
 4. Enter the Bluemix organization
 5. Enter the Bluemix space
-6. `cf push <cf-app-name> -p target/gojava-room.zip`
+6. `cf push <cf-app-name> -p target/gameon-room-java.zip`
 
 **NOTE:** Choose a unique app name to be included as part of the URL (`cf-app-name`). It must not contain spaces or special characters.
 
