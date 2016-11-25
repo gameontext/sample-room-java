@@ -63,6 +63,19 @@
                   <packagingExcludes>pom.xml</packagingExcludes>
               </configuration>
           </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <version>2.10</version>
+              <executions>
+                  <execution>
+                      <id>getClasspathFilenames</id>
+                      <goals>
+                          <goal>properties</goal>
+                      </goals>
+                  </execution>
+              </executions>
+          </plugin>
           <!-- Plugin to run unit tests -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -73,6 +86,7 @@
                     <phase>test</phase>
                     <id>default-test</id>
                     <configuration>
+                        <argLine>-javaagent:${org.jmockit:jmockit:jar}</argLine>
                         <reportsDirectory>${project.build.directory}/test-reports/unit</reportsDirectory>
                     </configuration>
                 </execution>
