@@ -16,44 +16,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+  <style>
+    input:disabled { background-color: gray; }
+  </style>
 </head>
 <body style="width: 80%">
 
-    <h1>Your room is running!</h1>
+  <h1>Your room is running! </h1>
 
-    <p>Consider this your primitive health check, well done!</p>
+  <p>Your websocket endpoint is <b><span id="socketUrl"></span></b>.</p>
 
-    <p>Your websocket endpoint is <b><span id="socketUrl"></span></b>.
-        Use browser extensions to play with the WebSocket directly,
-        or go to <a href="http://game-on.org/">http://game-on.org/</a>
-        and check out the <code>/listmyrooms</code> command in
-        First Room.</p>
+  <p>Check the health of the service (REST): <a href="/rest/health"><span id="healthUrl"></span></a></p>
 
-    <p>The <a href="https://gameontext.gitbooks.io/gameon-gitbook/content/microservices/WebsocketProtocol.html">WebSocket protocol</a>
-        used by Game On! is documented in the <a href="https://gameontext.gitbooks.io/gameon-gitbook/content/">book</a>.</p>
+  <p>What next?</p>
 
-    <p>Standing up this initial room was pretty easy, right?</p>
+  <ul>
+    <li>Use the <code>/listmyrooms</code> command in First Room to find your live room in the game</li>
+    <li>Add custom commands and items to your room (see org.gameontext.sample.RoomImplementation)</li>
+    <li>Scale your service -- does that change how you manage state?</li>
+    <li>Check out other <a href="https://book.game-on.org/walkthroughs/createMore.html">Advanced Adventures</a>
+    <li>Learn about the game's <a href="https://book.game-on.org/microservices/">Application architecture</a>
+  </ul>
 
-    <p>
-        So, what happens if you want to make this scale? How will the
-        Map service find and connect to the instances of your service?
-    </p><p>
-        Each room instance uses WebSockets to broadcast events and
-        chat to connected players. What happens when you have multiple
-        instances of your room? Do you want all of them to behave as
-        a single room (such that all events are visible in all rooms),
-        or is each an independent/transient sharded instance?
-    </p><p>
-        Want to try adding items? How do you track the state of those
-        items: In memory? In a shared cache? ...
-    </p>
+<p> Go play! Game On!</p>
 
-    <p> Go play. Game On!</p>
+<hr />
+  <h2>Test out your room... </h2>
 
-    <script>
-    document.getElementById('socketUrl').innerHTML = "ws://" + window.document.location.host + '/room';
-    </script>
+  <p>If your room pays attention to the room id, update this to match the target id</p>
+  <input type="text" id="roomId" size="50" value="TheGeneratedIdOfThisRoom" />
+
+  <button id="connectButton" onclick="connect()">connect</button><button id="disconnectButton"  onclick="disconnect()" disabled>disconnect</button>
+
+  <h3>Protocol operations:</h3>
+  <button id="helloButton"  onclick="hello()" disabled>roomHello</button><button id="goodbyeButton"  onclick="goodbye()" disabled>roomGoodbye</button>
+  <button id="joinButton"  onclick="join()" disabled>roomJoin</button><button id="partButton" onclick="part()" disabled>roomPart</button>
+
+  <h3>User initiated commands:</h3>
+  <form id="simpleForm">
+      <input type="text" id="inputmessage" size="50" placeholder="type something and press ENTER, type 'clear' to clear" disabled/>
+  </form>
+  <h4>Activity:</h4>
+  <div id="response" style="width: 80%; margin: 0 auto; border: 1px solid gray; height: 20rem; max-height: 40rem; "></div>
+
+  <script type="text/javascript" src="websocketClient.js"></script>
 
 </body>
 </html>
