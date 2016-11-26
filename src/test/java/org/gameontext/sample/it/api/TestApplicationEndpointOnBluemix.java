@@ -29,7 +29,7 @@ public class TestApplicationEndpointOnBluemix extends EndpointClient {
         assumeNotNull(runningInBluemix);
         assumeTrue(Boolean.valueOf(runningInBluemix));
         String context = System.getProperty("cf.context.root");
-        testEndpoint(context, "index.html", "Your room is running!");
+        testEndpoint(context, "/rest/health", "OK");
     }
 
 }

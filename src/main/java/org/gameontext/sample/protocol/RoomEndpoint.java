@@ -41,12 +41,11 @@ import org.gameontext.sample.RoomImplementation;
  * will be created for every connected client.
  * https://book.game-on.org/microservices/WebSocketProtocol.html
  */
-@ServerEndpoint(value = "/room",
-decoders = MessageDecoder.class, encoders = MessageEncoder.class)
+@ServerEndpoint(value = "/room", decoders = MessageDecoder.class, encoders = MessageEncoder.class)
 public class RoomEndpoint {
 
     @Inject
-    private RoomImplementation roomImplementation;
+    protected RoomImplementation roomImplementation;
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig ec) {

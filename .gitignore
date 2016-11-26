@@ -5,3 +5,5 @@ docker-compose.override.yml
 /target
 .DS_Store
 /.classpath
+/.apt_generated/
+.factorypath

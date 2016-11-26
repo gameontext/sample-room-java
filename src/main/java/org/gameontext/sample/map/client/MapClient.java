@@ -29,6 +29,9 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.gameontext.sample.Log;
+import org.gameontext.sample.RoomDescription;
+
 /**
  * A wrapped/encapsulation of outbound REST requests to the map service.
  * <p>
@@ -75,24 +78,38 @@ public class MapClient {
      */
     @PostConstruct
     public void initClient() {
-        if (mapLocation == null) {
-            MapClientLog.log(Level.FINER, this, "No MAP_URL environment variable provided. Will use default.");
-            mapLocation = DEFAULT_MAP_URL;
+        try {
+            // The Map URL is an optional value.
+            if (mapLocation == null || mapLocation.contains("MAP_URL") ) {
+                MapClientLog.log(Level.FINER, this, "No MAP_URL environment variable provided. Will use default.");
+                mapLocation = DEFAULT_MAP_URL;
+            }
+
+            Client queryClient = ClientBuilder.newBuilder()
+                    .property("com.ibm.ws.jaxrs.client.ssl.config", "DefaultSSLSettings")
+                    .property("com.ibm.ws.jaxrs.client.disableCNCheck", true)
+                    .build();
+
+            queryClient.register(MapResponseReader.class);
+
+            // create the jax-rs 2.0 client
+            this.queryRoot = queryClient.target(mapLocation);
+
+            MapClientLog.log(Level.INFO, this, "Map client initialized. Map URL set to {0}", mapLocation);
+        } catch ( Exception ex ) {
+            Log.log(Level.SEVERE, this, "Unable to initialize map service", ex);
         }
+    }
 
-        MapClientLog.log(Level.INFO, this, "Map URL set to {0}", mapLocation);
+    public boolean ok() {
+        return queryRoot != null;
+    }
 
-        Client queryClient = ClientBuilder.newBuilder()
-                .property("com.ibm.ws.jaxrs.client.ssl.config", "DefaultSSLSettings")
-                .property("com.ibm.ws.jaxrs.client.disableCNCheck", true)
-                .build();
-
-        queryClient.register(MapResponseReader.class);
-
-        // create the jax-rs 2.0 client
-        this.queryRoot = queryClient.target(mapLocation);
-
-        MapClientLog.log(Level.FINER, this, "Map client initialized");
+    public void updateRoom(String roomId, RoomDescription roomDescription) {
+        MapData data = getMapData(roomId);
+        if ( data != null ) {
+            roomDescription.updateData(data);
+        }
     }
 
     public MapData getMapData(String siteId) {
