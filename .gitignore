@@ -3,4 +3,5 @@
 docker-compose.override.yml
 .gradle
 /target
+.DS_Store
 /.classpath
