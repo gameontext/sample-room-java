@@ -1,0 +1,5 @@
+<server>
+    <!-- turn off polling -->
+    <config updateTrigger="mbean"/>
+    <applicationMonitor dropinsEnabled="false" updateTrigger="mbean"/>
+</server>

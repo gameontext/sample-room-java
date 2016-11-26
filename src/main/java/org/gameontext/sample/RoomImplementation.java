@@ -20,6 +20,7 @@ import java.util.logging.Level;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.JsonObject;
@@ -41,8 +42,6 @@ import org.gameontext.sample.protocol.RoomEndpoint;
 @ApplicationScoped
 public class RoomImplementation {
 
-    /** The id of the room: you can retrieve this from the room editing view in the UI */
-    public static final String ROOM_ID = "TheGeneratedIdOfThisRoom";
     public static final String LOOK_UNKNOWN = "It doesn't look interesting";
     public static final String UNKNOWN_COMMAND = "This room is a basic model. It doesn't understand `%s`";
     public static final String UNSPECIFIED_DIRECTION = "You didn't say which way you wanted to go.";
@@ -53,6 +52,13 @@ public class RoomImplementation {
     public static final String GOODBYE_ALL = "%s has gone";
     public static final String GOODBYE_USER = "Bye!";
 
+    /**
+     * The room id: this is translated from the ROOM_ID environment variable into
+     * a JNDI value by server.xml (Liberty)
+     */
+    @Resource(lookup = "roomId")
+    protected String roomId;
+
     @Inject
     protected MapClient mapClient;
 
@@ -60,6 +66,14 @@ public class RoomImplementation {
 
     @PostConstruct
     protected void postConstruct() {
+
+        if ( roomId == null || roomId.contains("ROOM_ID") ) {
+            // The room id was not set by the environment; make one up.
+            roomId = "TheGeneratedIdForThisRoom";
+        } else {
+            // we have a custom room id! let's see what the map thinks.
+            mapClient.updateRoom(roomId, roomDescription);
+        }
 
         // Customize the room
         roomDescription.addCommand("/ping", "Does this work?");
@@ -75,10 +89,10 @@ public class RoomImplementation {
     public void handleMessage(Session session, Message message, RoomEndpoint endpoint) {
 
         // If this message isn't for this room, TOSS IT!
-        if ( !ROOM_ID.equals(message.getTargetId()) ) {
-            Log.log(Level.FINEST, this, "Received message for the wrong room ({0}): {1}", message.getTargetId(), message);
-            return;
-        }
+//        if ( !roomId.equals(message.getTargetId()) ) {
+//            Log.log(Level.FINEST, this, "Received message for the wrong room ({0}): {1}", message.getTargetId(), message);
+//            return;
+//        }
 
         // Fetch the userId and the username of the sender.
         // The username can change overtime, so always use the sent username when
@@ -296,5 +310,9 @@ public class RoomImplementation {
 
             default  : return exitId;
         }
+    }
+
+    public boolean ok() {
+        return mapClient.ok();
     }
 }

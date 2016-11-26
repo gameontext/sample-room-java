@@ -13,23 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.gameontext.sample.it.api;
+package org.gameontext.sample;
 
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeNotNull;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 
-import org.gameontext.sample.it.EndpointClient;
-import org.junit.Test;
-
-public class TestApplicationEndpoint extends EndpointClient {
-
-    @Test
-    public void indexHtml() {
-        String runningInBluemix = System.getProperty("running.bluemix");
-        assumeNotNull(runningInBluemix);
-        assumeFalse(Boolean.valueOf(runningInBluemix));
-        String port = System.getProperty("liberty.test.port");
-        testEndpoint("localhost:" + port, "/rest/health", "OK");
-    }
-
+@ApplicationPath("rest")
+public class RestApplication extends Application {
+    /*
+     * The context root for this application is /
+     * @ApplicationPath will tuck the entirety of the REST endpoint under /rest/
+     * Any {@link Path} annotations at the class level are appended onto that, etc.
+     */
 }

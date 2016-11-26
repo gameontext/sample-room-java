@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.gameontext.sample.it.api;
+package org.gameontext.sample;
 
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeNotNull;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
-import org.gameontext.sample.it.EndpointClient;
-import org.junit.Test;
+@Path("/health")
+public class HealthEndpoint {
 
-public class TestApplicationEndpoint extends EndpointClient {
+    @Inject
+    private RoomImplementation roomImplementation;
 
-    @Test
-    public void indexHtml() {
-        String runningInBluemix = System.getProperty("running.bluemix");
-        assumeNotNull(runningInBluemix);
-        assumeFalse(Boolean.valueOf(runningInBluemix));
-        String port = System.getProperty("liberty.test.port");
-        testEndpoint("localhost:" + port, "/rest/health", "OK");
+    @GET
+    public Response health() {
+        if ( roomImplementation != null && roomImplementation.ok() ) {
+            return Response.ok("OK").build();
+        }
+        return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
-
 }

@@ -70,7 +70,7 @@ public class RoomImplementationTest {
 
     @Test
     public void testHandleChatMessage(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomMessage(RoomImplementation.ROOM_ID, TEST_ID, TEST_USERNAME, "Just chatting");
+        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "Just chatting");
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -97,7 +97,7 @@ public class RoomImplementationTest {
 
     @Test
     public void testRoomHelloV1(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomHello(RoomImplementation.ROOM_ID, TEST_ID, TEST_USERNAME, 1);
+        Message message = Message.createRoomHello(roomImpl.roomId, TEST_ID, TEST_USERNAME, 1);
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -126,7 +126,7 @@ public class RoomImplementationTest {
 
     @Test
     public void testRoomHelloV2(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomHello(RoomImplementation.ROOM_ID, TEST_ID, TEST_USERNAME, 2);
+        Message message = Message.createRoomHello(roomImpl.roomId, TEST_ID, TEST_USERNAME, 2);
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -154,7 +154,7 @@ public class RoomImplementationTest {
 
     @Test
     public void testRoomGoodbye(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomGoodbye(RoomImplementation.ROOM_ID, TEST_ID, TEST_USERNAME);
+        Message message = Message.createRoomGoodbye(roomImpl.roomId, TEST_ID, TEST_USERNAME);
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -178,7 +178,7 @@ public class RoomImplementationTest {
 
     @Test
     public void testRoomJoin(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomJoin(RoomImplementation.ROOM_ID, TEST_ID, TEST_USERNAME, 2);
+        Message message = Message.createRoomJoin(roomImpl.roomId, TEST_ID, TEST_USERNAME, 2);
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -195,7 +195,7 @@ public class RoomImplementationTest {
 
     @Test
     public void testRoomPart(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomPart(RoomImplementation.ROOM_ID, TEST_ID, TEST_USERNAME);
+        Message message = Message.createRoomPart(roomImpl.roomId, TEST_ID, TEST_USERNAME);
 
         roomImpl.handleMessage(session, message, endpoint);
 
