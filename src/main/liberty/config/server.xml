@@ -40,5 +40,5 @@
 
     <!-- Environment specific config. 
          Set TARGET=production as env var to include production-config.xml, e.g. -->
-    <include location="${env.TARGET}-config.xml" optional="true"/>
+    <!-- include location="${env.TARGET}-config.xml" optional="true"/ -->
 </server>

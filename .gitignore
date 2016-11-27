@@ -1,9 +1,10 @@
+/.apt_generated/
+.DS_Store
+.gradle
 /.project
 /.settings
-docker-compose.override.yml
-.gradle
-/target
-.DS_Store
-/.classpath
-/.apt_generated/
 .factorypath
+.*.swp
+/.classpath
+docker-compose.override.yml
+/target
