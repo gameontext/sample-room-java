@@ -1,5 +1,5 @@
 gojava:
- build: ./gojava-wlpcfg
+ build: .
  ports:
   - "9080:9080"
 
