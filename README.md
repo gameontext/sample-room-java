@@ -35,7 +35,7 @@ Game On! communicates with this service (a room) over WebSockets using the [Game
 
 1. `cd sample-room-java`
 2. `mvn install`
-3. `mvn package -PstartLocal`
+3. `mvn liberty:run-server`
 
 After running this, the server will be running locally at [http://localhost:9080/](http://localhost:9080/). 
 * Visiting this page provides a small form you can use to test the WebSocket endpoint in your service directly.
