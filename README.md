@@ -107,7 +107,11 @@ For those of you familiar with the Liberty server configuration you will know th
 
 ### Testing
 
-You can write two types of tests: unit and integration tests.  The unit tests will use the maven-surefire-plugin to run any tests found in packages that include "unit" in their name. The integration tests will start a Liberty server before using the maven-failsafe-plugin to run any tests with in pacakges that include "it" in their names before then stopping the Liberty server. As integration tests are longer running then can be skipped by providing the skipTests flag: `mvn install -DskipTests`.
+You can write two types of tests: unit and integration tests.  The unit tests will use the maven-surefire-plugin to run any tests found in packages that include "unit" in their name. The integration tests will:
+1. Start a Liberty server
+2. Use the maven-failsafe-plugin to run any tests with in packages that include "it" in their names
+3. Stop the Liberty server
+As integration tests are longer running they can be skipped by providing the skipTests flag: `mvn install -DskipTests`.
 
 ### Build phases
 
