@@ -29,13 +29,7 @@ Game On! communicates with this service (a room) over WebSockets using the [Game
 ## Let's get started!
 
 1. Create your own fork of this repository ([what's a fork?](https://help.github.com/articles/fork-a-repo/))
-
-
-
-
-
-
-Create a local clone of your fork ([Cloning a repository](https://help.github.com/articles/cloning-a-repository/))
+2. Create a local clone of your fork ([Cloning a repository](https://help.github.com/articles/cloning-a-repository/))
 
 ## Build the service locally
 
