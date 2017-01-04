@@ -29,7 +29,13 @@ Game On! communicates with this service (a room) over WebSockets using the [Game
 ## Let's get started!
 
 1. Create your own fork of this repository ([what's a fork?](https://help.github.com/articles/fork-a-repo/))
-2. Create a local clone of your fork ([Cloning a repository](https://help.github.com/articles/cloning-a-repository/))
+
+
+
+
+
+
+Create a local clone of your fork ([Cloning a repository](https://help.github.com/articles/cloning-a-repository/))
 
 ## Build the service locally
 
@@ -109,7 +115,7 @@ For those of you familiar with the Liberty server configuration you will know th
 
 You can write two types of tests: unit and integration tests.  The unit tests will use the maven-surefire-plugin to run any tests found in packages that include "unit" in their name. The integration tests will:
 1. Start a Liberty server
-2. Use the maven-failsafe-plugin to run any tests with in packages that include "it" in their names
+2. Use the maven-failsafe-plugin to run any tests that have packages that include "it" in their names
 3. Stop the Liberty server
 As integration tests are longer running they can be skipped by providing the skipTests flag: `mvn install -DskipTests`.
 
