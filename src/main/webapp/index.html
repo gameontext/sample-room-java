@@ -18,19 +18,31 @@
 <head>
   <style>
     input:disabled { background-color: gray; }
+    .callout {
+      border: 1px solid silver;
+      margin: 1em;
+      padding: .5em;
+    }
+    #socketUrl {
+      color: blue;
+    }
   </style>
 </head>
 <body style="width: 80%">
 
   <h1>Your room is running! </h1>
 
-  <p>Your websocket endpoint is <b><span id="socketUrl"></span></b>.</p>
-
-  <p>Check the health of the service (REST): <a href="/rest/health"><span id="healthUrl"></span></a></p>
+  <div class="callout">
+    <dl>
+      <li><b>WebSocket Endpoint: <span id="socketUrl"></span></b></li>
+      <li>Health Check (REST): <a href="/rest/health"><span id="healthUrl"></span></a></li>
+    </dl>
+  </div>
 
   <p>What next?</p>
 
   <ul>
+    <li>Use the bottom half of this page for the equivalent of poking your room with a stick</li>
     <li>Use the <code>/listmyrooms</code> command in First Room to find your live room in the game</li>
     <li>Add custom commands and items to your room (see org.gameontext.sample.RoomImplementation)</li>
     <li>Scale your service -- does that change how you manage state?</li>
