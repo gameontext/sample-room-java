@@ -39,7 +39,7 @@ Game On! communicates with this service (a room) over WebSockets using the [Game
 
 After running this, the server will be running locally at [http://localhost:9080/](http://localhost:9080/).
 * Visiting this page provides a small form you can use to test the WebSocket endpoint in your service directly.
-* A health URL is also defined by the service, at http://localhost:9080/health
+* A health URL is also defined by the service, at http://localhost:9080/rest/health
 
 ## Make your room public!
 
@@ -56,7 +56,7 @@ A `docker-compose.yml` file is also there, which can be used to specify overlay 
 
 ## Ok. So this thing is running... Now what?
 
-We know, this walkthrough was simple. You have a nice shiny service that has a REST API (/health),
+We know, this walkthrough was simple. You have a nice shiny service that has a REST API (/rest/health),
 and emulates async messaging behavior via a WebSocket. So?
 
 The purpose of this text-based adventure is to help you grapple with microservices concepts and technologies
