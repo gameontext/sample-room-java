@@ -15,6 +15,7 @@
  *******************************************************************************/
 package org.gameontext.sample;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 
@@ -42,7 +43,7 @@ import org.gameontext.sample.protocol.RoomEndpoint;
 public class RoomImplementation {
 
     /** The id of the room: you can retrieve this from the room editing view in the UI */
-    public static final String ROOM_ID = "TheGeneratedIdOfThisRoom";
+    public static final String ROOM_ID = "bd66f1ad68a2993002364ebf1107478e";
     public static final String LOOK_UNKNOWN = "It doesn't look interesting";
     public static final String UNKNOWN_COMMAND = "This room is a basic model. It doesn't understand `%s`";
     public static final String UNSPECIFIED_DIRECTION = "You didn't say which way you wanted to go.";
@@ -237,6 +238,25 @@ public class RoomImplementation {
                             Message.createBroadcastEvent("Ping! Pong sent to " + username + ": " + remainder, userId, "Ping! Pong! " + remainder));
                 }
 
+                break;
+                
+            case "/test":
+                endpoint.sendMessage(session,
+                        Message.createChatMessage(username, "Running mapclient test"));
+                String a = mapClient.getValue("XMYKEY");
+                String b = mapClient.getValue("FISH");
+                String c = mapClient.getValue("XMYKEY");
+                Log.log(Level.INFO, this, "A)"+a+"  B)"+b+"  C)"+c);
+                break;
+                
+            case "/logs":
+                endpoint.sendMessage(session,
+                        Message.createSpecificEvent(userId, "LOGS::"));
+                List<String> logs = Log.logPipe.getLogLines();
+                for(String s: logs){
+                endpoint.sendMessage(session,
+                        Message.createSpecificEvent(userId,  s));
+                }
                 break;
 
             default:

@@ -20,6 +20,7 @@ import java.util.logging.Level;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.cache.annotation.CacheResult;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.ServiceUnavailableException;
@@ -30,6 +31,8 @@ import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.gameontext.sample.Log;
 
 import net.jodah.failsafe.CircuitBreaker;
 import net.jodah.failsafe.Failsafe;
@@ -53,15 +56,18 @@ import net.jodah.failsafe.RetryPolicy;
 @ApplicationScoped
 public class MapClient {
 
-    public static final String DEFAULT_MAP_URL = "https://game-on.org/map/v1/sites";
+    public static final String DEFAULT_MAP_URL = "https://gameontext.org/map/v1/sites";
 
     /**
      * The URL for the target map service.
      * This is set via the environment variable MAP_URL. This value is read
      * in server.xml.
      */
-    @Resource(lookup = "mapUrl")
-    private String mapLocation;
+    //@Resource(lookup = "mapUrl")
+    private String mapLocation = DEFAULT_MAP_URL;
+    
+    @Resource(lookup = "serverDir")
+    private String serverDir;
 
     /**
      * The root target used to define the root path and common query parameters
@@ -98,6 +104,7 @@ public class MapClient {
 
         MapClientLog.log(Level.INFO, this, "Map URL set to {0}", mapLocation);
 
+        
         Client queryClient = ClientBuilder.newBuilder()
                 .property("com.ibm.ws.jaxrs.client.ssl.config", "DefaultSSLSettings")
                 .property("com.ibm.ws.jaxrs.client.disableCNCheck", true)
@@ -119,8 +126,17 @@ public class MapClient {
                 .withDelay(1,  TimeUnit.MINUTES)
                 ;
 
+        
         MapClientLog.log(Level.FINER, this, "Map client initialized");
     }
+    
+    @CacheResult
+    public String getValue(String key){
+        String r = "KEY:"+key+"VALUE:"+System.currentTimeMillis();
+        Log.log(Level.INFO, this, "getValue return "+r);
+        return r;
+    }
+    
 
     public MapData getMapData(String siteId) {
         WebTarget target = this.queryRoot.path(siteId);

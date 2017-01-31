@@ -357,6 +357,16 @@
          <artifactId>failsafe</artifactId>
          <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.BarDweller</groupId>
+            <artifactId>JSR107-RI-CDI-Redisson-Bluemix</artifactId>
+            <version>v1.0.5-STILETTO</version>
+        </dependency>
     </dependencies>
     
      <build>
@@ -367,7 +377,7 @@
                 <version>2.6</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <packagingExcludes>pom.xml</packagingExcludes>
+                    <packagingExcludes>WEB-INF/lib/JSR107-RI-CDI-Redisson-Bluemix-*,pom.xml</packagingExcludes>
                 </configuration>
             </plugin>
             <!-- Plugin to run unit tests -->

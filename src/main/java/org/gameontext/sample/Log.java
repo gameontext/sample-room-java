@@ -15,7 +15,12 @@
  *******************************************************************************/
 package org.gameontext.sample;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -26,9 +31,46 @@ import java.util.logging.Logger;
 public class Log {
     private final static Logger log = Logger.getLogger("org.gameontext.sample");
 
+
     private static final String log_format = ": %-8x : %s";
     private static final boolean NO_LOG_LEVEL_PROMOTION = Boolean.valueOf(System.getenv("NO_LOG_LEVEL_PROMOTION"));
 
+    public static class LogPipeHandler extends Handler {
+        LinkedList<String> logLines = new LinkedList<String>();
+        
+        @Override
+        public void publish(LogRecord record) {
+            logLines.add(record.getMessage());
+            if(logLines.size() > 50){
+                logLines.removeFirst();
+            }
+        }
+
+        @Override
+        public void flush() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void close() throws SecurityException {
+            // TODO Auto-generated method stub
+            
+        }
+        
+        public List<String> getLogLines(){
+            return Collections.unmodifiableList(logLines);
+        }
+    }
+    
+    public static LogPipeHandler logPipe = new LogPipeHandler();
+    
+    static {
+        log.addHandler(logPipe);
+    }
+    
+
+    
     public static void log(Level level, Object source, String message, Object... args) {
         if (log.isLoggable(level)) {
             String msg = String.format(log_format, getHash(source), message);
