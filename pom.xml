@@ -325,6 +325,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3</version>
+        </dependency>
+        <dependency>
             <groupId>net.wasdev.wlp.starters.rest</groupId>
             <artifactId>provided-pom</artifactId>
             <version>0.0.3</version>
@@ -363,9 +368,14 @@
             <version>3.2.3</version>
         </dependency>
         <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.BarDweller</groupId>
             <artifactId>JSR107-RI-CDI-Redisson-Bluemix</artifactId>
-            <version>v1.0.5-STILETTO</version>
+            <version>v1.0.7-STILETTO</version>
         </dependency>
     </dependencies>
     

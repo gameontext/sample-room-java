@@ -66,9 +66,6 @@ public class MapClient {
     //@Resource(lookup = "mapUrl")
     private String mapLocation = DEFAULT_MAP_URL;
     
-    @Resource(lookup = "serverDir")
-    private String serverDir;
-
     /**
      * The root target used to define the root path and common query parameters
      * for all outbound requests to the concierge service.
@@ -130,14 +127,7 @@ public class MapClient {
         MapClientLog.log(Level.FINER, this, "Map client initialized");
     }
     
-    @CacheResult
-    public String getValue(String key){
-        String r = "KEY:"+key+"VALUE:"+System.currentTimeMillis();
-        Log.log(Level.INFO, this, "getValue return "+r);
-        return r;
-    }
     
-
     public MapData getMapData(String siteId) {
         WebTarget target = this.queryRoot.path(siteId);
         MapClientLog.log(Level.FINER, this, "making request to {0} for room", target.getUri().toString());
