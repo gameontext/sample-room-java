@@ -15,17 +15,21 @@
  *******************************************************************************/
 package org.gameontext.sample;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
+import org.gameontext.sample.items.Items;
 import org.gameontext.sample.map.client.MapData;
 
 /**
@@ -45,12 +49,12 @@ public class RoomDescription {
     private String description = "An undescribed room (or perhaps the data hasn't been fetched from the map)";
 
     private Map<String, String> commands = new ConcurrentHashMap<>();
-    private JsonObject commandObj = null;
 
-    private Set<String> items = new CopyOnWriteArraySet<>();
-    private JsonArray itemObj = null;
-
+    //required else this bean cannot be injected to elsewhere
     public RoomDescription() {}
+    
+    @Inject
+    Items items;
 
     /**
      * Create a new room description based on data retrieved from the Map service
@@ -114,14 +118,21 @@ public class RoomDescription {
      * @return JsonObject containing custom room commands. Never null.
      */
     public JsonObject getCommands() {
-        JsonObject obj = commandObj;
+        JsonObject obj = null;
 
         if ( commands.isEmpty()) {
             return EMPTY_COMMANDS;
         } else if ( obj == null) {
             JsonObjectBuilder newCommandObj = Json.createObjectBuilder();
-            commands.entrySet().forEach(e -> { newCommandObj.add(e.getKey(), e.getValue()); });
-            obj = commandObj = newCommandObj.build();
+            Map<String,String> commandHelp = new HashMap<>();
+            
+            //merge the default commands with any commands coming from items in the room.
+            commandHelp.putAll(commands);
+            items.getItemsInRoom().forEach(i -> i.getCommandHelp().entrySet().forEach( c -> commandHelp.put( c.getKey(), c.getValue())));
+
+            //create json response
+            commandHelp.entrySet().forEach(e -> { newCommandObj.add(e.getKey(), e.getValue()); });
+            obj =  newCommandObj.build();
         }
 
         return obj;
@@ -132,12 +143,10 @@ public class RoomDescription {
             throw new IllegalArgumentException("description is required");
         }
         commands.put(command, description);
-        commandObj = null;
     }
 
     public void removeCommand(String command) {
         commands.remove(command);
-        commandObj = null;
     }
 
     /**
@@ -146,28 +155,23 @@ public class RoomDescription {
      * @return JsonArray containing room inventory. Never null
      */
     public JsonArray getInventory() {
-        JsonArray arr = itemObj;
+        JsonArray arr = null;
 
-        if ( items.isEmpty()) {
+        Set<Item> i = items.getItemsInRoom();
+        
+        Log.log(Level.INFO, this, "getItemsInRoom :: "+i.stream().map(n -> n.getName()).collect(Collectors.toSet()));
+        
+        if ( i.isEmpty()) {
             return EMPTY_INVENTORY;
         } else if ( arr == null) {
             JsonArrayBuilder newItemArr = Json.createArrayBuilder();
-            items.forEach(s -> { newItemArr.add(s); });
-            arr = itemObj = newItemArr.build();
+            i.forEach(s -> { newItemArr.add(s.getName()); });
+            arr = newItemArr.build();
         }
 
         return arr;
     }
 
-    public void addItem(String itemName) {
-        items.add(itemName);
-        itemObj = null;
-    }
-
-    public void removeItem(String itemName) {
-        items.remove(itemName);
-        itemObj = null;
-    }
 
     @Override
     public String toString() {

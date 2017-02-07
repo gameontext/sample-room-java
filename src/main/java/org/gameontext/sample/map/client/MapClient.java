@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corp.
+ * Copyright (c) 2016 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,15 @@
  *******************************************************************************/
 package org.gameontext.sample.map.client;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.cache.annotation.CacheResult;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -30,7 +33,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.gameontext.sample.Log;
-import org.gameontext.sample.RoomDescription;
+
+import net.jodah.failsafe.CircuitBreaker;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * A wrapped/encapsulation of outbound REST requests to the map service.
@@ -50,16 +56,16 @@ import org.gameontext.sample.RoomDescription;
 @ApplicationScoped
 public class MapClient {
 
-    public static final String DEFAULT_MAP_URL = "https://game-on.org/map/v1/sites";
+    public static final String DEFAULT_MAP_URL = "https://gameontext.org/map/v1/sites";
 
     /**
      * The URL for the target map service.
      * This is set via the environment variable MAP_URL. This value is read
      * in server.xml.
      */
-    @Resource(lookup = "mapUrl")
-    private String mapLocation;
-
+    //@Resource(lookup = "mapUrl")
+    private String mapLocation = DEFAULT_MAP_URL;
+    
     /**
      * The root target used to define the root path and common query parameters
      * for all outbound requests to the concierge service.
@@ -67,6 +73,15 @@ public class MapClient {
      * @see WebTarget
      */
     private WebTarget queryRoot;
+    
+    /**
+     * The retry policy for failsafe.
+     */
+    private RetryPolicy retryPolicy;
+    /**
+     * The circuit breaker for failsafe.
+     */
+    private CircuitBreaker breaker;
 
     /**
      * The {@code @PostConstruct} annotation indicates that this method should
@@ -76,65 +91,74 @@ public class MapClient {
      * @see PostConstruct
      * @see ApplicationScoped
      */
+    @SuppressWarnings("unchecked")
     @PostConstruct
     public void initClient() {
-        try {
-            // The Map URL is an optional value.
-            if (mapLocation == null || mapLocation.contains("MAP_URL") ) {
-                MapClientLog.log(Level.FINER, this, "No MAP_URL environment variable provided. Will use default.");
-                mapLocation = DEFAULT_MAP_URL;
-            }
-
-            Client queryClient = ClientBuilder.newBuilder()
-                    .property("com.ibm.ws.jaxrs.client.ssl.config", "DefaultSSLSettings")
-                    .property("com.ibm.ws.jaxrs.client.disableCNCheck", true)
-                    .build();
-
-            queryClient.register(MapResponseReader.class);
-
-            // create the jax-rs 2.0 client
-            this.queryRoot = queryClient.target(mapLocation);
-
-            MapClientLog.log(Level.INFO, this, "Map client initialized. Map URL set to {0}", mapLocation);
-        } catch ( Exception ex ) {
-            Log.log(Level.SEVERE, this, "Unable to initialize map service", ex);
+        if (mapLocation == null) {
+            MapClientLog.log(Level.FINER, this, "No MAP_URL environment variable provided. Will use default.");
+            mapLocation = DEFAULT_MAP_URL;
         }
-    }
 
-    public boolean ok() {
-        return queryRoot != null;
-    }
+        MapClientLog.log(Level.INFO, this, "Map URL set to {0}", mapLocation);
 
-    public void updateRoom(String roomId, RoomDescription roomDescription) {
-        MapData data = getMapData(roomId);
-        if ( data != null ) {
-            roomDescription.updateData(data);
-        }
-    }
+        
+        Client queryClient = ClientBuilder.newBuilder()
+                .property("com.ibm.ws.jaxrs.client.ssl.config", "DefaultSSLSettings")
+                .property("com.ibm.ws.jaxrs.client.disableCNCheck", true)
+                .build();
 
+        queryClient.register(MapResponseReader.class);
+
+        // create the jax-rs 2.0 client
+        this.queryRoot = queryClient.target(mapLocation);
+        
+        // create the retry policy & circuit breaker for failsafe.
+        retryPolicy = new RetryPolicy()
+                .retryOn(ServiceUnavailableException.class)
+                .withDelay(1, TimeUnit.SECONDS)
+                .withMaxRetries(3);
+        breaker = new CircuitBreaker()
+                .withFailureThreshold(3, 10)
+                .withSuccessThreshold(5)
+                .withDelay(1,  TimeUnit.MINUTES)
+                ;
+
+        
+        MapClientLog.log(Level.FINER, this, "Map client initialized");
+    }
+    
+    
     public MapData getMapData(String siteId) {
         WebTarget target = this.queryRoot.path(siteId);
         MapClientLog.log(Level.FINER, this, "making request to {0} for room", target.getUri().toString());
-        Response r = null;
-        try {
-            r = target.request(MediaType.APPLICATION_JSON).get();
-            if (r.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-                MapData data = r.readEntity(MapData.class);
-                return data;
+        
+        return Failsafe.with(retryPolicy).with(breaker).get( () -> {
+            try {
+                Response r = null;
+                r = target.request(MediaType.APPLICATION_JSON).get();
+                if (r.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+                    MapData data = r.readEntity(MapData.class);
+                    return data;
+                }
+                return null;
+            } catch (ResponseProcessingException rpe) {
+                Response response = rpe.getResponse();
+                MapClientLog.log(Level.FINER, this, "Exception fetching room list uri: {0} resp code: {1} ",
+                        target.getUri().toString(),
+                        response.getStatusInfo().getStatusCode() + " " + response.getStatusInfo().getReasonPhrase());
+                if(503 == response.getStatusInfo().getStatusCode()){
+                    throw new ServiceUnavailableException();
+                }
+                MapClientLog.log(Level.FINEST, this, "Exception fetching room list", rpe);
+            } catch (ProcessingException e) {
+                MapClientLog.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", e);
+            } catch (WebApplicationException ex) {
+                MapClientLog.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", ex);
             }
+            // Sadly, badness happened while trying to get the endpoints
             return null;
-        } catch (ResponseProcessingException rpe) {
-            Response response = rpe.getResponse();
-            MapClientLog.log(Level.FINER, this, "Exception fetching room list uri: {0} resp code: {1} ",
-                    target.getUri().toString(),
-                    response.getStatusInfo().getStatusCode() + " " + response.getStatusInfo().getReasonPhrase());
-            MapClientLog.log(Level.FINEST, this, "Exception fetching room list", rpe);
-        } catch (ProcessingException e) {
-            MapClientLog.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", e);
-        } catch (WebApplicationException ex) {
-            MapClientLog.log(Level.FINEST, this, "Exception fetching room list (" + target.getUri().toString() + ")", ex);
-        }
-        // Sadly, badness happened while trying to get the endpoints
-        return null;
+            
+        });
+        
     }
 }

@@ -11,9 +11,9 @@
             },
             "Packager": "com.ibm.perfectstorm.cloudoe.packager.LiveEditDeploymentPackager"
         },
-        "Name": "gameon-room-java",
+        "Name": "gameon-room-java-redis",
         "Target": {
-            "Org": "cfsworkload",
+            "Org": "Microservices",
             "Space": "dev",
             "Url": "https://api.ng.bluemix.net"
         },
