@@ -1,17 +1,11 @@
 package org.gameontext.sample.jsr107toggle;
 
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Set;
 import java.util.logging.Level;
 
 import javax.annotation.PostConstruct;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
-import javax.cache.Caching;
-import javax.cache.annotation.CacheMethodDetails;
-import javax.cache.annotation.CacheResolver;
 import javax.cache.configuration.CacheEntryListenerConfiguration;
 import javax.cache.configuration.FactoryBuilder;
 import javax.cache.configuration.MutableCacheEntryListenerConfiguration;
@@ -23,15 +17,13 @@ import javax.cache.event.CacheEntryUpdatedListener;
 import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.MutableEntry;
-import javax.cache.spi.CachingProvider;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.gameontext.sample.Log;
+import org.gameontext.sample.jsr107defaultprovider.RedissonCacheManagerProvider;
 import org.gameontext.sample.protocol.Message;
 import org.gameontext.sample.protocol.SessionSender;
-import org.jsr107.ri.annotations.DefaultCacheResolverFactory;
-import org.jsr107.ri.annotations.DefaultCacheResolverFactory.CacheConfigCustomizer;
 
 @ApplicationScoped
 public class Toggle {
@@ -69,10 +61,8 @@ public class Toggle {
         }
     }
     
-    private Cache<String,String> getCacheUsingDefaults(){
-        CachingProvider prov = Caching.getCachingProvider();
-        
-        CacheManager mgr = prov.getCacheManager();
+    private Cache<String,String> getCache(){
+        CacheManager mgr = (new RedissonCacheManagerProvider()).getDefaultCacheManager();
         
         MutableConfiguration<String, String> config =
                 new MutableConfiguration<String,String>().setStoreByValue(true);
@@ -80,43 +70,11 @@ public class Toggle {
         return mgr.createCache("toggle", config);
     }
     
-    private Cache<String,String> getCacheAbusingDefaultProvider(){
-        DefaultCacheResolverFactory dcrf = new DefaultCacheResolverFactory(new CacheConfigCustomizer() {
-            @Override
-            public void customizeConfiguration(MutableConfiguration<Object, Object> config) {
-                config.setStoreByValue(true);
-            }
-        });
-        
-        CacheResolver cr = dcrf.getCacheResolver(new CacheMethodDetails<Annotation>() {
-            @Override
-            public Method getMethod() {
-                return null;
-            }
-            @Override
-            public Set<Annotation> getAnnotations() {
-                return null;
-            }
-            @Override
-            public Annotation getCacheAnnotation() {
-                return null;
-            }
-            @Override
-            public String getCacheName() {
-                return "toggle";
-            }
-        });
-        
-        return cr.resolveCache(null);
-    }
-    
-    
-    
+
     @PostConstruct
     public void init(){
         //without using annotations, we have to setup our cache bit by bit.. 
-        //toggleCache = getCacheUsingDefaults();
-        toggleCache = getCacheAbusingDefaultProvider();
+        toggleCache = getCache();
 
         MyCacheEntryListener mcel = new MyCacheEntryListener();
         

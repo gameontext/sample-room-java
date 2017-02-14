@@ -375,7 +375,7 @@
         <dependency>
             <groupId>com.github.BarDweller</groupId>
             <artifactId>JSR107-RI-CDI-Redisson-Bluemix</artifactId>
-            <version>v1.0.7-STILETTO</version>
+            <version>v1.0.9-STILETTO</version>
         </dependency>
     </dependencies>
     
@@ -387,7 +387,7 @@
                 <version>2.6</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <packagingExcludes>WEB-INF/lib/JSR107-RI-CDI-Redisson-Bluemix-*,pom.xml</packagingExcludes>
+                    <packagingExcludes>pom.xml</packagingExcludes>
                 </configuration>
             </plugin>
             <!-- Plugin to run unit tests -->
