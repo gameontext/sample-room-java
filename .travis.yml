@@ -1,0 +1,13 @@
+sudo: false
+
+branches:
+  only:
+    - master
+
+language: java
+
+jdk:
+  - oraclejdk8
+
+script:
+  - mvn integration-test
