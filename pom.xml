@@ -375,7 +375,7 @@
                             <excludes>
                                 <exclude>**/it/**</exclude>
                             </excludes>
-                            <argLine>-javaagent:${org.jmockit:jmockit:jar}</argLine>
+                            <argLine>${argLine} -javaagent:${org.jmockit:jmockit:jar}</argLine>
                             <reportsDirectory>${project.build.directory}/test-reports/unit</reportsDirectory>
                         </configuration>
                     </execution>
