@@ -1,7 +1,7 @@
 # Game On! Microservices and Java
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4d099084aab34a57893e8fd29df79ae3)](https://www.codacy.com/app/gameontext/sample-room-java?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gameontext/sample-room-java&amp;utm_campaign=Badge_Grade)
-
+[![Codecov Badge](https://codecov.io/gh/gameontext/sample-room-java/branch/master/graph/badge.svg)](https://codecov.io/gh/gameontext/sample-room-java)
 [Game On!](https://game-on.org/) is both a sample microservices application, and a throwback text adventure brought to you by the WASdev team at IBM. This application demonstrates how microservice architectures work from two points of view:
 
 1. As a Player: navigate through a network/maze of rooms, and interact with other players and the items or actions available in each room.
@@ -113,6 +113,12 @@ You can write two types of tests: unit and integration tests.  The unit tests wi
 3. Stop the Liberty server
 As integration tests are longer running they can be skipped by providing the skipTests flag: `mvn install -DskipTests`.
 
+### Code Coverage
+
+The [JaCoCo maven plugin](http://www.eclemma.org/jacoco/trunk/doc/maven.html) is included in the build to generate code coverage reports. It will generate reports in multiple formats (HTML, XML, and CSV) in `target/site/jacoco`.
+
+You can also access code reports on the web at [codecov.io](https://codecov.io) if your project is a public Github project built with Travis. The included `travis.yml` file includes a command to upload the code coverage reports automatically.
+
 ### Build phases
 
 The following shows what goals run at which phases in the [default Maven lifecycle](https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html).
@@ -123,7 +129,9 @@ The following shows what goals run at which phases in the [default Maven lifecyc
 | initialize            | maven-enforcer-plugin   | enforce           | bluemix          | Makes sure the properties are set if deploying to Bluemix |
 | initialize            | maven-antrun-plugin     | run               | bluemix          | Prints out what is going to be pushed |
 | initialize            | maven-enforcer-plugin   | enforce           | existing-install | Checks that if the liberty.install property is set that it points to an existing directory. |
+| initialize            | jacoco-maven-plugin     | prepare-agent     | All              | Prepares a property pointing to the JaCoCo runtime agent for code coverage. |
 | test                  | maven-surefire-plugin   | test              | All              |  |
+| test                  | jacoco-maven-plugin     | report            | All              | Creates a code coverage report. |
 | prepare-package       | liberty-maven-plugin    | install-server    | All              | Creates the server using the server.xml in the src directory |
 | package               | maven-war-plugin        | war               | All              |  |
 | package               | maven-dependency-plugin | copy-server-files | All              | Copies the server.xml snippets that contain the <featureManager/> elements |
