@@ -16,7 +16,6 @@
 package org.gameontext.sample.protocol;
 
 import org.gameontext.sample.RoomDescription;
-import org.gameontext.sample.map.client.MapData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -115,9 +114,9 @@ public class MessageTest {
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
-        Assert.assertTrue(s, s.contains("\"name\":\"nickName\""));
-        Assert.assertTrue(s, s.contains("\"fullName\":\"A room with no full name\""));
-        Assert.assertTrue(s, s.contains("\"description\":\"An undescribed room (or perhaps the data hasn't been fetched from the map)\""));
+        Assert.assertTrue(s, s.contains("\"name\":\""+roomDescription.getName()+"\""));
+        Assert.assertTrue(s, s.contains("\"fullName\":\""+roomDescription.getFullName()+"\""));
+        Assert.assertTrue(s, s.contains("\"description\":\""+roomDescription.getDescription()+"\""));
 
         Message m2 = new Message(s);
         Assert.assertEquals(m1, m2);
@@ -125,17 +124,17 @@ public class MessageTest {
 
     @Test
     public void testCreateLocationMessageFailNullName() throws Exception {
-        MapData data = new MapData();
+        RoomDescription data = new RoomDescription();
         data.setName(null);
         data.setFullName("b");
         data.setDescription("c");
 
-        Message m1 = Message.createLocationMessage("user1", new RoomDescription(data));
+        Message m1 = Message.createLocationMessage("user1", data);
         String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
-        Assert.assertTrue(s, s.contains("\"name\":\"nickName\""));
+        Assert.assertTrue(s, s.contains("\"name\":\""+data.getName()+"\""));
         Assert.assertTrue(s, s.contains("\"fullName\":\"b\""));
         Assert.assertTrue(s, s.contains("\"description\":\"c\""));
 
@@ -145,18 +144,18 @@ public class MessageTest {
 
     @Test
     public void testCreateLocationMessageFailNullFullName() throws Exception {
-        MapData data = new MapData();
+        RoomDescription data = new RoomDescription();
         data.setName("a");
         data.setFullName(null);
         data.setDescription("c");
 
-        Message m1 = Message.createLocationMessage("user1", new RoomDescription(data));
+        Message m1 = Message.createLocationMessage("user1", data);
         String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
         Assert.assertTrue(s, s.contains("\"name\":\"a\""));
-        Assert.assertTrue(s, s.contains("\"fullName\":\"A room with no full name\""));
+        Assert.assertTrue(s, s.contains("\"fullName\":\""+data.getFullName()+"\""));
         Assert.assertTrue(s, s.contains("\"description\":\"c\""));
 
         Message m2 = new Message(s);
@@ -165,19 +164,19 @@ public class MessageTest {
 
     @Test
     public void testCreateLocationMessageFailNullDescription() throws Exception {
-        MapData data = new MapData();
+        RoomDescription data = new RoomDescription();
         data.setName("a");
         data.setFullName("b");
         data.setDescription(null);
 
-        Message m1 = Message.createLocationMessage("user1", new RoomDescription(data));
+        Message m1 = Message.createLocationMessage("user1", data);
         String s = m1.encode();
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
         Assert.assertTrue(s, s.contains("\"name\":\"a\""));
         Assert.assertTrue(s, s.contains("\"fullName\":\"b\""));
-        Assert.assertTrue(s, s.contains("\"description\":\"An undescribed room (or perhaps the data hasn't been fetched from the map)\""));
+        Assert.assertTrue(s, s.contains("\"description\":\""+data.getDescription()+"\""));
 
         Message m2 = new Message(s);
         Assert.assertEquals(m1, m2);
@@ -199,9 +198,9 @@ public class MessageTest {
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
-        Assert.assertTrue(s, s.contains("\"name\":\"nickName\""));
-        Assert.assertTrue(s, s.contains("\"fullName\":\"A room with no full name\""));
-        Assert.assertTrue(s, s.contains("\"description\":\"An undescribed room (or perhaps the data hasn't been fetched from the map)\""));
+        Assert.assertTrue(s, s.contains("\"name\":\""+roomDescription.getName()+"\""));
+        Assert.assertTrue(s, s.contains("\"fullName\":\""+roomDescription.getFullName()+"\""));
+        Assert.assertTrue(s, s.contains("\"description\":\""+roomDescription.getDescription()+"\""));
         Assert.assertTrue(s, s.contains("\"commands\":{\"/command\":\"description\"}"));
 
         Message m2 = new Message(s);
@@ -219,9 +218,9 @@ public class MessageTest {
         System.out.println(s);
 
         Assert.assertTrue(s, s.startsWith("player,user1,{\"type\":\"location\""));
-        Assert.assertTrue(s, s.contains("\"name\":\"nickName\""));
-        Assert.assertTrue(s, s.contains("\"fullName\":\"A room with no full name\""));
-        Assert.assertTrue(s, s.contains("\"description\":\"An undescribed room (or perhaps the data hasn't been fetched from the map)\""));
+        Assert.assertTrue(s, s.contains("\"name\":\""+roomDescription.getName()+"\""));
+        Assert.assertTrue(s, s.contains("\"fullName\":\""+roomDescription.getFullName()+"\""));
+        Assert.assertTrue(s, s.contains("\"description\":\""+roomDescription.getDescription()+"\""));
         Assert.assertTrue(s, s.contains("\"roomInventory\":[\"Squashy Chair\"]"));
 
         Message m2 = new Message(s);

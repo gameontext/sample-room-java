@@ -25,20 +25,17 @@
 
     <httpEndpoint host="*" httpPort="9080" httpsPort="-1" id="defaultHttpEndpoint"/>
 
-    <jndiEntry jndiName="mapUrl" value="${env.MAP_URL}"/>
-    <jndiEntry jndiName="roomId" value="${env.ROOM_ID}"/>
-
     <logging traceSpecification="*=info:org.gameontext.*=all:map.client=all"/>
 
     <!-- This is required to prevent the web apps from being lazily loaded -->
     <webContainer deferServletLoad="false"/>
-    
+
     <!-- The JVM can get confused about available CPU in virtualized envs -->
     <executor coreThreads="5"/>
 
     <webApplication id="gojava" location="gojava-1.0-SNAPSHOT.war" name="gojava"/>
 
-    <!-- Environment specific config. 
+    <!-- Environment specific config.
          Set TARGET=production as env var to include production-config.xml, e.g. -->
     <!-- include location="${env.TARGET}-config.xml" optional="true"/ -->
 </server>
