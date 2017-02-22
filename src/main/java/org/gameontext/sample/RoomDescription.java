@@ -26,12 +26,9 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
-import org.gameontext.sample.map.client.MapData;
-
 /**
  * This is how our room is described.
- *  a) Use post-construct in {@link RoomImplementation} to fill some of this in by asking the map
- *  b) Update attributes dynamically in {@link RoomImplementation} as the room is used
+ *  - Update attributes dynamically in {@link RoomImplementation} as the room is used
  *
  *  @see RoomImplementation
  */
@@ -40,9 +37,9 @@ public class RoomDescription {
     private final JsonObject EMPTY_COMMANDS = Json.createObjectBuilder().build();
     private final JsonArray EMPTY_INVENTORY = Json.createArrayBuilder().build();
 
-    private String name = "nickName";
-    private String fullName = "A room with no full name";
-    private String description = "An undescribed room (or perhaps the data hasn't been fetched from the map)";
+    private String name = "defaultRoomNickName";
+    private String fullName = "A room with the default fullName still set in the source";
+    private String description = "A room that still has the default description set in the source";
 
     private Map<String, String> commands = new ConcurrentHashMap<>();
     private JsonObject commandObj = null;
@@ -53,36 +50,20 @@ public class RoomDescription {
     public RoomDescription() {}
 
     /**
-     * Create a new room description based on data retrieved from the Map service
-     * @param data Map data
-     */
-    public RoomDescription(MapData data) {
-        updateData(data);
-    }
-
-    /**
-     * Update the room description based on data retrieved from the Map service
-     * @param data Map data
-     */
-    public void updateData(MapData data) {
-        if ( data.getName() != null ) {
-            this.name = data.getName();
-        }
-
-        if ( data.getFullName() != null ) {
-            this.fullName = data.getFullName();
-        }
-
-        if ( data.getDescription() != null ) {
-            this.description = data.getDescription();
-        }
-    }
-
-    /**
      * @return The room's short name
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * The name for a room should match the
+     * name it was registered with.
+     */
+    public void setName(String name){
+        if(name!=null){
+          this.name = name;
+        }
     }
 
     /**
@@ -97,7 +78,9 @@ public class RoomDescription {
      * @param fullName A new display name for the room
      */
     public void setFullName(String fullName) {
-        this.fullName = fullName;
+        if(fullName!=null){
+          this.fullName = fullName;
+        }
     }
 
     public String getDescription() {
@@ -105,7 +88,9 @@ public class RoomDescription {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        if(description!=null){
+          this.description = description;
+        }
     }
 
     /**

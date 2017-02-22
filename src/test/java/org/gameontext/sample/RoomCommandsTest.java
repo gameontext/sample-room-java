@@ -36,6 +36,7 @@ import mockit.integration.junit4.JMockit;
 @RunWith(JMockit.class)
 public class RoomCommandsTest {
 
+    public static final String ROOM_ID = "roomId";
     public static final String TEST_ID = "testId";
     public static final String TEST_USERNAME = "testUser";
 
@@ -60,7 +61,7 @@ public class RoomCommandsTest {
 
     @Test
     public void testHandleGoMessageNoDirection(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/go");
+        Message message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/go");
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -85,22 +86,22 @@ public class RoomCommandsTest {
     @Test
     public void testHandleGoMessageCardinalDirection(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
 
-        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/go N");
+        Message message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/go N");
         roomImpl.handleMessage(session, message, endpoint);
 
-        message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/go north");
+        message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/go north");
         roomImpl.handleMessage(session, message, endpoint);
 
-        message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/go East");
+        message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/go East");
         roomImpl.handleMessage(session, message, endpoint);
 
-        message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/go e");
+        message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/go e");
         roomImpl.handleMessage(session, message, endpoint);
 
-        message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/go s");
+        message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/go s");
         roomImpl.handleMessage(session, message, endpoint);
 
-        message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/go w");
+        message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/go w");
         roomImpl.handleMessage(session, message, endpoint);
 
         new Verifications() {{
@@ -169,7 +170,7 @@ public class RoomCommandsTest {
 
     @Test
     public void testHandleGoMessageOtherDirection(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/go Up");
+        Message message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/go Up");
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -195,7 +196,7 @@ public class RoomCommandsTest {
 
     @Test
     public void testHandleAlmostGo(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/goe Stuff");
+        Message message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/goe Stuff");
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -220,7 +221,7 @@ public class RoomCommandsTest {
 
     @Test
     public void testHandleLookRoom(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/look");
+        Message message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/look");
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -237,7 +238,7 @@ public class RoomCommandsTest {
 
     @Test
     public void testHandleExamineRoom(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/examine");
+        Message message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/examine");
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -254,7 +255,7 @@ public class RoomCommandsTest {
 
     @Test
     public void testHandleLookOther(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/look stuff");
+        Message message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/look stuff");
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -279,7 +280,7 @@ public class RoomCommandsTest {
 
     @Test
     public void testHandleAlmostLook(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/looks stuff");
+        Message message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/looks stuff");
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -304,7 +305,7 @@ public class RoomCommandsTest {
 
     @Test
     public void testHandlePing(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/ping");
+        Message message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/ping");
 
         roomImpl.handleMessage(session, message, endpoint);
 
@@ -328,7 +329,7 @@ public class RoomCommandsTest {
 
     @Test
     public void testHandlePingStuff(@Mocked Session session, @Mocked RoomEndpoint endpoint) {
-        Message message = Message.createRoomMessage(roomImpl.roomId, TEST_ID, TEST_USERNAME, "/ping stuff");
+        Message message = Message.createRoomMessage(ROOM_ID, TEST_ID, TEST_USERNAME, "/ping stuff");
 
         roomImpl.handleMessage(session, message, endpoint);
 

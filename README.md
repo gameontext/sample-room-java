@@ -80,10 +80,6 @@ Here is a small roadmap to this basic service, so you can go about making it you
 * `org.gameontext.sample.rest.*`
    This package defines a REST endpoint, with a single defined path: /health
 
-* `org.gameontext.sample.map.client.*`
-   This package contains a client for the Map service. As the service is defined, it doesn't
-   have the credentials necessary to perform mutable operations on the Map service.
-
 * `src/main/liberty` contains configuration for Liberty, a lightweight Java EE composable app server
 
 * `src/test` -- Yes! There are tests!
@@ -137,4 +133,3 @@ The following shows what goals run at which phases in the [default Maven lifecyc
 | n/a                   | liberty-maven-plugin    | n/a               | runnable         | Just sets properties to indicate that a runnable JAR should be made rather than a ZIP when packaging the server |
 | n/a                   | liberty-maven-plugin    | n/a               | downloadLiberty  | Just sets properties that are used in the install-server goal to installs the Liberty runtime. Doesn't run if liberty.install is set to an existing install of Liberty |
 | n/a                   | liberty-maven-plugin    | n/a               | existing-install | Just sets properties that are used in the other Liberty goals to point to an existing Liberty install. Only runs if liberty.install is set to an existing install of Liberty |
-

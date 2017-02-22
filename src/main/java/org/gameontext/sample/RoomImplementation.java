@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.json.JsonObject;
 import javax.websocket.Session;
 
-import org.gameontext.sample.map.client.MapClient;
 import org.gameontext.sample.protocol.Message;
 import org.gameontext.sample.protocol.RoomEndpoint;
 
@@ -52,32 +51,13 @@ public class RoomImplementation {
     public static final String GOODBYE_ALL = "%s has gone";
     public static final String GOODBYE_USER = "Bye!";
 
-    /**
-     * The room id: this is translated from the ROOM_ID environment variable into
-     * a JNDI value by server.xml (Liberty)
-     */
-    @Resource(lookup = "roomId")
-    protected String roomId;
-
-    @Inject
-    protected MapClient mapClient;
 
     protected RoomDescription roomDescription = new RoomDescription();
 
     @PostConstruct
     protected void postConstruct() {
-
-        if ( roomId == null || roomId.contains("ROOM_ID") ) {
-            // The room id was not set by the environment; make one up.
-            roomId = "TheGeneratedIdForThisRoom";
-        } else {
-            // we have a custom room id! let's see what the map thinks.
-            mapClient.updateRoom(roomId, roomDescription);
-        }
-
         // Customize the room
         roomDescription.addCommand("/ping", "Does this work?");
-
         Log.log(Level.INFO, this, "Room initialized: {0}", roomDescription);
     }
 
@@ -87,13 +67,6 @@ public class RoomImplementation {
     }
 
     public void handleMessage(Session session, Message message, RoomEndpoint endpoint) {
-
-        // If this message isn't for this room, TOSS IT!
-//        if ( !roomId.equals(message.getTargetId()) ) {
-//            Log.log(Level.FINEST, this, "Received message for the wrong room ({0}): {1}", message.getTargetId(), message);
-//            return;
-//        }
-
         // Fetch the userId and the username of the sender.
         // The username can change overtime, so always use the sent username when
         // constructing messages
@@ -313,6 +286,6 @@ public class RoomImplementation {
     }
 
     public boolean ok() {
-        return mapClient.ok();
+        return true;
     }
 }
