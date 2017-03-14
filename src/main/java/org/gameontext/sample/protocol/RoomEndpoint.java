@@ -39,7 +39,7 @@ import org.gameontext.sample.RoomImplementation;
  * This is the WebSocket endpoint for a room. Java EE WebSockets
  * use simple annotations for event driven methods. An instance of this class
  * will be created for every connected client.
- * https://book.game-on.org/microservices/WebSocketProtocol.html
+ * https://book.gameontext.org/microservices/WebSocketProtocol.html
  */
 @ServerEndpoint(value = "/room", decoders = MessageDecoder.class, encoders = MessageEncoder.class)
 public class RoomEndpoint {
