@@ -2,12 +2,12 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4d099084aab34a57893e8fd29df79ae3)](https://www.codacy.com/app/gameontext/sample-room-java?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gameontext/sample-room-java&amp;utm_campaign=Badge_Grade)
 [![Codecov Badge](https://codecov.io/gh/gameontext/sample-room-java/branch/master/graph/badge.svg)](https://codecov.io/gh/gameontext/sample-room-java)
-[Game On!](https://game-on.org/) is both a sample microservices application, and a throwback text adventure brought to you by the WASdev team at IBM. This application demonstrates how microservice architectures work from two points of view:
+[Game On!](https://gameontext.org/) is both a sample microservices application, and a throwback text adventure brought to you by the WASdev team at IBM. This application demonstrates how microservice architectures work from two points of view:
 
 1. As a Player: navigate through a network/maze of rooms, and interact with other players and the items or actions available in each room.
 2. As a Developer: extend the game by creating simple services that define rooms. Learn about microservice architectures and their supporting infrastructure as you build and scale your service.
 
-You can learn more about Game On! at [http://game-on.org/](http://game-on.org/).
+You can learn more about Game On! at [http://gameontext.org/](http://gameontext.org/).
 
 ## Introduction
 
@@ -15,7 +15,7 @@ This walkthrough will guide you through creating and deploying a simple room (a 
 
 The microservice can be (a) deployed as a Cloud Foundry application or (b) built into a docker container.
 
-Game On! communicates with this service (a room) over WebSockets using the [Game On! WebSocket protocol](https://book.game-on.org/microservices/WebSocketProtocol.html). Consider this a stand-in for asynchronous messaging like MQTT, which requires a lot more setup than a simple WebSocket does.
+Game On! communicates with this service (a room) over WebSockets using the [Game On! WebSocket protocol](https://book.gameontext.org/microservices/WebSocketProtocol.html). Consider this a stand-in for asynchronous messaging like MQTT, which requires a lot more setup than a simple WebSocket does.
 
 ## Requirements
 
@@ -45,14 +45,14 @@ After running this, the server will be running locally at [http://localhost:9080
 
 For Game On! to include your room, you need to tell it where the publicly reachable WebSocket endpoint is. This usually requires two steps:
 
-* [hosting your service somewhere with a publicly reachable endpoint](https://book.game-on.org/walkthroughs/createRoom.html#_deploy_your_room_to_a_publicly_reachable_location), and then
-* [registering your room with the game](https://book.game-on.org/v/walkthrough/walkthroughs/createRoom.html#_register_your_room).
+* [hosting your service somewhere with a publicly reachable endpoint](https://book.gameontext.org/walkthroughs/createRoom.html#_deploy_your_room_to_a_publicly_reachable_location), and then
+* [registering your room with the game](https://book.gameontext.org/v/walkthrough/walkthroughs/createRoom.html#_register_your_room).
 
 ## Build a docker container
 
 Creating a Docker image is straight-up: `docker build .` right from the root menu.
 
-A `docker-compose.yml` file is also there, which can be used to specify overlay volumes to allow local development without restarting the container. See the [Advanced Adventure for local development with Docker](https://book.game-on.org/v/walkthrough/walkthroughs/local-docker.html) for a more detailed walkthrough.
+A `docker-compose.yml` file is also there, which can be used to specify overlay volumes to allow local development without restarting the container. See the [Advanced Adventure for local development with Docker](https://book.gameontext.org/v/walkthrough/walkthroughs/local-docker.html) for a more detailed walkthrough.
 
 ## Ok. So this thing is running... Now what?
 
@@ -89,9 +89,9 @@ Things you might try:
 * Use RxJava to manage all of the connected WebSockets together as one event stream.
 * Call out to another API (NodeRed integration, Watson API, Weather API) to perform actions in the room.
 * Integrate this room with IFTTT, or Slack, or ...
-* .. other [Advanced Adventures](https://book.game-on.org/v/walkthrough/walkthroughs/createMore.html)!
+* .. other [Advanced Adventures](https://book.gameontext.org/v/walkthrough/walkthroughs/createMore.html)!
 
-Remember our https://game-on.org/#/terms. Most importantly, there are kids around: make your parents proud.
+Remember our https://gameontext.org/#/terms. Most importantly, there are kids around: make your parents proud.
 
 ## How the build works
 
