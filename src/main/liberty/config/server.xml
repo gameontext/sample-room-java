@@ -33,7 +33,7 @@
     <!-- The JVM can get confused about available CPU in virtualized envs -->
     <executor coreThreads="5"/>
 
-    <webApplication id="gojava" location="gojava-1.0-SNAPSHOT.war" name="gojava"/>
+    <webApplication id="gojava" location="cloudant-adventure-1.0-SNAPSHOT.war" name="gojava"/>
 
     <!-- Environment specific config.
          Set TARGET=production as env var to include production-config.xml, e.g. -->

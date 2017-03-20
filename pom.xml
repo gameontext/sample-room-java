@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.gameon.sample</groupId>
-    <artifactId>gojava</artifactId>
+    <artifactId>cloudant-adventure</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -138,6 +138,11 @@
             <artifactId>javax.json</artifactId>
             <version>1.0.4</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.cloudant</groupId>
+            <artifactId>cloudant-client</artifactId>
+            <version>2.8.0</version>
         </dependency>
     </dependencies>
 

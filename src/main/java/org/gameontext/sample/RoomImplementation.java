@@ -15,19 +15,30 @@
  *******************************************************************************/
 package org.gameontext.sample;
 
+import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.websocket.Session;
 
+import org.gameontext.sample.data.PlayerData;
 import org.gameontext.sample.protocol.Message;
 import org.gameontext.sample.protocol.RoomEndpoint;
+
+import com.cloudant.client.api.ClientBuilder;
+import com.cloudant.client.api.CloudantClient;
+import com.cloudant.client.api.Database;
+import com.cloudant.client.org.lightcouch.NoDocumentException;
 
 /**
  * Here is where your room implementation lives. The WebSocket endpoint
@@ -53,12 +64,40 @@ public class RoomImplementation {
 
 
     protected RoomDescription roomDescription = new RoomDescription();
+    private Database db;
+    private Map<String, String> nameToId = new ConcurrentHashMap<String, String>();
+    
+    final static String shoes[][] = {
+            {"Red Stilettos", "a beautiful pair of red stiletto heels."},
+            {"Pink GoGo Boots", "a shockingly high platformed pair of gogo boots."},
+            {"Green Strappy Sandals", "a curious combination seemingly held together by"+
+                                 " many tiny buckles."},
+            {"Blue Wedge Heels", "a deep blue pair of very high wedge heels."},
+            {"Black Oxfords", "a dull boring pair of oxfords, with a 5 inch heel."}
+    };
 
     @PostConstruct
-    protected void postConstruct() {
+    protected void postConstruct() throws MalformedURLException {
         // Customize the room
         roomDescription.addCommand("/ping", "Does this work?");
         Log.log(Level.INFO, this, "Room initialized: {0}", roomDescription);
+        String vcapServicesEnv = System.getenv("VCAP_SERVICES");
+        if (vcapServicesEnv == null) {
+            throw new RuntimeException("VCAP_SERVICES was not set, are we running in Bluemix?");
+        }
+        JsonObject vcapServices = Json.createReader(
+                              new StringReader(vcapServicesEnv)).readObject();
+        JsonArray serviceObjectArray = vcapServices.getJsonArray("cloudantNoSQLDB");
+        JsonObject serviceObject = serviceObjectArray.getJsonObject(0);
+        JsonObject credentials = serviceObject.getJsonObject("credentials");
+        String username = credentials.getJsonString("username").getString();
+        String password = credentials.getJsonString("password").getString();
+        String url = credentials.getJsonString("url").getString();
+        CloudantClient client = ClientBuilder.url(new URL(url))
+            .username(username)
+            .password(password)
+            .build();
+        db = client.database("shoes", true);
     }
 
     @PreDestroy
@@ -73,7 +112,7 @@ public class RoomImplementation {
         JsonObject messageBody = message.getParsedBody();
         String userId = messageBody.getString(Message.USER_ID);
         String username = messageBody.getString(Message.USERNAME);
-
+        nameToId.put(username.toLowerCase(), userId);
         Log.log(Level.FINEST, this, "Received message from {0}({1}): {2}", username, userId, messageBody);
 
         // Who doesn't love switch on strings in Java 8?
@@ -122,6 +161,7 @@ public class RoomImplementation {
                     Message.createBroadcastEvent(
                             String.format(GOODBYE_ALL, username),
                             userId, GOODBYE_USER));
+            nameToId.remove(username.toLowerCase());
             break;
 
         case roomPart:
@@ -130,7 +170,7 @@ public class RoomImplementation {
             //		    "userId": "<userId>"
             //		}
             // See RoomImplementationTest#testRoomPart
-
+            nameToId.remove(username.toLowerCase());
             break;
 
         case room:
@@ -207,8 +247,22 @@ public class RoomImplementation {
                     // which includes the room description and inventory
                     endpoint.sendMessage(session, Message.createLocationMessage(userId, roomDescription));
                 } else {
-                    endpoint.sendMessage(session,
+                    String targetId = nameToId.get(remainder);
+                    if(targetId!=null){
+                        try {
+                            PlayerData pd = db.find(PlayerData.class,targetId);
+                            endpoint.sendMessage(session,
+                                    Message.createSpecificEvent(userId, remainder
+                                       +" is wearing "+pd.getShoeDesc()));
+                        } catch (NoDocumentException e){
+                            endpoint.sendMessage(session,
+                                    Message.createSpecificEvent(userId, remainder
+                                       +" does not seem to be wearing any shoes at the moment."));
+                        }
+                    } else {
+                        endpoint.sendMessage(session,
                             Message.createSpecificEvent(userId, LOOK_UNKNOWN));
+                    }
                 }
                 break;
 
@@ -225,7 +279,49 @@ public class RoomImplementation {
                 }
 
                 break;
+                
+            case "/listshoes" :
+                StringBuilder sb = new StringBuilder();
+                sb.append("There are the following shoes available;\n");
+                for(String[] shoe : shoes){
+                  sb.append("* \"");
+                  sb.append(shoe[0]);
+                  sb.append("\" - \"");
+                  sb.append(shoe[1]);
+                  sb.append("\"");
+                }
+                endpoint.sendMessage(session,
+                                   Message.createSpecificEvent(userId,
+                                   sb.toString()));
+                break;
 
+            case "/equip" :
+                if(remainder == null){
+                endpoint.sendMessage(session,
+                                     Message.createSpecificEvent(userId,
+                                     "Equip what? maybe try /listshoes, and pick a pair"));
+                }
+                for(String[] shoe : shoes){
+                    if(shoe[0].toLowerCase().equals(remainder)){
+                        endpoint.sendMessage(session,
+                                     Message.createSpecificEvent(userId,
+                                     "You are now wearing "+shoe[1]));
+                        PlayerData pd = new PlayerData();
+                        pd.set_id(userId);
+                        pd.setShoeName(shoe[0]);
+                        pd.setShoeDesc(shoe[1]);
+                        db.post(pd);
+                        
+                        return;
+                    }
+                }
+                //no match
+                endpoint.sendMessage(session,
+                                     Message.createSpecificEvent(userId,
+                                     "I couldn't find "+remainder+" to equip."+
+                                     " Maybe try /listshoes, and pick a pair"));
+                break;
+                
             default:
                 endpoint.sendMessage(session,
                         Message.createSpecificEvent(userId, String.format(UNKNOWN_COMMAND, content)));
