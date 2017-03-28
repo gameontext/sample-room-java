@@ -1,6 +1,6 @@
 # Game On! Microservices and Java
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4d099084aab34a57893e8fd29df79ae3)](https://www.codacy.com/app/gameontext/sample-room-java?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gameontext/sample-room-java&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f4e298d0b25849868cc9c0a16fd83485)](https://www.codacy.com/app/gameontext/sample-room-java?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gameontext/sample-room-java&amp;utm_campaign=Badge_Grade)
 [![Codecov Badge](https://codecov.io/gh/gameontext/sample-room-java/branch/master/graph/badge.svg)](https://codecov.io/gh/gameontext/sample-room-java)
 [Game On!](https://gameontext.org/) is both a sample microservices application, and a throwback text adventure brought to you by the WASdev team at IBM. This application demonstrates how microservice architectures work from two points of view:
 
