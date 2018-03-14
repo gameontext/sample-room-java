@@ -6,5 +6,6 @@
 .factorypath
 .*.swp
 /.classpath
+/.vscode
 docker-compose.override.yml
 /target
