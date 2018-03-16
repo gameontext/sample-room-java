@@ -54,7 +54,7 @@ For Game On! to include your room, you need to tell it where the publicly reacha
 
 Creating a Docker image is straight-up: `docker build .` right from the root menu.
 
-A `docker-compose.yml` file is also there, which can be used to specify overlay volumes to allow local development without restarting the container. See the [Advanced Adventure for local development with Docker](https://book.gameontext.org/walkthroughs/local-docker.html) for a more detailed walkthrough.
+A `docker-compose.yml` file is also there, which can be used to specify overlay volumes to allow local development without restarting the container. See [running with hot-reload](#running-with-hot-reload) for more details.
 
 ## Ok. So this thing is running... Now what?
 
@@ -94,6 +94,18 @@ Things you might try:
 * .. other [Advanced Adventures](https://book.gameontext.org/v/walkthrough/walkthroughs/createMore.html)!
 
 Remember our https://gameontext.org/#/terms. Most importantly, there are kids around: make your parents proud.
+
+## Running the app with hot-reload
+
+Since this walkthrough is running on WebSphere Liberty we can set the app up for development without restarting the container. 
+
+First build the app with `mvn clean install -P looseApp`. This will create a `gojava-1.0-SNAPSHOT.war.xml` file in `target/wlp/usr/server/gojava-room/apps` rather than a packaged war. Now when you run `mvn compile` or if your IDE recompiles your code Liberty will pick up the change.
+
+To run this in a Docker container we need to mount the `classes` directory, `server` directory and `webapp` directory as volumes so the container will pick up the changes without needing a rebuild.
+
+Use the `docker-compose.override.yml.example` file as a guide and create a `docker-compose.override.yml` that mounts a volume with the files required by the `war.xml` file. The example override file also demonstrates how to add your container to the Game On Docker network so it can be accessed locally.
+
+ See the [Advanced Adventure for local development with Docker](https://book.gameontext.org/walkthroughs/local-docker.html) for a more detailed walkthrough.
 
 ## How the build works
 
