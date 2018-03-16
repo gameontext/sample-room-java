@@ -1,0 +1,12 @@
+version: '2'
+services:
+  gojava:
+    container_name: <container_name>
+    volumes:
+      - './target/wlp/usr/servers/gojava-room:/opt/ibm/wlp/usr/servers/defaultServer'
+      - './target/classes:<path>/gameontext/sample-room-java/target/classes'
+      - './src/main/webapp:<path>/gameontext/sample-room-java/src/main/webapp'
+networks:
+  default:
+    external:
+      name: docker_gameontext
