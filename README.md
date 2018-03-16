@@ -54,7 +54,7 @@ For Game On! to include your room, you need to tell it where the publicly reacha
 
 Creating a Docker image is straight-up: `docker build .` right from the root menu.
 
-A `docker-compose.yml` file is also there, which can be used to specify overlay volumes to allow local development without restarting the container. See [running with hot-reload](#running-with-hot-reload) for more details.
+A `docker-compose.yml` file is also there, which can be used to specify overlay volumes to allow local development without restarting the container. See [running with hot-reload](#running-the-app-with-hot-reload) for more details.
 
 ## Ok. So this thing is running... Now what?
 
