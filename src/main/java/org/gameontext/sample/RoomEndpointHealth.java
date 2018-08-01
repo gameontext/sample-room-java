@@ -16,22 +16,33 @@
 package org.gameontext.sample;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import javax.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.health.Health;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
 
-@Path("/health")
-public class HealthEndpoint {
+@Health
+@ApplicationScoped
+public class RoomEndpointHealth implements HealthCheck {
 
     @Inject
     private RoomImplementation roomImplementation;
 
-    @GET
-    public Response health() {
+    public boolean isHealthy() {
         if ( roomImplementation != null && roomImplementation.ok() ) {
-            return Response.ok("OK").build();
+            return true;
         }
-        return Response.status(Status.SERVICE_UNAVAILABLE).build();
+        return false;
+    }
+
+    @Override
+    public HealthCheckResponse call() {
+      if (!isHealthy()) {
+        return HealthCheckResponse.named(RoomDescription.class.getSimpleName())
+                                  .withData("services", "not available").down()
+                                  .build();
+      }
+      return HealthCheckResponse.named(RoomDescription.class.getSimpleName())
+                                .withData("services", "available").up().build();
     }
 }

@@ -35,6 +35,10 @@ import javax.websocket.server.ServerEndpoint;
 import org.gameontext.sample.Log;
 import org.gameontext.sample.RoomImplementation;
 
+import org.eclipse.microprofile.metrics.annotation.Timed;
+import org.eclipse.microprofile.metrics.annotation.Metered;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+
 /**
  * This is the WebSocket endpoint for a room. Java EE WebSockets
  * use simple annotations for event driven methods. An instance of this class
@@ -47,6 +51,16 @@ public class RoomEndpoint {
     @Inject
     protected RoomImplementation roomImplementation;
 
+    @Timed(name = "websocket_onOpen_timer",
+        reusable = true,
+        tags = "label=websocket")
+    @Counted(name = "websocket_onOpen_count",
+        monotonic = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Metered(name = "websocket_onOpen_meter",
+        reusable = true,
+        tags = "label=websocket")
     @OnOpen
     public void onOpen(Session session, EndpointConfig ec) {
         Log.log(Level.FINE, this, "A new connection has been made to the room.");
@@ -55,11 +69,31 @@ public class RoomEndpoint {
         sendMessage(session, Message.ACK_MSG);
     }
 
+    @Timed(name = "websocket_onClose_timer",
+        reusable = true,
+        tags = "label=websocket")
+    @Counted(name = "websocket_onClose_count",
+        monotonic = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Metered(name = "websocket_onClose_meter",
+        reusable = true,
+        tags = "label=websocket")
     @OnClose
     public void onClose(Session session, CloseReason r) {
         Log.log(Level.FINE, this, "A connection to the room has been closed with reason " + r);
     }
 
+    @Timed(name = "websocket_onError_timer",
+        reusable = true,
+        tags = "label=websocket")
+    @Counted(name = "websocket_onError_count",
+        monotonic = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Metered(name = "websocket_onError_meter",
+        reusable = true,
+        tags = "label=websocket")
     @OnError
     public void onError(Session session, Throwable t) {
         Log.log(Level.FINE, this, "A problem occurred on connection", t);
@@ -77,6 +111,16 @@ public class RoomEndpoint {
      * @param message
      * @throws IOException
      */
+    @Timed(name = "websocket_onMessage_timer",
+        reusable = true,
+        tags = "label=websocket")
+    @Counted(name = "websocket_onMessage_count",
+        monotonic = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Metered(name = "websocket_onMessage_meter",
+        reusable = true,
+        tags = "label=websocket")
     @OnMessage
     public void receiveMessage(Session session, Message message) throws IOException {
         roomImplementation.handleMessage(session, message, this);
@@ -94,6 +138,16 @@ public class RoomEndpoint {
      * @param message Message to send
      * @see #sendRemoteTextMessage(Session, Message)
      */
+    @Timed(name = "websocket_sendMessage_timer",
+        reusable = true,
+        tags = "label=websocket")
+    @Counted(name = "websocket_sendMessage_count",
+        monotonic = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Metered(name = "websocket_sendMessage_meter",
+        reusable = true,
+        tags = "label=websocket")
     public void sendMessage(Session session, Message message) {
         for (Session s : session.getOpenSessions()) {
             sendMessageToSession(s, message);
