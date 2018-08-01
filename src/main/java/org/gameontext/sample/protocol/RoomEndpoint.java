@@ -35,6 +35,10 @@ import javax.websocket.server.ServerEndpoint;
 import org.gameontext.sample.Log;
 import org.gameontext.sample.RoomImplementation;
 
+import org.eclipse.microprofile.metrics.annotation.Timed;
+import org.eclipse.microprofile.metrics.annotation.Metered;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+
 /**
  * This is the WebSocket endpoint for a room. Java EE WebSockets
  * use simple annotations for event driven methods. An instance of this class
@@ -47,6 +51,14 @@ public class RoomEndpoint {
     @Inject
     protected RoomImplementation roomImplementation;
 
+    @Timed(name = "onOpenTimer",
+        absolute = true,
+        description = "Time needed to create a connection to the room and display a message")
+    @Counted(name = "onOpenCount",
+        absolute = false,
+        monotonic = true,
+        description = "Number of times the onOpen() method is called")
+    @Metered(name = "onOpenMeter")
     @OnOpen
     public void onOpen(Session session, EndpointConfig ec) {
         Log.log(Level.FINE, this, "A new connection has been made to the room.");

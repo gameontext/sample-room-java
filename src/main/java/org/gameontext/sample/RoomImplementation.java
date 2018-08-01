@@ -27,6 +27,10 @@ import javax.websocket.Session;
 import org.gameontext.sample.protocol.Message;
 import org.gameontext.sample.protocol.RoomEndpoint;
 
+import org.eclipse.microprofile.metrics.annotation.Timed;
+import org.eclipse.microprofile.metrics.annotation.Metered;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+
 /**
  * Here is where your room implementation lives. The WebSocket endpoint
  * is defined in {@link RoomEndpoint}, with {@link Message} as the text-based
@@ -52,6 +56,14 @@ public class RoomImplementation {
 
     protected RoomDescription roomDescription = new RoomDescription();
 
+    @Timed(name = "postConstructTimer",
+        absolute = true,
+        description = "Time needed to finish postConstruct method")
+    @Counted(name = "postConstructCount",
+        absolute = false,
+        monotonic = true,
+        description = "Number of times the postConstruct() method is called")
+    @Metered(name = "postConstructMeter")
     @PostConstruct
     protected void postConstruct() {
         // Customize the room
@@ -59,11 +71,27 @@ public class RoomImplementation {
         Log.log(Level.INFO, this, "Room initialized: {0}", roomDescription);
     }
 
+    @Timed(name = "preDestroyTimer",
+        absolute = true,
+        description = "Time needed to finish preDestroy method")
+    @Counted(name = "preDestroyCount",
+        absolute = false,
+        monotonic = true,
+        description = "Number of times the preDestroy() method is called")
+    @Metered(name = "preDestroyMeter")
     @PreDestroy
     protected void preDestroy() {
         Log.log(Level.FINE, this, "Room to be destroyed");
     }
 
+    @Timed(name = "handleMessageTimer",
+        absolute = true,
+        description = "Time needed to process a message through handleMessage")
+    @Counted(name = "handleMessageCount",
+        absolute = false,
+        monotonic = true,
+        description = "Number of times the handleMessage() method is called")
+    @Metered(name = "handleMessageMeter")
     public void handleMessage(Session session, Message message, RoomEndpoint endpoint) {
         // Fetch the userId and the username of the sender.
         // The username can change overtime, so always use the sent username when
@@ -157,6 +185,14 @@ public class RoomImplementation {
         }
     }
 
+    @Timed(name = "processCommandTimer",
+        absolute = true,
+        description = "Time needed to process a command with processCommand()")
+    @Counted(name = "processCommandCount",
+        absolute = false,
+        monotonic = true,
+        description = "Number of times the processCommand() method is called")
+    @Metered(name = "processCommandMeter")
     private void processCommand(String userId, String username, String content, RoomEndpoint endpoint, Session session) {
         // Work mostly off of lower case.
         String contentToLower = content.toLowerCase(Locale.ENGLISH).trim();
@@ -242,6 +278,11 @@ public class RoomImplementation {
      * @param lowerDirection String read from the provided message
      * @return exit id or null
      */
+
+    @Counted(name = "getExitIdCount",
+        absolute = false,
+        monotonic = true,
+        description = "Number of times the getExitId() method is called")
     protected String getExitId(String lowerDirection) {
         if (lowerDirection == null) {
             return null;
@@ -272,6 +313,10 @@ public class RoomImplementation {
      * @param exitId The exitId in lower case
      * @return A pretty version of the direction for use in the exit message.
      */
+    @Counted(name = "prettyDirectionCount",
+        absolute = false,
+        monotonic = true,
+        description = "Number of times the prettyDirection() method is called")
     protected String prettyDirection(String exitId) {
         switch(exitId) {
             case "n" : return "North";
