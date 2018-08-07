@@ -51,14 +51,12 @@ public class RoomEndpoint {
     @Inject
     protected RoomImplementation roomImplementation;
 
-    @Timed(name = "onOpenTimer",
-        absolute = true,
-        description = "Time needed to create a connection to the room and display a message")
-    @Counted(name = "onOpenCount",
+    @Timed(name = "websocket_open_seconds",
+        absolute = true)
+    @Counted(name = "websocket_open_total",
         absolute = false,
-        monotonic = true,
-        description = "Number of times the onOpen() method is called")
-    @Metered(name = "onOpenMeter")
+        monotonic = true)
+    @Metered(name = "websocket_open_seconds_average")
     @OnOpen
     public void onOpen(Session session, EndpointConfig ec) {
         Log.log(Level.FINE, this, "A new connection has been made to the room.");
@@ -67,23 +65,23 @@ public class RoomEndpoint {
         sendMessage(session, Message.ACK_MSG);
     }
 
-    @Counted(name = "onCloseCount",
+    @Timed(name = "websocket_close_seconds",
+        absolute = true)
+    @Counted(name = "websocket_close_total",
         absolute = false,
-        monotonic = true,
-        description = "Number of times the onClose() method is called")
+        monotonic = true)
+    @Metered(name = "websocket_close_seconds_average")
     @OnClose
     public void onClose(Session session, CloseReason r) {
         Log.log(Level.FINE, this, "A connection to the room has been closed with reason " + r);
     }
 
-    @Timed(name = "onErrorTimer",
-        absolute = true,
-        description = "Time needed to close the session when an error is encountered")
-    @Counted(name = "onErrorCount",
+    @Timed(name = "websocket_error_seconds",
+        absolute = true)
+    @Counted(name = "websocket_error_total",
         absolute = false,
-        monotonic = true,
-        description = "Number of times the onError() method is called")
-    @Metered(name = "onErrorMeter")
+        monotonic = true)
+    @Metered(name = "websocket_error_seconds_average")
     @OnError
     public void onError(Session session, Throwable t) {
         Log.log(Level.FINE, this, "A problem occurred on connection", t);
@@ -101,14 +99,12 @@ public class RoomEndpoint {
      * @param message
      * @throws IOException
      */
-    @Timed(name = "receiveMessageTimer",
-        absolute = true,
-        description = "Time needed handle a message when received")
-    @Counted(name = "receiveMessageCount",
+    @Timed(name = "websocket_message_seconds",
+        absolute = true)
+    @Counted(name = "websocket_message_count",
         absolute = false,
-        monotonic = true,
-        description = "Number of times the receiveMessage() method is called")
-    @Metered(name = "receiveMessageMeter")
+        monotonic = true)
+    @Metered(name = "websocket_message_seconds_average")
     @OnMessage
     public void receiveMessage(Session session, Message message) throws IOException {
         roomImplementation.handleMessage(session, message, this);
@@ -126,14 +122,12 @@ public class RoomEndpoint {
      * @param message Message to send
      * @see #sendRemoteTextMessage(Session, Message)
      */
-    @Timed(name = "sendMessageTimer",
-        absolute = true,
-        description = "Time needed send a message")
-    @Counted(name = "sendMessageCount",
+    @Timed(name = "room_message_seconds",
+        absolute = true)
+    @Counted(name = "room_message_count",
         absolute = false,
-        monotonic = true,
-        description = "Number of times the sendMessage() method is called")
-    @Metered(name = "sendMessageMeter")
+        monotonic = true)
+    @Metered(name = "room_message_seconds_average")
     public void sendMessage(Session session, Message message) {
         for (Session s : session.getOpenSessions()) {
             sendMessageToSession(s, message);
@@ -148,14 +142,6 @@ public class RoomEndpoint {
      * @param message Message to send
      * @return true if send was successful, or false if it failed
      */
-    @Timed(name = "sendMessageToSessionTimer",
-        absolute = true,
-        description = "Time needed send a message to the session")
-    @Counted(name = "sendMessageToSessionCount",
-        absolute = false,
-        monotonic = true,
-        description = "Number of times the sendMessageToSession() method is called")
-    @Metered(name = "sendMessageToSessionMeter")
     private boolean sendMessageToSession(Session session, Message message) {
         if (session.isOpen()) {
             try {
@@ -180,10 +166,6 @@ public class RoomEndpoint {
      * @param message String to trim
      * @return a string no longer than 123 characters (limit of value length for {@code CloseReason})
      */
-    @Counted(name = "trimReasonCount",
-        absolute = false,
-        monotonic = true,
-        description = "Number of times the trimReason() method is called")
     private String trimReason(String message) {
         return message.length() > 123 ? message.substring(0, 123) : message;
     }
@@ -194,14 +176,6 @@ public class RoomEndpoint {
      * @param s  Session to close
      * @param reason {@link CloseReason} the WebSocket is closing.
      */
-    @Timed(name = "tryToCloseTimer",
-        absolute = true,
-        description = "Time needed to try to close a session")
-    @Counted(name = "tryToCloseCount",
-        absolute = false,
-        monotonic = true,
-        description = "Number of times the tryToClose() method is called")
-    @Metered(name = "tryToCloseMeter")
     public void tryToClose(Session s, CloseReason reason) {
         try {
             s.close(reason);
@@ -216,14 +190,6 @@ public class RoomEndpoint {
      *
      * @param c Closable to close
      */
-    @Timed(name = "tryToCloseCloseableTimer",
-        absolute = true,
-        description = "Time needed to try to close a Closeable")
-    @Counted(name = "tryToCloseCloseableCount",
-        absolute = false,
-        monotonic = true,
-        description = "Number of times the tryToClose() method is called with a Closeable")
-    @Metered(name = "tryToCloseCloseableMeter")
     public void tryToClose(Closeable c) {
         if (c != null) {
             try {

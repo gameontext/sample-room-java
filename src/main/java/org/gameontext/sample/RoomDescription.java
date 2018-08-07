@@ -58,11 +58,6 @@ public class RoomDescription {
     /**
      * @return The room's short name
      */
-     @Counted(name="getName.counted",
-             absolute = true,
-             displayName="getName Count",
-             description="Number of times getName is called",
-             monotonic=true)
     public String getName() {
         return name;
     }
@@ -71,11 +66,6 @@ public class RoomDescription {
      * The name for a room should match the
      * name it was registered with.
      */
-     @Counted(name="setName.counted",
-             absolute = true,
-             displayName="setName Count",
-             description="Number of times setName is called.",
-             monotonic=true)
     public void setName(String name){
         if(name!=null){
           this.name = name;
@@ -85,11 +75,6 @@ public class RoomDescription {
     /**
      * @return The room's long name
      */
-     @Counted(name="getFullName.counted",
-             absolute = true,
-             displayName="getFullName Count",
-             description="Number of times getFullName is called.",
-             monotonic=true)
     public String getFullName() {
         return fullName;
     }
@@ -98,31 +83,16 @@ public class RoomDescription {
      * The display name for a room can change at any time.
      * @param fullName A new display name for the room
      */
-     @Counted(name="setFullName.counted",
-             absolute = true,
-             displayName="setFullName Count",
-             description="Number of times setFullName is called.",
-             monotonic=true)
     public void setFullName(String fullName) {
         if(fullName!=null){
           this.fullName = fullName;
         }
     }
 
-    @Counted(name="getDescription.counted",
-            absolute = true,
-            displayName="getDescription Count",
-            description="Number of times getDescription is called.",
-            monotonic=true)
     public String getDescription() {
         return description;
     }
 
-    @Counted(name="setDescription.counted",
-            absolute = true,
-            displayName="setDescription Count",
-            description="Number of times setDescription is called.",
-            monotonic=true)
     public void setDescription(String description) {
         if(description!=null){
           this.description = description;
@@ -134,18 +104,6 @@ public class RoomDescription {
      * commands and a description of what they do for use in location messages
      * @return JsonObject containing custom room commands. Never null.
      */
-     @Timed(name = "getCommands.timer",
-             absolute = true,
-             displayName="getCommands Timer",
-             description = "Time taken by getCommands")
-     @Counted(name="getCommands.counted",
-             absolute = true,
-             displayName="getCommands Count",
-             description="Number of times getCommands is called.",
-             monotonic=true)
-     @Metered(name="getCommands",
-             displayName="getCommands Frequency",
-             description="Average time to call getCommands")
     public JsonObject getCommands() {
         JsonObject obj = commandObj;
 
@@ -160,11 +118,6 @@ public class RoomDescription {
         return obj;
     }
 
-    @Counted(name="addCommand.counted",
-            absolute = true,
-            displayName="addCommand Count",
-            description="Number of times addCommand is called.",
-            monotonic=true)
     public void addCommand(String command, String description) {
         if ( description == null ) {
             throw new IllegalArgumentException("description is required");
@@ -173,11 +126,6 @@ public class RoomDescription {
         commandObj = null;
     }
 
-    @Counted(name="removeCommand.counted",
-            absolute = true,
-            displayName="removeCommand Count",
-            description="Number of times removeCommand is called.",
-            monotonic=true)
     public void removeCommand(String command) {
         commands.remove(command);
         commandObj = null;
@@ -188,18 +136,6 @@ public class RoomDescription {
      * items in the room for use in location messages.
      * @return JsonArray containing room inventory. Never null
      */
-     @Timed(name = "getInventory.timer",
-             absolute = true,
-             displayName="getInventory Timer",
-             description = "Time taken by getInventory")
-     @Counted(name="getInventory.counted",
-             absolute = true,
-             displayName="getInventory Count",
-             description="Number of times getInventory is called.",
-             monotonic=true)
-     @Metered(name="getInventory",
-             displayName="getInventory Frequency",
-             description="Average time to call getInventory")
     public JsonArray getInventory() {
         JsonArray arr = itemObj;
 
@@ -214,21 +150,11 @@ public class RoomDescription {
         return arr;
     }
     
-    @Counted(name="addItem.counted",
-            absolute = true,
-            displayName="addItem Count",
-            description="Number of times addItem is called.",
-            monotonic=true)
     public void addItem(String itemName) {
         items.add(itemName);
         itemObj = null;
     }
     
-    @Counted(name="removeItem.counted",
-            absolute = true,
-            displayName="removeItem Count",
-            description="Number of times removeItem is called.",
-            monotonic=true)
     public void removeItem(String itemName) {
         items.remove(itemName);
         itemObj = null;
