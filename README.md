@@ -121,7 +121,7 @@ MicroProfile is an open platform that optimizes the Enterprise Java for microser
 ### Features
 [MicroProfile Metrics](https://github.com/eclipse/microprofile-metrics) - This feature allows us to expose telemetry data. Using this, developers can monitor their services with the help of metrics.
 
-In our sample application, we used @Timed, @Counted and @Metered annotations. These metrics are reused using reuse functionality. We also integrated Microprofile metrics with Prometheus. To access these features, access the metrics endpoint at `/metrics` on the https port that is running.
+In our sample application, we used @Timed, @Counted and @Metered annotations.To access these features, access the metrics endpoint at `/metrics` on the https port that is running.
 
 ### Testing
 
