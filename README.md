@@ -97,7 +97,7 @@ Remember our https://gameontext.org/#/terms. Most importantly, there are kids ar
 
 ## Running the app with hot-reload
 
-Since this walkthrough is running on WebSphere Liberty we can set the app up for development without restarting the container. 
+Since this walkthrough is running on WebSphere Liberty we can set the app up for development without restarting the container.
 
 First build the app with `mvn clean install -P looseApp`. This will create a `gojava-1.0-SNAPSHOT.war.xml` file in `target/wlp/usr/server/gojava-room/apps` rather than a packaged war. Now when you run `mvn compile` or if your IDE recompiles your code Liberty will pick up the change.
 
@@ -114,6 +114,14 @@ This project is built using Maven and makes use of the [Liberty Maven plugin](ht
 ### Server feature definitions
 
 For those of you familiar with the Liberty server configuration you will know that features are enabled in the server by adding a <featureManager/> element to the server.xml. For this project the <featureManager/> is provided by snippets from the [Liberty app accelerator](http://liberty-app-accelerator.wasdev.developer.ibm.com/start/). This means that there is no <featureManager/> element in the [server.xml](src/main/liberty/config/server.xml) file. When the build is run these will appear in the server's configDropins/defaults directory.
+
+## [MicroProfile](https://microprofile.io/)
+MicroProfile is an open platform that optimizes the Enterprise Java for microservices architecture. In this application, we are using [**MicroProfile 1.3**](https://github.com/eclipse/microprofile-bom).
+
+### Features
+[MicroProfile Metrics](https://github.com/eclipse/microprofile-metrics) - This feature allows us to expose telemetry data. Using this, developers can monitor their services with the help of metrics.
+
+In our sample application, we used @Timed, @Counted and @Metered annotations. These metrics are reused using reuse functionality. We also integrated Microprofile metrics with Prometheus. To access these features, access the metrics endpoint at `/metrics` on the https port that is running.
 
 ### Testing
 
