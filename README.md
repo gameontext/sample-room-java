@@ -107,6 +107,16 @@ Use the `docker-compose.override.yml.example` file as a guide and create a `dock
 
  See the [Advanced Adventure for local development with Docker](https://book.gameontext.org/walkthroughs/local-docker.html) for a more detailed walkthrough.
 
+## [MicroProfile](https://microprofile.io/)
+MicroProfile is an open platform that optimizes the Enterprise Java for microservices architecture. In this application, we are using [**MicroProfile 1.3**](https://github.com/eclipse/microprofile-bom).
+
+### Features
+[MicroProfile Metrics](https://github.com/eclipse/microprofile-metrics) - This feature allows us to expose telemetry data. Using this, developers can monitor their services with the help of metrics.
+
+The application uses @Timed, @Counted and @Metered metrics.To access these metrics, go to [https://localhost:9443/metrics](https://localhost:9443/metrics).
+Metrics is configured with SSL and can only be accessed through https. You will need to login using the username and password configured in the server.xml.
+The default values are `admin` and `password`.
+
 ## How the build works
 
 This project is built using Maven and makes use of the [Liberty Maven plugin](https://github.com/WASdev/ci.maven) and the [Cloud Foundry Maven plugin](https://docs.run.pivotal.io/buildpacks/java/build-tool-int.html#maven) to integrate with Liberty and Bluemix.
@@ -114,14 +124,6 @@ This project is built using Maven and makes use of the [Liberty Maven plugin](ht
 ### Server feature definitions
 
 For those of you familiar with the Liberty server configuration you will know that features are enabled in the server by adding a <featureManager/> element to the server.xml. For this project the <featureManager/> is provided by snippets from the [Liberty app accelerator](http://liberty-app-accelerator.wasdev.developer.ibm.com/start/). This means that there is no <featureManager/> element in the [server.xml](src/main/liberty/config/server.xml) file. When the build is run these will appear in the server's configDropins/defaults directory.
-
-## [MicroProfile](https://microprofile.io/)
-MicroProfile is an open platform that optimizes the Enterprise Java for microservices architecture. In this application, we are using [**MicroProfile 1.3**](https://github.com/eclipse/microprofile-bom).
-
-### Features
-[MicroProfile Metrics](https://github.com/eclipse/microprofile-metrics) - This feature allows us to expose telemetry data. Using this, developers can monitor their services with the help of metrics.
-
-In our sample application, we used @Timed, @Counted and @Metered annotations.To access these features, access the metrics endpoint at `/metrics` on the https port that is running.
 
 ### Testing
 
