@@ -97,7 +97,7 @@ Remember our https://gameontext.org/#/terms. Most importantly, there are kids ar
 
 ## Running the app with hot-reload
 
-Since this walkthrough is running on WebSphere Liberty we can set the app up for development without restarting the container. 
+Since this walkthrough is running on WebSphere Liberty we can set the app up for development without restarting the container.
 
 First build the app with `mvn clean install -P looseApp`. This will create a `gojava-1.0-SNAPSHOT.war.xml` file in `target/wlp/usr/server/gojava-room/apps` rather than a packaged war. Now when you run `mvn compile` or if your IDE recompiles your code Liberty will pick up the change.
 
@@ -106,6 +106,15 @@ To run this in a Docker container we need to mount the `classes` directory, `ser
 Use the `docker-compose.override.yml.example` file as a guide and create a `docker-compose.override.yml` that mounts a volume with the files required by the `war.xml` file. The example override file also demonstrates how to add your container to the Game On Docker network so it can be accessed locally.
 
  See the [Advanced Adventure for local development with Docker](https://book.gameontext.org/walkthroughs/local-docker.html) for a more detailed walkthrough.
+
+## [MicroProfile](https://microprofile.io/)
+MicroProfile is an open platform that optimizes the Enterprise Java for microservices architecture. In this application, we are using [**MicroProfile 1.3**](https://github.com/eclipse/microprofile-bom).
+
+### Features
+[MicroProfile Metrics](https://github.com/eclipse/microprofile-metrics) - This feature allows us to expose telemetry data. Using this, developers can monitor their services with the help of metrics.
+
+The application uses the `Timed`, `Counted` and `Metered` metrics. To access these metrics, go to [https://localhost:9443/metrics](https://localhost:9443/metrics).
+The Metrics feature is configured with SSL and can only be accessed through https. You will need to login using the username and password configured in the server.xml. The default values are `admin` and `password`.
 
 ## How the build works
 
