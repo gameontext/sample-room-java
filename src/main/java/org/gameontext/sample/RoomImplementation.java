@@ -27,10 +27,6 @@ import javax.websocket.Session;
 import org.gameontext.sample.protocol.Message;
 import org.gameontext.sample.protocol.RoomEndpoint;
 
-import org.eclipse.microprofile.metrics.annotation.Timed;
-import org.eclipse.microprofile.metrics.annotation.Metered;
-import org.eclipse.microprofile.metrics.annotation.Counted;
-
 /**
  * Here is where your room implementation lives. The WebSocket endpoint
  * is defined in {@link RoomEndpoint}, with {@link Message} as the text-based

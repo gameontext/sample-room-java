@@ -26,12 +26,6 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
-import org.eclipse.microprofile.metrics.annotation.Counted;
-import org.eclipse.microprofile.metrics.annotation.Timed;
-import org.eclipse.microprofile.metrics.annotation.Gauge;
-import org.eclipse.microprofile.metrics.annotation.Metered;
-import org.eclipse.microprofile.metrics.MetricUnits;
-
 /**
  * This is how our room is described.
  *  - Update attributes dynamically in {@link RoomImplementation} as the room is used
@@ -149,12 +143,12 @@ public class RoomDescription {
 
         return arr;
     }
-    
+
     public void addItem(String itemName) {
         items.add(itemName);
         itemObj = null;
     }
-    
+
     public void removeItem(String itemName) {
         items.remove(itemName);
         itemObj = null;
