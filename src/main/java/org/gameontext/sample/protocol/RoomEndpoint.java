@@ -52,16 +52,13 @@ public class RoomEndpoint {
     protected RoomImplementation roomImplementation;
 
     @Timed(name = "websocket_onOpen_timer",
-        absolute = true,
         reusable = true,
         tags = "label=websocket")
     @Counted(name = "websocket_onOpen_count",
-        absolute = true,
         monotonic = true,
         reusable = true,
         tags = "label=websocket")
     @Metered(name = "websocket_onOpen_meter",
-        absolute = true,
         reusable = true,
         tags = "label=websocket")
     @OnOpen
@@ -73,16 +70,13 @@ public class RoomEndpoint {
     }
 
     @Timed(name = "websocket_onClose_timer",
-        absolute = true,
         reusable = true,
         tags = "label=websocket")
     @Counted(name = "websocket_onClose_count",
-        absolute = true,
         monotonic = true,
         reusable = true,
         tags = "label=websocket")
     @Metered(name = "websocket_onClose_meter",
-        absolute = true,
         reusable = true,
         tags = "label=websocket")
     @OnClose
@@ -91,16 +85,13 @@ public class RoomEndpoint {
     }
 
     @Timed(name = "websocket_onError_timer",
-        absolute = true,
         reusable = true,
         tags = "label=websocket")
     @Counted(name = "websocket_onError_count",
-        absolute = true,
         monotonic = true,
         reusable = true,
         tags = "label=websocket")
     @Metered(name = "websocket_onError_meter",
-        absolute = true,
         reusable = true,
         tags = "label=websocket")
     @OnError
@@ -121,16 +112,13 @@ public class RoomEndpoint {
      * @throws IOException
      */
     @Timed(name = "websocket_onMessage_timer",
-        absolute = true,
         reusable = true,
         tags = "label=websocket")
     @Counted(name = "websocket_onMessage_count",
-        absolute = true,
         monotonic = true,
         reusable = true,
         tags = "label=websocket")
     @Metered(name = "websocket_onMessage_meter",
-        absolute = true,
         reusable = true,
         tags = "label=websocket")
     @OnMessage
@@ -151,16 +139,13 @@ public class RoomEndpoint {
      * @see #sendRemoteTextMessage(Session, Message)
      */
     @Timed(name = "websocket_sendMessage_timer",
-        absolute = true,
         reusable = true,
         tags = "label=websocket")
     @Counted(name = "websocket_sendMessage_count",
-        absolute = true,
         monotonic = true,
         reusable = true,
         tags = "label=websocket")
     @Metered(name = "websocket_sendMessage_meter",
-        absolute = true,
         reusable = true,
         tags = "label=websocket")
     public void sendMessage(Session session, Message message) {
