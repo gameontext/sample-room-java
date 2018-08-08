@@ -113,7 +113,7 @@ MicroProfile is an open platform that optimizes the Enterprise Java for microser
 ### Features
 [MicroProfile Metrics](https://github.com/eclipse/microprofile-metrics) - This feature allows us to expose telemetry data. Using this, developers can monitor their services with the help of metrics.
 
-The application uses `Timed`, `Counted` and `Metered` metrics.To access these metrics, go to [https://localhost:9443/metrics](https://localhost:9443/metrics).
+The application uses the `Timed`, `Counted` and `Metered` metrics. To access these metrics, go to [https://localhost:9443/metrics](https://localhost:9443/metrics).
 The Metrics feature is configured with SSL and can only be accessed through https. You will need to login using the username and password configured in the server.xml. The default values are `admin` and `password`.
 
 ## How the build works
