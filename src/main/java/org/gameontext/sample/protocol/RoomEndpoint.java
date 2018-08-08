@@ -51,12 +51,19 @@ public class RoomEndpoint {
     @Inject
     protected RoomImplementation roomImplementation;
 
-    @Timed(name = "websocket_open_timer",
-        absolute = false)
-    @Counted(name = "websocket_open_count",
-        absolute = false,
-        monotonic = true)
-    @Metered(name = "websocket_open_meter")
+    @Timed(name = "websocket_onOpen_timer",
+        absolute = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Counted(name = "websocket_onOpen_count",
+        absolute = true,
+        monotonic = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Metered(name = "websocket_onOpen_meter",
+        absolute = true,
+        reusable = true,
+        tags = "label=websocket")
     @OnOpen
     public void onOpen(Session session, EndpointConfig ec) {
         Log.log(Level.FINE, this, "A new connection has been made to the room.");
@@ -65,23 +72,37 @@ public class RoomEndpoint {
         sendMessage(session, Message.ACK_MSG);
     }
 
-    @Timed(name = "websocket_close_timer",
-        absolute = false)
-    @Counted(name = "websocket_close_count",
-        absolute = false,
-        monotonic = true)
-    @Metered(name = "websocket_close_meter")
+    @Timed(name = "websocket_onClose_timer",
+        absolute = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Counted(name = "websocket_onClose_count",
+        absolute = true,
+        monotonic = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Metered(name = "websocket_onClose_meter",
+        absolute = true,
+        reusable = true,
+        tags = "label=websocket")
     @OnClose
     public void onClose(Session session, CloseReason r) {
         Log.log(Level.FINE, this, "A connection to the room has been closed with reason " + r);
     }
 
-    @Timed(name = "websocket_error_timer",
-        absolute = false)
-    @Counted(name = "websocket_error_count",
-        absolute = false,
-        monotonic = true)
-    @Metered(name = "websocket_error_meter")
+    @Timed(name = "websocket_onError_timer",
+        absolute = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Counted(name = "websocket_onError_count",
+        absolute = true,
+        monotonic = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Metered(name = "websocket_onError_meter",
+        absolute = true,
+        reusable = true,
+        tags = "label=websocket")
     @OnError
     public void onError(Session session, Throwable t) {
         Log.log(Level.FINE, this, "A problem occurred on connection", t);
@@ -99,12 +120,19 @@ public class RoomEndpoint {
      * @param message
      * @throws IOException
      */
-    @Timed(name = "websocket_message_timer",
-        absolute = false)
-    @Counted(name = "websocket_message_count",
-        absolute = false,
-        monotonic = true)
-    @Metered(name = "websocket_message_meter")
+    @Timed(name = "websocket_onMessage_timer",
+        absolute = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Counted(name = "websocket_onMessage_count",
+        absolute = true,
+        monotonic = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Metered(name = "websocket_onMessage_meter",
+        absolute = true,
+        reusable = true,
+        tags = "label=websocket")
     @OnMessage
     public void receiveMessage(Session session, Message message) throws IOException {
         roomImplementation.handleMessage(session, message, this);
@@ -122,12 +150,19 @@ public class RoomEndpoint {
      * @param message Message to send
      * @see #sendRemoteTextMessage(Session, Message)
      */
-    @Timed(name = "room_message_timer",
-        absolute = false)
-    @Counted(name = "room_message_counter",
-        absolute = false,
-        monotonic = true)
-    @Metered(name = "room_message_meter")
+    @Timed(name = "websocket_sendMessage_timer",
+        absolute = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Counted(name = "websocket_sendMessage_count",
+        absolute = true,
+        monotonic = true,
+        reusable = true,
+        tags = "label=websocket")
+    @Metered(name = "websocket_sendMessage_meter",
+        absolute = true,
+        reusable = true,
+        tags = "label=websocket")
     public void sendMessage(Session session, Message message) {
         for (Session s : session.getOpenSessions()) {
             sendMessageToSession(s, message);
