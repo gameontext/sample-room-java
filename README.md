@@ -111,10 +111,12 @@ Use the `docker-compose.override.yml.example` file as a guide and create a `dock
 MicroProfile is an open platform that optimizes the Enterprise Java for microservices architecture. In this application, we are using [**MicroProfile 1.3**](https://github.com/eclipse/microprofile-bom).
 
 ### Features
-[MicroProfile Metrics](https://github.com/eclipse/microprofile-metrics) - This feature allows us to expose telemetry data. Using this, developers can monitor their services with the help of metrics.
+1. [MicroProfile Metrics](https://github.com/eclipse/microprofile-metrics) - This feature allows us to expose telemetry data. Using this, developers can monitor their services with the help of metrics.
 
 The application uses the `Timed`, `Counted` and `Metered` metrics. To access these metrics, go to [https://localhost:9443/metrics](https://localhost:9443/metrics).
 The Metrics feature is configured with SSL and can only be accessed through https. You will need to login using the username and password configured in the server.xml. The default values are `admin` and `password`.
+
+2. [MicroProfile Health Check](https://github.com/eclipse/microprofile-health) - This feature helps us to determine the status of the service as well as its availability. This can be checked by accessing the `/health` endpoint.
 
 ## How the build works
 
