@@ -118,10 +118,9 @@ The Metrics feature is configured with SSL and can only be accessed through http
 
 2. [MicroProfile Health Check](https://github.com/eclipse/microprofile-health) - This feature helps determine the status of the service as well as its availability. This can be checked by accessing the `/health` endpoint.
 
-3. [MicroProfile Open Tracing](https://github.com/eclipse/microprofile-opentracing) -  This feature enables distributed tracing. It analyzes the transaction flow through Zipkin. It enables and allows for custom tracing of JAX-RS and non-JAX-RS methods.
+3. [MicroProfile Open Tracing](https://github.com/eclipse/microprofile-opentracing) -  This feature enables distributed tracing. It analyzes the transaction flow and allows for custom tracing of JAX-RS and non-JAX-RS methods.
 
-This application uses [Zipkin](https://zipkin.io/) as the distributed tracing system. The @Traced annotation is used to retrieve messages.
-To set up Zipkin locally, you will need to run it as a [Docker](https://www.docker.com/) container:
+We are using [Zipkin](https://zipkin.io/) as the distributed tracing system. To set up Zipkin locally, you will need to run it as a [Docker container](https://www.docker.com/):
 
 `docker run -d -p 9411:9411 openzipkin/zipkin`
 
