@@ -39,6 +39,12 @@ import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.metrics.annotation.Metered;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 
+import org.eclipse.microprofile.opentracing.Traced;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+
+import io.opentracing.ActiveSpan;
+import io.opentracing.Tracer;
+
 /**
  * This is the WebSocket endpoint for a room. Java EE WebSockets
  * use simple annotations for event driven methods. An instance of this class
@@ -51,6 +57,10 @@ public class RoomEndpoint {
     @Inject
     protected RoomImplementation roomImplementation;
 
+    @Inject
+    Tracer tracer;
+
+    @Traced
     @Timed(name = "websocket_onOpen_timer",
         reusable = true,
         tags = "label=websocket")
@@ -69,6 +79,7 @@ public class RoomEndpoint {
         sendMessage(session, Message.ACK_MSG);
     }
 
+    @Traced
     @Timed(name = "websocket_onClose_timer",
         reusable = true,
         tags = "label=websocket")
@@ -84,6 +95,7 @@ public class RoomEndpoint {
         Log.log(Level.FINE, this, "A connection to the room has been closed with reason " + r);
     }
 
+    @Traced
     @Timed(name = "websocket_onError_timer",
         reusable = true,
         tags = "label=websocket")
@@ -111,6 +123,7 @@ public class RoomEndpoint {
      * @param message
      * @throws IOException
      */
+    @Traced
     @Timed(name = "websocket_onMessage_timer",
         reusable = true,
         tags = "label=websocket")
@@ -138,6 +151,7 @@ public class RoomEndpoint {
      * @param message Message to send
      * @see #sendRemoteTextMessage(Session, Message)
      */
+    @Traced
     @Timed(name = "websocket_sendMessage_timer",
         reusable = true,
         tags = "label=websocket")
@@ -162,6 +176,7 @@ public class RoomEndpoint {
      * @param message Message to send
      * @return true if send was successful, or false if it failed
      */
+    @Traced
     private boolean sendMessageToSession(Session session, Message message) {
         if (session.isOpen()) {
             try {
@@ -186,6 +201,7 @@ public class RoomEndpoint {
      * @param message String to trim
      * @return a string no longer than 123 characters (limit of value length for {@code CloseReason})
      */
+    @Traced
     private String trimReason(String message) {
         return message.length() > 123 ? message.substring(0, 123) : message;
     }
@@ -196,6 +212,7 @@ public class RoomEndpoint {
      * @param s  Session to close
      * @param reason {@link CloseReason} the WebSocket is closing.
      */
+    @Traced
     public void tryToClose(Session s, CloseReason reason) {
         try {
             s.close(reason);
@@ -210,6 +227,7 @@ public class RoomEndpoint {
      *
      * @param c Closable to close
      */
+    @Traced
     public void tryToClose(Closeable c) {
         if (c != null) {
             try {
