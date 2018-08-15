@@ -116,7 +116,19 @@ MicroProfile is an open platform that optimizes the Enterprise Java for microser
 The application uses the `Timed`, `Counted` and `Metered` metrics. To access these metrics, go to [https://localhost:9443/metrics](https://localhost:9443/metrics).
 The Metrics feature is configured with SSL and can only be accessed through https. You will need to login using the username and password configured in the server.xml. The default values are `admin` and `password`.
 
-2. [MicroProfile Health Check](https://github.com/eclipse/microprofile-health) - This feature helps us to determine the status of the service as well as its availability. This can be checked by accessing the `/health` endpoint.
+2. [MicroProfile Health Check](https://github.com/eclipse/microprofile-health) - This feature helps determine the status of the service as well as its availability. This can be checked by accessing the `/health` endpoint.
+
+3. [MicroProfile Open Tracing](https://github.com/eclipse/microprofile-opentracing) -  This feature enables distributed tracing. It analyzes the transaction flow through Zipkin. It enables and allows for custom tracing of JAX-RS and non-JAX-RS methods.
+
+This application uses [Zipkin](https://zipkin.io/) as the distributed tracing system. The @Traced annotation is used to retrieve messages.
+
+## Setting up Zipkin
+
+This is an optional step.
+
+In our sample application, we used Zipkin as our distributed tracing system.
+
+If you want to access the traces for inventory service, run Zipkin as a docker container locally. You can find the instructions and more details [here](https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes/blob/microprofile/Zipkin/README.md)
 
 ## How the build works
 
