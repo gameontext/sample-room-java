@@ -121,14 +121,11 @@ The Metrics feature is configured with SSL and can only be accessed through http
 3. [MicroProfile Open Tracing](https://github.com/eclipse/microprofile-opentracing) -  This feature enables distributed tracing. It analyzes the transaction flow through Zipkin. It enables and allows for custom tracing of JAX-RS and non-JAX-RS methods.
 
 This application uses [Zipkin](https://zipkin.io/) as the distributed tracing system. The @Traced annotation is used to retrieve messages.
+To set up Zipkin locally, you will need to run it as a [Docker](https://www.docker.com/) container:
 
-## Setting up Zipkin
+`docker run -d -p 9411:9411 openzipkin/zipkin`
 
-This is an optional step.
-
-In our sample application, we used Zipkin as our distributed tracing system.
-
-If you want to access the traces for inventory service, run Zipkin as a docker container locally. You can find the instructions and more details [here](https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes/blob/microprofile/Zipkin/README.md)
+You can find the detailed instructions [here](https://zipkin.io/pages/quickstart).
 
 ## How the build works
 
