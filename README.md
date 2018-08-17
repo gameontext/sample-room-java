@@ -126,6 +126,14 @@ We are using [Zipkin](https://zipkin.io/) as the distributed tracing system. To 
 
 You can find the detailed instructions [here](https://zipkin.io/pages/quickstart).
 
+To continue experimenting with other MicroProfile capabilities, check out the guides below to learn more:
+
+1. [MicroProfile Rest Client](https://openliberty.io/guides/microprofile-rest-client.html)
+
+2. [MicroProfile OpenAPI](https://openliberty.io/guides/microprofile-openapi.html)
+
+3. [MicroProfile Fault Tolerance](https://openliberty.io/guides/microprofile-fallback.html)
+
 ## How the build works
 
 This project is built using Maven and makes use of the [Liberty Maven plugin](https://github.com/WASdev/ci.maven) and the [Cloud Foundry Maven plugin](https://docs.run.pivotal.io/buildpacks/java/build-tool-int.html#maven) to integrate with Liberty and Bluemix.
