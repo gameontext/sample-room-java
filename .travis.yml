@@ -11,6 +11,3 @@ jdk:
 
 script:
   - mvn clean test integration-test
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
